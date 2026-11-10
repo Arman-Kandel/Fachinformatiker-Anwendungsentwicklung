@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
-import { buildExamDeck, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, validateModule } from '../src/lib/learning';
+import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
@@ -101,6 +101,26 @@ describe('learning logic', () => {
     );
 
     expect(examDeck).toEqual(['q3', 'q1']);
+  });
+
+  it('builds a module overview for the curriculum', () => {
+    const overview = buildModuleOverview(
+      [
+        { moduleId: 'ap1-01-datenmodellierung', exam: 'AP1', title: 'Datenmodellierung', difficulty: 'mittel', status: 'draft', tags: [], learningObjectives: [], dependencies: [], sourceRefs: [], sections: [] },
+        { moduleId: 'ap1-02-sql', exam: 'AP1', title: 'SQL-Grundlagen', difficulty: 'mittel', status: 'draft', tags: [], learningObjectives: [], dependencies: [], sourceRefs: [], sections: [] },
+      ],
+      {
+        'ap1-01-datenmodellierung': { moduleId: 'ap1-01-datenmodellierung', seen: 4, correct: 3, total: 4, lastPracticedAt: '2026-11-10T12:00:00.000Z', status: 'completed' },
+        'ap1-02-sql': { moduleId: 'ap1-02-sql', seen: 1, correct: 1, total: 3, lastPracticedAt: '2026-11-10T12:00:00.000Z', status: 'in-progress' },
+      },
+    );
+
+    expect(overview[0]?.title).toBe('Datenmodellierung');
+    expect(overview[0]?.percent).toBe(75);
+    expect(overview[0]?.mastery).toBe('ready');
+    expect(overview[1]?.title).toBe('SQL-Grundlagen');
+    expect(overview[1]?.percent).toBe(33);
+    expect(overview[1]?.mastery).toBe('learning');
   });
 
   it('persists and loads app state from local storage', () => {

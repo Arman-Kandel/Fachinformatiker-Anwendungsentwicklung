@@ -167,6 +167,48 @@ button.primary {
   gap: 14px;
 }
 
+.overview-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.overview-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 120px;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--purple-soft);
+  font-size: 0.76rem;
+}
+
+.overview-pill.done {
+  border-color: rgba(126, 240, 176, 0.45);
+  background: rgba(126, 240, 176, 0.08);
+}
+
+.mini-progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.mini-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #b78cff, #7ef0b0);
+}
+
 .study-panel {
   display: grid;
   gap: 14px;

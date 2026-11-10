@@ -1,8 +1,8 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
-import { buildExamDeck, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, getQuestionById, validateModule } from './lib/learning';
-import type { AppState, Module, ModuleProgress, Question } from './types';
+import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, getQuestionById, validateModule } from './lib/learning';
+import type { AppState, Module, ModuleOverview, ModuleProgress, Question } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
 const moduleCatalog = getModuleCatalog();
@@ -109,6 +109,17 @@ function renderSourceRefs(sourceRefs: Array<{ sourceId: string; quote: string; s
 
 function renderModuleCard(item: (typeof moduleIndex)[number]): string {
   const active = item.moduleId === state.selectedModuleId;
+  const sourceModule = getModuleById(item.moduleId);
+  const overview = buildModuleOverview(moduleCatalog, state.moduleProgress).find((entry) => entry.moduleId === item.moduleId) ?? {
+    moduleId: item.moduleId,
+    title: item.title,
+    exam: sourceModule?.exam ?? 'AP1',
+    difficulty: sourceModule?.difficulty ?? item.difficulty,
+    percent: 0,
+    mastery: 'starter',
+    status: 'not-started',
+  } satisfies ModuleOverview;
+
   return `
     <button class="module-card ${active ? 'active' : ''}" type="button" data-module-id="${item.moduleId}">
       <div class="module-topline">
@@ -116,7 +127,10 @@ function renderModuleCard(item: (typeof moduleIndex)[number]): string {
         <span>${item.estimatedMinutes} min</span>
       </div>
       <strong>${item.title}</strong>
-      <small>${item.sourceRefs[0]?.sourceId ?? 'FIAUSBV'}</small>
+      <small>${item.sourceRefs[0]?.sourceId ?? 'FIAUSBV'} · ${overview.mastery}</small>
+      <div class="mini-progress">
+        <span style="width: ${overview.percent}%"></span>
+      </div>
     </button>
   `;
 }
@@ -214,6 +228,18 @@ function render(): void {
           <div class="section-head">
             <h2>Module</h2>
             <span class="pill">${moduleCatalog.length} Inhalte</span>
+          </div>
+          <div class="overview-strip">
+            ${buildModuleOverview(moduleCatalog, state.moduleProgress)
+              .map(
+                (entry) => `
+                  <div class="overview-pill ${entry.status === 'completed' ? 'done' : ''}">
+                    <span>${entry.title}</span>
+                    <strong>${entry.percent}%</strong>
+                  </div>
+                `,
+              )
+              .join('')}
           </div>
           <div class="module-grid">
             ${moduleIndex.map(renderModuleCard).join('')}

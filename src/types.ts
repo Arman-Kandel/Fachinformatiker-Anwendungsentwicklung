@@ -59,6 +59,16 @@ export type ModuleProgress = {
   status: 'not-started' | 'in-progress' | 'completed';
 };
 
+export type ModuleOverview = {
+  moduleId: string;
+  title: string;
+  exam: string;
+  difficulty: string;
+  percent: number;
+  mastery: 'starter' | 'learning' | 'ready' | 'mastered';
+  status: 'not-started' | 'in-progress' | 'completed';
+};
+
 export type AppState = {
   resumeModuleId: string | null;
   currentQuestionId: string | null;

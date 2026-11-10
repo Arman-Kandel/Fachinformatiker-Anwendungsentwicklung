@@ -1,4 +1,4 @@
-import type { Module, ModuleProgress, Question, SourceRef } from '../types';
+import type { Module, ModuleOverview, ModuleProgress, Question, SourceRef } from '../types';
 
 export type MasteryLevel = 'starter' | 'learning' | 'ready' | 'mastered';
 
@@ -67,11 +67,40 @@ export function getMasteryLevel(progress: ModuleProgress): { label: MasteryLevel
     return { label: 'ready', percent };
   }
 
-  if (percent >= 40) {
+  if (percent >= 25) {
     return { label: 'learning', percent };
   }
 
   return { label: 'starter', percent };
+}
+
+export function buildModuleOverview(
+  modules: Module[],
+  progressByModule: Record<string, ModuleProgress>,
+): ModuleOverview[] {
+  return modules.map((module) => {
+    const progress = progressByModule[module.moduleId] ?? {
+      moduleId: module.moduleId,
+      seen: 0,
+      correct: 0,
+      total: 0,
+      lastPracticedAt: new Date().toISOString(),
+      status: 'not-started',
+    };
+
+    const percent = progress.total > 0 ? computeAccuracy(progress.correct, progress.total) : 0;
+    const mastery = getMasteryLevel(progress).label;
+
+    return {
+      moduleId: module.moduleId,
+      title: module.title,
+      exam: module.exam,
+      difficulty: module.difficulty,
+      percent,
+      mastery,
+      status: progress.status,
+    };
+  });
 }
 
 export function buildModuleProgress(
