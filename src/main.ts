@@ -1,7 +1,7 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
-import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionById, startExamSession, validateModule } from './lib/learning';
+import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
 import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
@@ -19,6 +19,7 @@ const defaultState: AppState = {
   moduleProgress: {},
   answeredQuestions: {},
   examSession: null,
+  retryQuestionId: null,
   lastUpdatedAt: null,
 };
 
@@ -108,6 +109,7 @@ function openAgendaItem(item: StudyAgendaItem): void {
   state.resumeModuleId = item.moduleId;
   state.studySectionId = module?.sections[0]?.id ?? null;
   state.currentQuestionId = item.questionId;
+  state.retryQuestionId = null;
   ensureModuleState(item.moduleId);
   saveCurrentState();
   render();
@@ -169,6 +171,9 @@ function renderModuleCard(item: (typeof moduleIndex)[number]): string {
 function renderQuestion(question: Question): string {
   const selectedAnswer = state.answeredQuestions[question.id];
   const isAnswered = selectedAnswer !== undefined;
+  const isRetrying = state.retryQuestionId === question.id;
+  const showResult = isAnswered && !isRetrying;
+  const canRetry = (state.reviewQueue[getSelectedModule().moduleId] ?? []).includes(question.id);
 
   return `
     <div class="question-box">
@@ -180,15 +185,15 @@ function renderQuestion(question: Question): string {
       <div class="options">
         ${question.options
           .map((option, index) => {
-            const isCorrect = isAnswered && index === question.correctIndex;
-            const isWrong = isAnswered && index === selectedAnswer && index !== question.correctIndex;
+            const isCorrect = showResult && index === question.correctIndex;
+            const isWrong = showResult && index === selectedAnswer && index !== question.correctIndex;
             return `
               <button
                 type="button"
                 class="answer-option ${isCorrect ? 'correct' : ''} ${isWrong ? 'incorrect' : ''}"
                 data-answer-index="${index}"
                 data-question-id="${question.id}"
-                ${isAnswered ? 'disabled' : ''}
+                ${isAnswered && !isRetrying ? 'disabled' : ''}
               >
                 <span>${String.fromCharCode(65 + index)}</span>
                 <span>${option}</span>
@@ -197,11 +202,12 @@ function renderQuestion(question: Question): string {
           })
           .join('')}
       </div>
-      ${isAnswered ? `
+      ${showResult ? `
         <div class="result-panel">
           <p class="result-label">${selectedAnswer === question.correctIndex ? 'Richtig' : 'Nicht ganz'}</p>
           <p>${question.explanation}</p>
           <ul class="source-list">${renderSourceRefs(question.sourceRefs)}</ul>
+          ${canRetry ? `<button type="button" data-review-retry="${question.id}">Erneut beantworten</button>` : ''}
         </div>
       ` : ''}
     </div>
@@ -524,6 +530,7 @@ function render(): void {
       state.selectedModuleId = nextId;
       state.resumeModuleId = nextId;
       state.studySectionId = nextModule?.sections[0]?.id ?? null;
+      state.retryQuestionId = null;
       const nextQuiz = getQuizByModuleId(nextId);
       state.currentQuestionId = nextQuiz?.questions[0]?.id ?? null;
       ensureModuleState(nextId);
@@ -553,11 +560,13 @@ function render(): void {
       if (!currentQuestion) return;
 
       const nextProgress = getCurrentProgress();
-      const exists = state.answeredQuestions[questionId] !== undefined;
-      if (exists) return;
+      const previousAnswer = state.answeredQuestions[questionId];
+      const isRetry = state.retryQuestionId === questionId;
+      if (previousAnswer !== undefined && !isRetry) return;
 
       const isCorrect = answerIndex === currentQuestion.correctIndex;
       state.answeredQuestions[questionId] = answerIndex;
+      state.retryQuestionId = null;
 
       const moduleReviewQueue = state.reviewQueue[selectedModule.moduleId] ?? [];
       const nextReviewQueue = moduleReviewQueue.filter((id) => id !== questionId);
@@ -568,14 +577,13 @@ function render(): void {
 
       state.reviewQueue[selectedModule.moduleId] = [...new Set(nextReviewQueue)];
 
-      const seen = nextProgress.seen + 1;
-      state.moduleProgress[selectedModule.moduleId] = {
-        ...nextProgress,
-        seen,
-        correct: isCorrect ? nextProgress.correct + 1 : nextProgress.correct,
-        lastPracticedAt: new Date().toISOString(),
-        status: seen >= currentQuiz.questions.length ? 'completed' : 'in-progress',
-      };
+      state.moduleProgress[selectedModule.moduleId] = updateModuleProgressForAnswer(
+        nextProgress,
+        previousAnswer,
+        answerIndex,
+        currentQuestion.correctIndex,
+        new Date().toISOString(),
+      );
 
       saveCurrentState();
       render();
@@ -587,6 +595,18 @@ function render(): void {
       const reviewQuestionId = button.getAttribute('data-review-question');
       if (!reviewQuestionId) return;
       state.currentQuestionId = reviewQuestionId;
+      state.retryQuestionId = null;
+      saveCurrentState();
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-review-retry]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const retryQuestionId = button.getAttribute('data-review-retry');
+      if (!retryQuestionId || !getCurrentReviewQueue().includes(retryQuestionId)) return;
+      state.currentQuestionId = retryQuestionId;
+      state.retryQuestionId = retryQuestionId;
       saveCurrentState();
       render();
     });

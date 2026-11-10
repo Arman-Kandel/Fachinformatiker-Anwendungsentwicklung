@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
-import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, startExamSession, validateModule } from '../src/lib/learning';
+import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, startExamSession, updateModuleProgressForAnswer, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
@@ -73,6 +73,16 @@ describe('learning logic', () => {
     );
 
     expect(reviewQueue).toEqual(['q1', 'q2']);
+  });
+
+  it('updates progress when a wrong answer is corrected without double-counting', () => {
+    const progress = buildModuleProgress('module-one', 3, 1, 0, '2026-11-10T12:00:00.000Z');
+    const retried = updateModuleProgressForAnswer(progress, 0, 1, 1, '2026-11-10T12:05:00.000Z');
+
+    expect(retried.seen).toBe(1);
+    expect(retried.correct).toBe(1);
+    expect(retried.status).toBe('in-progress');
+    expect(retried.lastPracticedAt).toBe('2026-11-10T12:05:00.000Z');
   });
 
   it('derives mastery level from progress', () => {
@@ -186,6 +196,7 @@ describe('learning logic', () => {
       moduleProgress: {},
       answeredQuestions: {},
       examSession: null,
+      retryQuestionId: null,
       lastUpdatedAt: null,
     };
 

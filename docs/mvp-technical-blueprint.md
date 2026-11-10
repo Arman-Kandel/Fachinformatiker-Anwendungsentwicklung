@@ -11,7 +11,7 @@ Die Basiskomponenten des MVP sind implementiert: zentrale App-Struktur, modulare
 - Storage-Schicht mit Versionskontrolle und Browser-/Node-Absicherung
 - Lernabschnitts-Flow mit persistierter Auswahl des aktuellen Abschnitts
 - Mastery-Status und Prüfungsmodus für Lernfortschritt und Wiederholungsstrategie
-- additive `examSession` im App-State speichert laufende Kurzprüfungen; Prüfungsantworten verändern die separate Übungsstatistik nicht
+- additive `examSession` und `retryQuestionId` im App-State speichern laufende Kurzprüfungen und Wiederholungsposition; Prüfungsantworten verändern die separate Übungsstatistik nicht
 - Prüfungslauf: TypeScript + Vitest + Vite Production Build
 
 ## 1. Ziel des MVP

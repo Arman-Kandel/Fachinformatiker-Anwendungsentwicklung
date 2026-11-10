@@ -10,6 +10,7 @@ Der Projektstand ist jetzt konkret umgesetzt: Es existiert eine lauffähige Vite
 - zweite AP1-Lernsektion (`SQL-Grundlagen`) inkl. Quiz
 - robuste localStorage-Fallback-Logik für Test-/Node-Umgebungen
 - persistierte Lernabschnitt-Auswahl mit Wiederaufnahme im UI
+- erneut beantwortbare Fehlversuche ohne doppelte Fortschrittszählung
 - Mastery-/Prüfungsmodus mit gezielter Wiederholungslogik
 - zeitbegrenzte Kurzprüfung mit browser-lokalem Sitzungsfortschritt und Ergebnisreview
 - Qualitätslauf erfolgreich verifiziert (`npm run check`)

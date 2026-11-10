@@ -97,5 +97,6 @@ export type AppState = {
   moduleProgress: Record<string, ModuleProgress>;
   answeredQuestions: Record<string, number>;
   examSession?: ExamSession | null;
+  retryQuestionId?: string | null;
   lastUpdatedAt: string | null;
 };

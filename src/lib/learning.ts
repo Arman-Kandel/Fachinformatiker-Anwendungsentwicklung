@@ -251,3 +251,24 @@ export function buildModuleProgress(
     status: totalQuestions > 0 && seen >= totalQuestions ? 'completed' : seen > 0 ? 'in-progress' : 'not-started',
   };
 }
+
+export function updateModuleProgressForAnswer(
+  progress: ModuleProgress,
+  previousAnswer: number | undefined,
+  nextAnswer: number,
+  correctIndex: number,
+  lastPracticedAt: string,
+): ModuleProgress {
+  const seen = progress.seen + (previousAnswer === undefined ? 1 : 0);
+  const previousWasCorrect = previousAnswer === correctIndex;
+  const nextIsCorrect = nextAnswer === correctIndex;
+  const correct = Math.max(0, Math.min(seen, progress.correct + Number(nextIsCorrect) - Number(previousWasCorrect)));
+
+  return {
+    ...progress,
+    seen,
+    correct,
+    lastPracticedAt,
+    status: progress.total > 0 && seen >= progress.total ? 'completed' : seen > 0 ? 'in-progress' : 'not-started',
+  };
+}
