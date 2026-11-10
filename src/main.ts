@@ -1,6 +1,6 @@
 import './styles.css';
 import { getApprovedSourceUrl, getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
-import { loadAppState, saveAppState } from './app/storage/local-store';
+import { loadAppState, normalizeAppState, saveAppState } from './app/storage/local-store';
 import { escapeHtml } from './lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
 import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
@@ -24,7 +24,7 @@ const defaultState: AppState = {
   lastUpdatedAt: null,
 };
 
-const state = loadAppState<AppState>(STORAGE_KEY, defaultState);
+const state = loadAppState<AppState>(STORAGE_KEY, defaultState, normalizeAppState);
 const app = document.querySelector('#app') as HTMLElement;
 let examTimer: number | null = null;
 

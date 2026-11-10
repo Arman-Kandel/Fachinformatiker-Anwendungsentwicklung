@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { getApprovedSourceUrl, getModuleById, getModuleCatalog, getModuleIndex, getQuizByModuleId } from '../src/app/content-loader/content-loader';
-import { loadAppState, saveAppState } from '../src/app/storage/local-store';
+import { loadAppState, normalizeAppState, saveAppState } from '../src/app/storage/local-store';
 import { escapeHtml } from '../src/lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, startExamSession, updateModuleProgressForAnswer, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
@@ -282,6 +282,102 @@ describe('learning logic', () => {
     };
 
     saveAppState(key, state);
-    expect(loadAppState(key, fallback)).toEqual(state);
+    expect(loadAppState(key, fallback, normalizeAppState)).toEqual(state);
+  });
+
+  it('uses the memory fallback when browser storage access is blocked', () => {
+    const key = 'blocked-storage-state';
+    const fallback: AppState = {
+      resumeModuleId: null,
+      currentQuestionId: null,
+      selectedModuleId: null,
+      studySectionId: null,
+      reviewQueue: {},
+      moduleProgress: {},
+      answeredQuestions: {},
+      examSession: null,
+      retryQuestionId: null,
+      lastUpdatedAt: null,
+    };
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+
+    try {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        get: () => {
+          throw new Error('Storage access blocked');
+        },
+      });
+      saveAppState(key, { ...fallback, selectedModuleId: 'module-one' });
+      expect(loadAppState(key, fallback, normalizeAppState).selectedModuleId).toBe('module-one');
+
+      const failingOperationsKey = 'failing-storage-operations';
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        get: () => ({
+          getItem: () => {
+            throw new Error('Storage read failed');
+          },
+          setItem: () => {
+            throw new Error('Storage write failed');
+          },
+          removeItem: () => {
+            throw new Error('Storage remove failed');
+          },
+        }),
+      });
+      saveAppState(failingOperationsKey, { ...fallback, selectedModuleId: 'module-two' });
+      expect(loadAppState(failingOperationsKey, fallback, normalizeAppState).selectedModuleId).toBe('module-two');
+    } finally {
+      if (descriptor) {
+        Object.defineProperty(globalThis, 'localStorage', descriptor);
+      } else {
+        Reflect.deleteProperty(globalThis, 'localStorage');
+      }
+    }
+  });
+
+  it('normalizes damaged local state without discarding valid progress', () => {
+    const fallback: AppState = {
+      resumeModuleId: null,
+      currentQuestionId: null,
+      selectedModuleId: null,
+      studySectionId: null,
+      reviewQueue: {},
+      moduleProgress: {},
+      answeredQuestions: {},
+      examSession: null,
+      retryQuestionId: null,
+      lastUpdatedAt: null,
+    };
+    const normalized = normalizeAppState({
+      selectedModuleId: 'module-one',
+      reviewQueue: { 'module-one': ['q1', 42] },
+      moduleProgress: {
+        'module-one': { seen: 2, correct: 99, total: 3, lastPracticedAt: '2026-11-10T12:00:00.000Z', status: 'invalid' },
+      },
+      answeredQuestions: { 'module-one::q1': 1, q1: 0, invalid: '1' },
+      examSession: { moduleId: 'module-one', questionIds: ['q1'], answers: {}, currentIndex: 9, startedAt: 1_000, deadlineAt: 61_000, status: 'active', completedAt: null },
+      retryQuestionId: 7,
+    }, fallback);
+
+    expect(normalized.selectedModuleId).toBe('module-one');
+    expect(normalized.reviewQueue).toEqual({ 'module-one': ['q1'] });
+    expect(normalized.moduleProgress['module-one']).toEqual({
+      moduleId: 'module-one',
+      seen: 2,
+      correct: 2,
+      total: 3,
+      lastPracticedAt: '2026-11-10T12:00:00.000Z',
+      status: 'in-progress',
+    });
+    expect(normalized.answeredQuestions).toEqual({ 'module-one::q1': 1, q1: 0 });
+    expect(normalized.examSession).toBeNull();
+    expect(normalized.retryQuestionId).toBeNull();
+
+    const legacy = normalizeAppState({ answeredQuestions: { q1: 0 } }, fallback);
+    expect(legacy.answeredQuestions).toEqual({ q1: 0 });
+    expect(legacy.examSession).toBeNull();
+    expect(legacy.retryQuestionId).toBeNull();
   });
 });

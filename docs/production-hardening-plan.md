@@ -7,6 +7,7 @@ Die frühere Philosophie der Sicherheits- und Qualitätsarbeit wurde in die tech
 ### Reale Produktionsverbesserungen
 
 - Storage-Fallback verhindert Laufzeitfehler in Test- und CI-Umgebungen
+- State-Normalisierung verwirft beschädigte Felder einzeln; gesperrtes oder fehlschlagendes `localStorage` fällt auf Memory-Storage zurück
 - modulare Lernmodule erlauben klarere Validierung und Erweiterung
 - persistierte Lernabschnitt-Auswahl schützt den Resume-First-Workflow
 - Mastery- und Prüfungslogik unterstützt Lernkontrolle und Wiederholungsstrategie
