@@ -24,11 +24,23 @@ src/
 │  ├─ bootstrap/
 │  ├─ content-loader/
 │  ├─ state/
+│  │  ├─ app-state.ts
+│  │  ├─ session-state.ts
+│  │  ├─ progress-state.ts
+│  │  └─ cache-state.ts
 │  ├─ storage/
+│  │  ├─ local-store.ts
+│  │  ├─ indexeddb-store.ts
+│  │  └─ migration.ts
 │  ├─ routing/
 │  ├─ validators/
+│  ├─ cache/
+│  │  ├─ memory-cache.ts
+│  │  ├─ session-cache.ts
+│  │  └─ asset-cache.ts
 │  └─ test-engine/
 ├─ features/
+│  ├─ resume/
 │  ├─ dashboard/
 │  ├─ module-view/
 │  ├─ quiz/
@@ -88,6 +100,8 @@ Jedes Modul ist ein eigenes Paket mit:
 - Quellenbelege
 
 Das ist entscheidend, damit neue Inhalte leicht via PR hinzugefügt werden können.
+
+Zusätzlich gilt eine zentrale UX-Prämisse: Die App arbeitet als Resume-First-Lernzustand. Das heißt, der Nutzer wird nicht in einer großen Navigation auf das Lernen geführt, sondern in einem klaren Zustandsfluss mit fortsetzbaren Lernsessions.
 
 ---
 
@@ -253,6 +267,8 @@ Die App darf keinen harten, festen einseitigen Quiz-Block verwenden. Stattdessen
 
 Die Lernplattform darf keine sensiblen oder wichtigen Nutzerdaten außerhalb des Browsers speichern. Die lokale Speichermodellierung muss versioniert und sauber getrennt sein.
 
+Für die UX ist die State Preservation hier besonders wichtig. Wenn der Nutzer kurz weg ist, muss die App nach dem Neustart exakt in den Lernzustand zurückkehren, den er zuletzt hatte.
+
 ```json
 {
   "schemaVersion": "1.0.0",
@@ -336,6 +352,8 @@ Damit die App nicht schon bei frühen Versionsschritten „Live“ ist, müssen 
 - Modul-Renderer
 - Statistik- und Fortschrittslogik
 - Local Storage Manager
+- Session-State Recovery
+- Resume-First Startscreen
 
 ### Phase 3: Test- und Wiederholungslogik
 
@@ -343,8 +361,16 @@ Damit die App nicht schon bei frühen Versionsschritten „Live“ ist, müssen 
 - Testset-Auswahl
 - Wiederholungslogik
 - Ergebnis-Speicherung
+- Test-Resume nach Abbruch
 
-### Phase 4: Release-Readiness
+### Phase 4: Caching und Performance
+
+- Memory Cache für aktuelle Session
+- Session Cache für Abschnitts- und Testzustand
+- IndexedDB für Lernhistorik und Wiederholung
+- Service Worker für App Shell und Asset Caching
+
+### Phase 5: Release-Readiness
 
 - SPA-Deployment konfigurieren
 - GitHub Actions einrichten
@@ -363,11 +389,15 @@ Das MVP wird erst dann als tragfähig gelten, wenn es wirklich diese Eigenschaft
 - Lernstatus bleibt lokal und stabil
 - App ist sauber modular und einfach erweiterbar
 - AI-Agenten können neue Inhalte ohne manuelle UI-Umstellung hinzufügen
+- der Nutzer kann nach kurzer Pause ohne Re-Login und ohne Neu-Starten weiterlernen
+- die App hält den aktuellen Lernzustand mit möglichst wenig Klicks und sofort zugänglichem Resume
 
 ---
 
 ## 11. Entscheidende Designregel
 
 Das Projekt muss als “Content-first, UI-second”-System gebaut werden. UIs können iteriert werden; Inhalte, Quellen und Logik müssen von Anfang an strukturiert und belastbar sein.
+
+Zusätzlich gilt die UX-Regel: “State-first, interaction-light”. Der Nutzer soll nicht zwischen Screens und Entscheidungen gefangen sein, sondern einen stabilen Lernzustand mit minimaler Interaktionslast erleben.
 
 Wenn diese Reihenfolge eingehalten wird, wird die Plattform nicht nur schön, sondern wirklich nutzbar und sicher.

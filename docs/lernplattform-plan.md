@@ -50,6 +50,7 @@ Empfohlene Stack:
 - CSS mit Design-Tokens und Glassmorphism
 - lokale Speicherung über localStorage oder IndexedDB
 - JSON/Markdown als strukturiertes Content-Format
+- Session- und State-Persistence für Resume-First UX
 
 Warum diese Richtung?
 
@@ -58,6 +59,7 @@ Warum diese Richtung?
 - stark modular und gut für PR-basierte Erweiterungen
 - leicht für AI-Agenten zu analysieren und zu erweitern
 - Inhalte bleiben separat vom UI und sind damit robust dokumentiert
+- die App ist als Lernzustand aufgebaut, nicht als reine Inhaltsseite
 
 ---
 
@@ -304,6 +306,8 @@ Damit bleiben alle persönlichen Daten auf dem Gerät des Nutzers.
 ## 8. Alternative Fragen und Tests
 
 Das ist ein wichtiges Feature für die spätere Nutzung und entspricht genau dem Wunsch, verschiedene Tests mit neuen oder alternativen Fragen durchspielen zu können.
+
+Zusätzlich ist die Test- und Lernspirale so zu planen, dass ein Nutzer nach kurzer Pause genau dort weiterkommt, wo er aufgehört hat. Das ist ein zentrales Produktkriterium: Lernen als persistenter Zustandsfluss, nicht als separate Seite.
 
 ### Ziel
 
