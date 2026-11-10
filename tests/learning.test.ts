@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
 import { buildModuleProgress, computeAccuracy, validateModule } from '../src/lib/learning';
-import type { Module } from '../src/types';
+import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
   it('validates a complete module with source references', () => {
@@ -60,8 +60,22 @@ describe('learning logic', () => {
 
   it('persists and loads app state from local storage', () => {
     const key = 'test-state';
-    const fallback = { value: 'fallback' };
-    const state = { value: 'stored' };
+    const fallback: AppState = {
+      resumeModuleId: null,
+      currentQuestionId: null,
+      selectedModuleId: null,
+      studySectionId: null,
+      moduleProgress: {},
+      answeredQuestions: {},
+      lastUpdatedAt: null,
+    };
+
+    const state: AppState = {
+      ...fallback,
+      resumeModuleId: 'ap1-01-datenmodellierung',
+      selectedModuleId: 'ap1-01-datenmodellierung',
+      studySectionId: 's2',
+    };
 
     saveAppState(key, state);
     expect(loadAppState(key, fallback)).toEqual(state);

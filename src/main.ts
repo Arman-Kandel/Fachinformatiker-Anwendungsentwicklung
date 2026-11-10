@@ -12,6 +12,7 @@ const defaultState: AppState = {
   resumeModuleId: firstModule?.moduleId ?? null,
   currentQuestionId: getQuizByModuleId(firstModule?.moduleId ?? '')?.questions[0]?.id ?? null,
   selectedModuleId: firstModule?.moduleId ?? null,
+  studySectionId: firstModule?.sections[0]?.id ?? null,
   moduleProgress: {},
   answeredQuestions: {},
   lastUpdatedAt: null,
@@ -67,6 +68,17 @@ function getCurrentProgress(): ModuleProgress {
 
   state.moduleProgress[selectedModule.moduleId] = progress;
   return progress;
+}
+
+function getCurrentSection() {
+  const selectedModule = getSelectedModule();
+  const section = selectedModule.sections.find((item) => item.id === state.studySectionId) ?? selectedModule.sections[0] ?? null;
+
+  if (section) {
+    state.studySectionId = section.id;
+  }
+
+  return section;
 }
 
 function renderSourceRefs(sourceRefs: Array<{ sourceId: string; quote: string; section: string; type?: string }>): string {
@@ -147,6 +159,7 @@ function saveCurrentState(): void {
 function render(): void {
   const selectedModule = getSelectedModule();
   const currentQuiz = getCurrentQuiz();
+  const currentSection = getCurrentSection();
   const validationErrors = validateModule(selectedModule);
   const progress = getCurrentProgress();
   const currentQuestion = getQuestionById(currentQuiz.questions, state.currentQuestionId);
@@ -216,6 +229,39 @@ function render(): void {
             </div>
           </div>
 
+          <div class="study-panel">
+            <div class="section-head compact">
+              <h3>Lernabschnitte</h3>
+              <span class="pill">${selectedModule.sections.length} Abschnitte</span>
+            </div>
+            <div class="study-grid">
+              ${selectedModule.sections
+                .map(
+                  (section) => `
+                    <button
+                      type="button"
+                      class="study-card ${section.id === state.studySectionId ? 'active' : ''}"
+                      data-section-id="${section.id}"
+                    >
+                      <span>${section.type}</span>
+                      <strong>${section.title}</strong>
+                    </button>
+                  `,
+                )
+                .join('')}
+            </div>
+            ${currentSection ? `
+              <article class="section-detail">
+                <div class="section-header">
+                  <span>${currentSection.type}</span>
+                  <strong>${currentSection.title}</strong>
+                </div>
+                <p>${currentSection.content}</p>
+                <ul class="source-list">${renderSourceRefs(currentSection.sourceRefs)}</ul>
+              </article>
+            ` : ''}
+          </div>
+
           <div class="objective-list">
             ${selectedModule.learningObjectives.map((objective) => `<li>${objective}</li>`).join('')}
           </div>
@@ -235,11 +281,24 @@ function render(): void {
     button.addEventListener('click', () => {
       const nextId = button.getAttribute('data-module-id');
       if (!nextId) return;
+
+      const nextModule = getModuleById(nextId);
       state.selectedModuleId = nextId;
       state.resumeModuleId = nextId;
+      state.studySectionId = nextModule?.sections[0]?.id ?? null;
       const nextQuiz = getQuizByModuleId(nextId);
       state.currentQuestionId = nextQuiz?.questions[0]?.id ?? null;
       ensureModuleState(nextId);
+      saveCurrentState();
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-section-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const sectionId = button.getAttribute('data-section-id');
+      if (!sectionId) return;
+      state.studySectionId = sectionId;
       saveCurrentState();
       render();
     });

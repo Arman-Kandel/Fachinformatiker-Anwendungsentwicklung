@@ -8,6 +8,7 @@ Die frühere Philosophie der Sicherheits- und Qualitätsarbeit wurde in die tech
 
 - Storage-Fallback verhindert Laufzeitfehler in Test- und CI-Umgebungen
 - modulare Lernmodule erlauben klarere Validierung und Erweiterung
+- persistierte Lernabschnitt-Auswahl schützt den Resume-First-Workflow
 - das Projekt erfüllt einen echten Checklauf mit Test- und Build-Evidenz
 
 ## 1. Ausgangspunkt

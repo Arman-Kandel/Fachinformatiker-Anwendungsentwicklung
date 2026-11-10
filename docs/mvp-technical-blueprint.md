@@ -9,6 +9,7 @@ Die Basiskomponenten des MVP sind implementiert: zentrale App-Struktur, modulare
 - Content-Model als modulare Struktur im `content/`-Ordner
 - AP1-Module: Datenmodellierung + SQL-Grundlagen
 - Storage-Schicht mit Versionskontrolle und Browser-/Node-Absicherung
+- Lernabschnitts-Flow mit persistierter Auswahl des aktuellen Abschnitts
 - Prüfungslauf: TypeScript + Vitest + Vite Production Build
 
 ## 1. Ziel des MVP
