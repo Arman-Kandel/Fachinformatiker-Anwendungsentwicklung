@@ -1,5 +1,9 @@
 # Lernplattform-Plan: IHK AP1/AP2 2026/27
 
+## Status 2026-11-10
+
+Der Projektstand ist jetzt konkret umgesetzt: Es existiert eine lauffähige Vite/TypeScript-Basis, eine erste modulare Lernansicht mit Browser-Persistenz, ein erstes Quiz-Modul aus `content/` und ein strenger TypeScript-/Build-Check als Qualitätsbasis. Die App arbeitet browser-lokal, hält Lernzustand in `localStorage` und dient als stabiler Startpunkt für weitere AP1/AP2-Module.
+
 ## 1. Ziel und Grundidee
 
 Eine modulare Lernplattform für die IHK-Klausurvorbereitung AP1 und AP2, die über GitHub Pages läuft und vollständig clientseitig arbeitet. Die Lerninhalte werden strukturiert und lokal im Browser gespeichert. Der Fokus liegt auf:

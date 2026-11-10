@@ -1,0 +1,19 @@
+{
+  "exam": "AP1",
+  "modules": [
+    {
+      "moduleId": "ap1-01-datenmodellierung",
+      "title": "Datenmodellierung",
+      "difficulty": "mittel",
+      "estimatedMinutes": 20,
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Die Ausbildung fokussiert auf fachliche Grundlagen, Datenmodellierung und fachgerechte Dokumentation.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    }
+  ]
+}

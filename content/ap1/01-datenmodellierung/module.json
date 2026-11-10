@@ -1,0 +1,66 @@
+{
+  "moduleId": "ap1-01-datenmodellierung",
+  "exam": "AP1",
+  "title": "Datenmodellierung",
+  "difficulty": "mittel",
+  "status": "draft",
+  "tags": ["DB", "ERM", "Normalformen"],
+  "learningObjectives": [
+    "Entitätstypen erkennen",
+    "Beziehungen modellieren",
+    "ER-Diagramme interpretieren"
+  ],
+  "dependencies": [],
+  "sourceRefs": [
+    {
+      "sourceId": "FIAUSBV",
+      "quote": "Der fachliche Rahmen für Datenmodellierung und -analyse ist Teil der beruflichen Grundlagen und dient der fachgerechten Anwendungsentwicklung.",
+      "section": "Ausbildungsrahmen",
+      "type": "official"
+    }
+  ],
+  "sections": [
+    {
+      "id": "s1",
+      "type": "theory",
+      "title": "Grundlagen",
+      "content": "Ein Entitätstyp beschreibt eine Menge logisch zusammengehöriger Objekte, die über gleiche Merkmale und Beziehungen definiert werden. Beispielsweise kann eine Person, ein Produkt oder eine Bestellung als eigener Entitätstyp modelliert werden.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Datenmodellierung und fachliche Analyse bilden die Grundlage für die spätere Umsetzung in Anwendungen.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "type": "theory",
+      "title": "Beziehungen",
+      "content": "Beziehungen dokumentieren, wie Entitätstypen miteinander verknüpft sind. Eine 1:n-Beziehung ist häufig bei Kunden und Bestellungen zu sehen, während n:m-Beziehungen meist durch eine zusätzliche Verbindungstabelle gelöst werden.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Die fachliche Modellierung von Beziehungen ist ein zentraler Bestandteil der Datenanalyse und Anwendungsentwicklung.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "type": "summary",
+      "title": "Fazit",
+      "content": "Ziel der Datenmodellierung ist es, fachliche Sachverhalte klar, konsistent und verlässlich in Strukturen zu übersetzen, damit Anwendungen später verständlich und wartbar bleiben.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Ein nachvollziehbares, fachlich korrektes Datenmodell ist für die Entwicklung und Dokumentation von Anwendungen erforderlich.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    }
+  ]
+}

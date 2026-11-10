@@ -1,5 +1,9 @@
 # MVP-Technische Blueprint: modulare Lernplattform mit Quellenpflicht
 
+## Status 2026-11-10
+
+Die Basiskomponenten des MVP sind implementiert: zentrale App-Struktur, Module/Quiz-Daten, lokale State-Persistenz, UI-Shell mit Resume-First-Flow und erste Testabdeckung für die Lernlogik. Der Build- und Type-Check läuft erfolgreich, sodass der Code als produktionsnahe Baseline für weitere Module und Features dient.
+
 ## 1. Ziel des MVP
 
 Das erste produktionsfähige MVP soll die Lernplattform als robuste, modular aufgebaute Static-App validieren. Es muss nicht schön sein wie ein Produkt, sondern stabil, belastbar und AI-freundlich sein.

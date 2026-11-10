@@ -1,5 +1,9 @@
 # Produktionssicherungs-Plan und Launch-Fehleranalyse
 
+## Status 2026-11-10
+
+Die frühere Philosophie der Sicherheits- und Qualitätsarbeit wurde in die technische Projektbasis übersetzt: strenge TypeScript-Checks, zentrale Agenten-Regeln, definierter Qualitätslauf (`npm run check`) und ein Test- und App-Framework, das lokale Persistenz und modulare Inhalte explizit unterstützt. Der Stack ist damit deutlich robuster für spätere Erweiterungen und für AI-gestützte Entwicklung.
+
 ## 1. Ausgangspunkt
 
 Wir gehen davon aus, dass der Launch der Lernplattform in der ersten Version miserabel gescheitert ist. Nicht aus einem Zufall, sondern wegen einer klaren Reihe systemischer Mängel:

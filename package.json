@@ -4,12 +4,17 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test && npm run build"
   },
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "typescript": "7.0.2",
-    "vite": "8.3.7"
+    "vite": "8.3.7",
+    "vitest": "3.2.4"
   }
 }
