@@ -1,6 +1,8 @@
 import type { AppState, ExamSession, ModuleProgress } from '../../types';
 
 const STORAGE_VERSION = 1;
+const EXPORT_FORMAT = 'ihk-lernplattform-state';
+const EXPORT_VERSION = 1;
 
 const memoryStore = new Map<string, string>();
 
@@ -135,6 +137,28 @@ export function normalizeAppState(value: unknown, fallback: AppState): AppState 
     retryQuestionId: nullableString('retryQuestionId', fallback.retryQuestionId ?? null),
     lastUpdatedAt: nullableString('lastUpdatedAt', fallback.lastUpdatedAt),
   };
+}
+
+export function serializeAppState(state: AppState, exportedAt = new Date().toISOString()): string {
+  return JSON.stringify({
+    format: EXPORT_FORMAT,
+    version: EXPORT_VERSION,
+    exportedAt,
+    data: state,
+  }, null, 2);
+}
+
+export function parseAppStateExport(raw: string, fallback: AppState): AppState | null {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isRecord(parsed) || parsed['format'] !== EXPORT_FORMAT || parsed['version'] !== EXPORT_VERSION || !('data' in parsed)) {
+      return null;
+    }
+
+    return normalizeAppState(parsed['data'], fallback);
+  } catch {
+    return null;
+  }
 }
 
 function getMemoryStorage(): StorageLike {

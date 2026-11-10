@@ -6,6 +6,7 @@ Eine statische Lernplattform für IHK-relevante Inhalte mit lokalem Browser-Stat
 
 - modulare Lernpfade mit mehreren Inhalten
 - lokale, browser-basierte Persistenz ohne Backend
+- JSON-Export und validierter Import des lokalen Lernstands
 - Quellenbelege je Lernmodul und Frage
 - Wiederholungs-Queue für falsch beantwortete Fragen
 - Mastery-Status, zeitbegrenzte Kurzprüfung und Ergebnisreview

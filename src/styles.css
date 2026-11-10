@@ -150,6 +150,12 @@ button.primary {
   color: #e7dbff;
 }
 
+.state-notice {
+  margin-top: 10px;
+  color: var(--green);
+  font-size: 0.85rem;
+}
+
 .section-head {
   display: flex;
   align-items: center;

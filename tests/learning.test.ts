@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { getApprovedSourceUrl, getModuleById, getModuleCatalog, getModuleIndex, getQuizByModuleId } from '../src/app/content-loader/content-loader';
-import { loadAppState, normalizeAppState, saveAppState } from '../src/app/storage/local-store';
+import { loadAppState, normalizeAppState, parseAppStateExport, saveAppState, serializeAppState } from '../src/app/storage/local-store';
 import { escapeHtml } from '../src/lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, startExamSession, updateModuleProgressForAnswer, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
@@ -283,6 +283,30 @@ describe('learning logic', () => {
 
     saveAppState(key, state);
     expect(loadAppState(key, fallback, normalizeAppState)).toEqual(state);
+  });
+
+  it('exports and restores a versioned learner state while rejecting unknown formats', () => {
+    const fallback: AppState = {
+      resumeModuleId: null,
+      currentQuestionId: null,
+      selectedModuleId: null,
+      studySectionId: null,
+      reviewQueue: {},
+      moduleProgress: {},
+      answeredQuestions: {},
+      examSession: null,
+      retryQuestionId: null,
+      lastUpdatedAt: null,
+    };
+    const state: AppState = {
+      ...fallback,
+      selectedModuleId: 'ap1-01-datenmodellierung',
+      answeredQuestions: { 'ap1-01-datenmodellierung::q1': 1 },
+    };
+    const exported = serializeAppState(state, '2026-11-10T12:00:00.000Z');
+
+    expect(parseAppStateExport(exported, fallback)).toEqual(state);
+    expect(parseAppStateExport('{"format":"unknown","version":1,"data":{}}', fallback)).toBeNull();
   });
 
   it('uses the memory fallback when browser storage access is blocked', () => {

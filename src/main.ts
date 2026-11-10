@@ -1,6 +1,6 @@
 import './styles.css';
 import { getApprovedSourceUrl, getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
-import { loadAppState, normalizeAppState, saveAppState } from './app/storage/local-store';
+import { loadAppState, normalizeAppState, parseAppStateExport, saveAppState, serializeAppState } from './app/storage/local-store';
 import { escapeHtml } from './lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
 import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
@@ -8,6 +8,7 @@ import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Que
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
 const EXAM_QUESTION_LIMIT = 3;
 const EXAM_DURATION_SECONDS = 5 * 60;
+const MAX_STATE_IMPORT_BYTES = 1_000_000;
 const moduleCatalog = getModuleCatalog();
 const moduleIndex = getModuleIndex();
 const firstModule = moduleCatalog[0];
@@ -27,6 +28,7 @@ const defaultState: AppState = {
 const state = loadAppState<AppState>(STORAGE_KEY, defaultState, normalizeAppState);
 const app = document.querySelector('#app') as HTMLElement;
 let examTimer: number | null = null;
+let stateNotice = '';
 
 function safePercentWidth(value: number): number {
   return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
@@ -322,6 +324,62 @@ function saveCurrentState(): void {
   saveAppState(STORAGE_KEY, state);
 }
 
+async function restoreStateFromFile(file: File): Promise<void> {
+  if (file.size > MAX_STATE_IMPORT_BYTES) {
+    stateNotice = 'Die Datei ist größer als 1 MB und wurde nicht importiert.';
+    render();
+    return;
+  }
+
+  try {
+    const imported = parseAppStateExport(await file.text(), defaultState);
+    if (!imported) {
+      stateNotice = 'Die Datei ist ungültig oder hat ein nicht unterstütztes Format.';
+      render();
+      return;
+    }
+
+    const importedModule = imported.selectedModuleId ? getModuleById(imported.selectedModuleId) : firstModule;
+    const importedQuiz = importedModule ? getQuizByModuleId(importedModule.moduleId) : undefined;
+    const validSelection = !imported.selectedModuleId || importedModule !== undefined;
+    const validQuestion = !imported.currentQuestionId || importedQuiz?.questions.some((question) => question.id === imported.currentQuestionId) === true;
+    const importedExamModule = imported.examSession ? getModuleById(imported.examSession.moduleId) : undefined;
+    const importedExamQuiz = importedExamModule ? getQuizByModuleId(importedExamModule.moduleId) : undefined;
+    const validExam = !imported.examSession || importedExamQuiz !== undefined
+      && imported.examSession.questionIds.every((questionId) => importedExamQuiz.questions.some((question) => question.id === questionId));
+
+    if (!validSelection || !validQuestion || !validExam) {
+      stateNotice = 'Die Datei verweist auf Inhalte, die in dieser Version nicht verfügbar sind.';
+      render();
+      return;
+    }
+
+    if (!window.confirm('Der importierte Lernstand ersetzt die aktuellen lokalen Daten. Fortfahren?')) {
+      return;
+    }
+
+    Object.assign(state, imported);
+    stateNotice = 'Lernstand erfolgreich importiert.';
+    saveCurrentState();
+    render();
+  } catch {
+    stateNotice = 'Die Datei konnte nicht gelesen werden.';
+    render();
+  }
+}
+
+function downloadCurrentState(): void {
+  const blob = new Blob([serializeAppState(state)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `ihk-lernplattform-state-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  stateNotice = 'Lernstand wurde als JSON exportiert.';
+  render();
+}
+
 function render(): void {
   if (examTimer !== null) {
     window.clearInterval(examTimer);
@@ -370,7 +428,11 @@ function render(): void {
             <button type="button" data-action="quick-test">Schnelltest</button>
             <button type="button" data-action="exam-mode">Prüfungsmodus</button>
             <button type="button" data-action="review-next" ${reviewQueue.length === 0 ? 'disabled' : ''}>Wiederholen</button>
+            <button type="button" data-action="export-state">Exportieren</button>
+            <button type="button" data-action="import-state">Importieren</button>
+            <input type="file" accept="application/json,.json" data-state-import-input hidden>
           </div>
+          ${stateNotice ? `<p class="state-notice" role="status">${escapeHtml(stateNotice)}</p>` : ''}
           <p class="summary">
             ${escapeHtml(selectedModule.title)} · ${escapeHtml(computeAccuracy(progress.correct, progress.total))}% Trefferquote · ${escapeHtml(getMasteryLevel(progress).label)} · ${escapeHtml(selectedModule.learningObjectives[0] ?? '')}
           </p>
@@ -660,6 +722,16 @@ function render(): void {
         return;
       }
 
+      if (action === 'export-state') {
+        downloadCurrentState();
+        return;
+      }
+
+      if (action === 'import-state') {
+        app.querySelector<HTMLInputElement>('[data-state-import-input]')?.click();
+        return;
+      }
+
       if (action === 'exam-mode') {
         const examDeck = buildExamDeck(currentQuiz.questions, reviewQueue, EXAM_QUESTION_LIMIT);
         state.examSession = startExamSession(selectedModule.moduleId, examDeck, Date.now(), EXAM_DURATION_SECONDS);
@@ -689,6 +761,15 @@ function render(): void {
       saveCurrentState();
       render();
     });
+  });
+
+  app.querySelector<HTMLInputElement>('[data-state-import-input]')?.addEventListener('change', (event) => {
+    const input = event.currentTarget;
+    if (!(input instanceof HTMLInputElement)) return;
+
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) void restoreStateFromFile(file);
   });
 
   const activeSession = state.examSession;
