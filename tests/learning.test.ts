@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
-import { buildModuleProgress, computeAccuracy, validateModule } from '../src/lib/learning';
+import { buildModuleProgress, buildReviewQueue, computeAccuracy, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
@@ -58,6 +58,23 @@ describe('learning logic', () => {
     expect(progress.status).toBe('in-progress');
   });
 
+  it('creates a review queue for wrong answers', () => {
+    const reviewQueue = buildReviewQueue(
+      [
+        { id: 'q1', correctIndex: 1, question: 'Q1', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+        { id: 'q2', correctIndex: 1, question: 'Q2', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+        { id: 'q3', correctIndex: 2, question: 'Q3', options: ['a', 'b', 'c'], explanation: '', sourceRefs: [] },
+      ],
+      {
+        q1: 0,
+        q2: 0,
+        q3: 2,
+      },
+    );
+
+    expect(reviewQueue).toEqual(['q1', 'q2']);
+  });
+
   it('persists and loads app state from local storage', () => {
     const key = 'test-state';
     const fallback: AppState = {
@@ -65,6 +82,7 @@ describe('learning logic', () => {
       currentQuestionId: null,
       selectedModuleId: null,
       studySectionId: null,
+      reviewQueue: {},
       moduleProgress: {},
       answeredQuestions: {},
       lastUpdatedAt: null,
@@ -75,6 +93,9 @@ describe('learning logic', () => {
       resumeModuleId: 'ap1-01-datenmodellierung',
       selectedModuleId: 'ap1-01-datenmodellierung',
       studySectionId: 's2',
+      reviewQueue: {
+        'ap1-01-datenmodellierung': ['q1'],
+      },
     };
 
     saveAppState(key, state);

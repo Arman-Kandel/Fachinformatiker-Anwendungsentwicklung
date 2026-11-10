@@ -1,7 +1,7 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
-import { buildModuleProgress, computeAccuracy, getQuestionById, validateModule } from './lib/learning';
+import { buildModuleProgress, buildReviewQueue, computeAccuracy, getQuestionById, validateModule } from './lib/learning';
 import type { AppState, Module, ModuleProgress, Question } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
@@ -13,6 +13,7 @@ const defaultState: AppState = {
   currentQuestionId: getQuizByModuleId(firstModule?.moduleId ?? '')?.questions[0]?.id ?? null,
   selectedModuleId: firstModule?.moduleId ?? null,
   studySectionId: firstModule?.sections[0]?.id ?? null,
+  reviewQueue: {},
   moduleProgress: {},
   answeredQuestions: {},
   lastUpdatedAt: null,
@@ -68,6 +69,17 @@ function getCurrentProgress(): ModuleProgress {
 
   state.moduleProgress[selectedModule.moduleId] = progress;
   return progress;
+}
+
+function getCurrentReviewQueue(): string[] {
+  const selectedModule = getSelectedModule();
+  const currentQuiz = getCurrentQuiz();
+  const persistedQueue = state.reviewQueue[selectedModule.moduleId] ?? [];
+  const derivedQueue = buildReviewQueue(currentQuiz.questions, state.answeredQuestions);
+  const validQueue = [...new Set([...derivedQueue, ...persistedQueue])].filter((questionId) => currentQuiz.questions.some((question) => question.id === questionId));
+
+  state.reviewQueue[selectedModule.moduleId] = validQueue;
+  return validQueue;
 }
 
 function getCurrentSection() {
@@ -162,6 +174,7 @@ function render(): void {
   const currentSection = getCurrentSection();
   const validationErrors = validateModule(selectedModule);
   const progress = getCurrentProgress();
+  const reviewQueue = getCurrentReviewQueue();
   const currentQuestion = getQuestionById(currentQuiz.questions, state.currentQuestionId);
   ensureModuleState(selectedModule.moduleId);
 
@@ -188,6 +201,7 @@ function render(): void {
             <button class="primary" type="button" data-action="resume">Fortsetzen</button>
             <button type="button" data-action="study-today">Heute üben</button>
             <button type="button" data-action="quick-test">Schnelltest</button>
+            <button type="button" data-action="review-next" ${reviewQueue.length === 0 ? 'disabled' : ''}>Wiederholen</button>
           </div>
           <p class="summary">
             ${selectedModule.title} · ${computeAccuracy(progress.correct, progress.total)}% Trefferquote · ${selectedModule.learningObjectives[0]}
@@ -262,6 +276,27 @@ function render(): void {
             ` : ''}
           </div>
 
+          <div class="review-box">
+            <div class="section-head compact">
+              <h3>Wiederholungs-Queue</h3>
+              <span class="pill">${reviewQueue.length} offen</span>
+            </div>
+            ${reviewQueue.length > 0 ? `
+              <div class="review-list">
+                ${reviewQueue
+                  .map(
+                    (questionId, index) => `
+                      <button type="button" class="review-item" data-review-question="${questionId}">
+                        <span>${index + 1}</span>
+                        <strong>${questionId.toUpperCase()}</strong>
+                      </button>
+                    `,
+                  )
+                  .join('')}
+              </div>
+            ` : '<p>Keine offenen Wiederholungen.</p>'}
+          </div>
+
           <div class="objective-list">
             ${selectedModule.learningObjectives.map((objective) => `<li>${objective}</li>`).join('')}
           </div>
@@ -310,6 +345,7 @@ function render(): void {
       const answerIndex = Number(button.getAttribute('data-answer-index'));
       if (!questionId || Number.isNaN(answerIndex)) return;
 
+      const selectedModule = getSelectedModule();
       const currentQuestion = getQuestionById(currentQuiz.questions, questionId);
       if (!currentQuestion) return;
 
@@ -319,6 +355,16 @@ function render(): void {
 
       const isCorrect = answerIndex === currentQuestion.correctIndex;
       state.answeredQuestions[questionId] = answerIndex;
+
+      const moduleReviewQueue = state.reviewQueue[selectedModule.moduleId] ?? [];
+      const nextReviewQueue = moduleReviewQueue.filter((id) => id !== questionId);
+
+      if (!isCorrect) {
+        nextReviewQueue.push(questionId);
+      }
+
+      state.reviewQueue[selectedModule.moduleId] = [...new Set(nextReviewQueue)];
+
       const seen = nextProgress.seen + 1;
       state.moduleProgress[selectedModule.moduleId] = {
         ...nextProgress,
@@ -333,10 +379,29 @@ function render(): void {
     });
   });
 
+  document.querySelectorAll('[data-review-question]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const reviewQuestionId = button.getAttribute('data-review-question');
+      if (!reviewQuestionId) return;
+      state.currentQuestionId = reviewQuestionId;
+      saveCurrentState();
+      render();
+    });
+  });
+
   document.querySelectorAll('[data-action]').forEach((button) => {
     button.addEventListener('click', () => {
       const action = button.getAttribute('data-action');
       if (!action) return;
+
+      const reviewQueue = getCurrentReviewQueue();
+
+      if (action === 'review-next' && reviewQueue.length > 0) {
+        state.currentQuestionId = reviewQueue[0] ?? currentQuiz.questions[0]?.id ?? null;
+        saveCurrentState();
+        render();
+        return;
+      }
 
       state.currentQuestionId = currentQuiz.questions[0]?.id ?? null;
       if (action === 'quick-test') {

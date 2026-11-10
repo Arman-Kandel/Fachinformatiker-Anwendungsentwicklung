@@ -43,6 +43,12 @@ export function ensureSourceRefs(sourceRefs: SourceRef[] | undefined): SourceRef
   return sourceRefs ?? [];
 }
 
+export function buildReviewQueue(questions: Question[], answeredQuestions: Record<string, number>): string[] {
+  return questions
+    .filter((question) => answeredQuestions[question.id] !== undefined && answeredQuestions[question.id] !== question.correctIndex)
+    .map((question) => question.id);
+}
+
 export function buildModuleProgress(
   moduleId: string,
   totalQuestions: number,

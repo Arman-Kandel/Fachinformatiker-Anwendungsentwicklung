@@ -64,6 +64,7 @@ export type AppState = {
   currentQuestionId: string | null;
   selectedModuleId: string | null;
   studySectionId: string | null;
+  reviewQueue: Record<string, string[]>;
   moduleProgress: Record<string, ModuleProgress>;
   answeredQuestions: Record<string, number>;
   lastUpdatedAt: string | null;
