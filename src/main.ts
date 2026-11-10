@@ -1,6 +1,7 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
+import { escapeHtml } from './lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
 import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
 
@@ -26,6 +27,10 @@ const defaultState: AppState = {
 const state = loadAppState<AppState>(STORAGE_KEY, defaultState);
 const app = document.querySelector('#app') as HTMLElement;
 let examTimer: number | null = null;
+
+function safePercentWidth(value: number): number {
+  return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+}
 
 function ensureModuleState(moduleId: string): void {
   const module = getModuleById(moduleId);
@@ -131,9 +136,9 @@ function renderSourceRefs(sourceRefs: Array<{ sourceId: string; quote: string; s
     .map(
       (ref) => `
         <li>
-          <span>${ref.sourceId}</span>
-          <strong>${ref.section}</strong>
-          <p>${ref.quote}</p>
+          <span>${escapeHtml(ref.sourceId)}</span>
+          <strong>${escapeHtml(ref.section)}</strong>
+          <p>${escapeHtml(ref.quote)}</p>
         </li>
       `,
     )
@@ -154,15 +159,15 @@ function renderModuleCard(item: (typeof moduleIndex)[number]): string {
   } satisfies ModuleOverview;
 
   return `
-    <button class="module-card ${active ? 'active' : ''}" type="button" data-module-id="${item.moduleId}">
+    <button class="module-card ${active ? 'active' : ''}" type="button" data-module-id="${escapeHtml(item.moduleId)}">
       <div class="module-topline">
-        <span>${item.difficulty}</span>
-        <span>${item.estimatedMinutes} min</span>
+        <span>${escapeHtml(item.difficulty)}</span>
+        <span>${escapeHtml(item.estimatedMinutes)} min</span>
       </div>
-      <strong>${item.title}</strong>
-      <small>${item.sourceRefs[0]?.sourceId ?? 'FIAUSBV'} · ${overview.mastery}</small>
+      <strong>${escapeHtml(item.title)}</strong>
+      <small>${escapeHtml(item.sourceRefs[0]?.sourceId ?? 'FIAUSBV')} · ${escapeHtml(overview.mastery)}</small>
       <div class="mini-progress">
-        <span style="width: ${overview.percent}%"></span>
+        <span style="width: ${safePercentWidth(overview.percent)}%"></span>
       </div>
     </button>
   `;
@@ -179,9 +184,9 @@ function renderQuestion(question: Question): string {
     <div class="question-box">
       <div class="question-meta">
         <span>Frage</span>
-        <strong>${question.id.toUpperCase()}</strong>
+        <strong>${escapeHtml(question.id.toUpperCase())}</strong>
       </div>
-      <h3>${question.question}</h3>
+      <h3>${escapeHtml(question.question)}</h3>
       <div class="options">
         ${question.options
           .map((option, index) => {
@@ -192,11 +197,11 @@ function renderQuestion(question: Question): string {
                 type="button"
                 class="answer-option ${isCorrect ? 'correct' : ''} ${isWrong ? 'incorrect' : ''}"
                 data-answer-index="${index}"
-                data-question-id="${question.id}"
+                data-question-id="${escapeHtml(question.id)}"
                 ${isAnswered && !isRetrying ? 'disabled' : ''}
               >
                 <span>${String.fromCharCode(65 + index)}</span>
-                <span>${option}</span>
+                <span>${escapeHtml(option)}</span>
               </button>
             `;
           })
@@ -205,9 +210,9 @@ function renderQuestion(question: Question): string {
       ${showResult ? `
         <div class="result-panel">
           <p class="result-label">${selectedAnswer === question.correctIndex ? 'Richtig' : 'Nicht ganz'}</p>
-          <p>${question.explanation}</p>
+          <p>${escapeHtml(question.explanation)}</p>
           <ul class="source-list">${renderSourceRefs(question.sourceRefs)}</ul>
-          ${canRetry ? `<button type="button" data-review-retry="${question.id}">Erneut beantworten</button>` : ''}
+          ${canRetry ? `<button type="button" data-review-retry="${escapeHtml(question.id)}">Erneut beantworten</button>` : ''}
         </div>
       ` : ''}
     </div>
@@ -240,25 +245,25 @@ function renderExamSession(session: ExamSession): string {
         <div class="section-head">
           <div>
             <p class="eyebrow">Kurzprüfung · 5 Minuten</p>
-            <h2>${module.title}</h2>
+            <h2>${escapeHtml(module.title)}</h2>
           </div>
           <button type="button" data-action="close-exam">Prüfung abbrechen</button>
         </div>
         <div class="exam-progress-line">
-          <span>Frage ${session.currentIndex + 1} von ${session.questionIds.length}</span>
-          <strong data-exam-timer>${formatExamTime(remaining)}</strong>
+          <span>Frage ${escapeHtml(session.currentIndex + 1)} von ${escapeHtml(session.questionIds.length)}</span>
+          <strong data-exam-timer>${escapeHtml(formatExamTime(remaining))}</strong>
         </div>
-        <div class="exam-progress-track"><span style="width: ${(session.currentIndex / session.questionIds.length) * 100}%"></span></div>
+        <div class="exam-progress-track"><span style="width: ${safePercentWidth((session.currentIndex / session.questionIds.length) * 100)}%"></span></div>
         <div class="question-box">
-          <div class="question-meta"><span>Prüfungsfrage</span><strong>${question.id.toUpperCase()}</strong></div>
-          <h3>${question.question}</h3>
+          <div class="question-meta"><span>Prüfungsfrage</span><strong>${escapeHtml(question.id.toUpperCase())}</strong></div>
+          <h3>${escapeHtml(question.question)}</h3>
           <div class="options">
             ${question.options
               .map(
                 (option, index) => `
                   <button type="button" class="answer-option" data-exam-answer="${index}">
                     <span>${String.fromCharCode(65 + index)}</span>
-                    <span>${option}</span>
+                    <span>${escapeHtml(option)}</span>
                   </button>
                 `,
               )
@@ -274,14 +279,14 @@ function renderExamSession(session: ExamSession): string {
     <section class="panel exam-panel exam-result">
       <div class="section-head">
         <div>
-          <p class="eyebrow">${session.status === 'expired' ? 'Zeit abgelaufen' : 'Prüfung abgeschlossen'}</p>
-          <h2>${module.title}</h2>
+          <p class="eyebrow">${escapeHtml(session.status === 'expired' ? 'Zeit abgelaufen' : 'Prüfung abgeschlossen')}</p>
+          <h2>${escapeHtml(module.title)}</h2>
         </div>
         <button type="button" data-action="close-exam">Zurück zum Lernen</button>
       </div>
       <div class="exam-score">
-        <strong>${result.correct}<span>/${result.total}</span></strong>
-        <span>${result.percent}% richtig</span>
+        <strong>${escapeHtml(result.correct)}<span>/${escapeHtml(result.total)}</span></strong>
+        <span>${escapeHtml(result.percent)}% richtig</span>
       </div>
       <div class="exam-review-list">
         ${session.questionIds
@@ -292,10 +297,10 @@ function renderExamSession(session: ExamSession): string {
             const isCorrect = answerIndex === question.correctIndex;
             return `
               <article class="exam-review-item ${isCorrect ? 'correct' : 'incorrect'}">
-                <div class="exam-review-heading"><strong>${index + 1}. ${question.question}</strong><span>${isCorrect ? 'Richtig' : answerIndex === undefined ? 'Keine Antwort' : 'Falsch'}</span></div>
-                <p>Deine Antwort: ${answerIndex === undefined ? 'Keine Antwort' : question.options[answerIndex] ?? 'Ungültige Auswahl'}</p>
-                <p>Richtige Antwort: ${question.options[question.correctIndex]}</p>
-                <p>${question.explanation}</p>
+                <div class="exam-review-heading"><strong>${escapeHtml(index + 1)}. ${escapeHtml(question.question)}</strong><span>${isCorrect ? 'Richtig' : answerIndex === undefined ? 'Keine Antwort' : 'Falsch'}</span></div>
+                <p>Deine Antwort: ${escapeHtml(answerIndex === undefined ? 'Keine Antwort' : question.options[answerIndex] ?? 'Ungültige Auswahl')}</p>
+                <p>Richtige Antwort: ${escapeHtml(question.options[question.correctIndex] ?? 'Keine gültige Antwort')}</p>
+                <p>${escapeHtml(question.explanation)}</p>
                 <ul class="source-list">${renderSourceRefs(question.sourceRefs)}</ul>
               </article>
             `;
@@ -361,9 +366,9 @@ function render(): void {
             <button type="button" data-action="review-next" ${reviewQueue.length === 0 ? 'disabled' : ''}>Wiederholen</button>
           </div>
           <p class="summary">
-            ${selectedModule.title} · ${computeAccuracy(progress.correct, progress.total)}% Trefferquote · ${getMasteryLevel(progress).label} · ${selectedModule.learningObjectives[0]}
+            ${escapeHtml(selectedModule.title)} · ${escapeHtml(computeAccuracy(progress.correct, progress.total))}% Trefferquote · ${escapeHtml(getMasteryLevel(progress).label)} · ${escapeHtml(selectedModule.learningObjectives[0] ?? '')}
           </p>
-          ${validationErrors.length > 0 ? `<p class="validation-warning">Warnung: ${validationErrors.join(', ')}</p>` : ''}
+          ${validationErrors.length > 0 ? `<p class="validation-warning">Warnung: ${escapeHtml(validationErrors.join(', '))}</p>` : ''}
         </section>
 
         <section class="panel agenda-panel">
@@ -372,18 +377,18 @@ function render(): void {
               <p class="eyebrow">Nächste Schritte</p>
               <h2>Heute üben</h2>
             </div>
-            <span class="pill">${studyAgenda.length} Vorschläge</span>
+            <span class="pill">${escapeHtml(studyAgenda.length)} Vorschläge</span>
           </div>
           ${studyAgenda.length > 0 ? `
             <div class="agenda-list">
               ${studyAgenda
                 .map(
                   (item, index) => `
-                    <button class="agenda-item" type="button" data-agenda-module="${item.moduleId}" data-agenda-question="${item.questionId}">
-                      <span class="agenda-order">${String(index + 1).padStart(2, '0')}</span>
+                    <button class="agenda-item" type="button" data-agenda-module="${escapeHtml(item.moduleId)}" data-agenda-question="${escapeHtml(item.questionId)}">
+                      <span class="agenda-order">${escapeHtml(String(index + 1).padStart(2, '0'))}</span>
                       <span class="agenda-copy">
-                        <strong>${item.title}</strong>
-                        <small>${item.kind === 'review' ? `Wiederholen · ${item.pendingCount} offen` : `Weiterlernen · ${item.pendingCount} unbeantwortet`}</small>
+                        <strong>${escapeHtml(item.title)}</strong>
+                        <small>${escapeHtml(item.kind === 'review' ? `Wiederholen · ${item.pendingCount} offen` : `Weiterlernen · ${item.pendingCount} unbeantwortet`)}</small>
                       </span>
                       <span class="agenda-arrow" aria-hidden="true">→</span>
                     </button>
@@ -397,15 +402,15 @@ function render(): void {
         <section class="panel">
           <div class="section-head">
             <h2>Module</h2>
-            <span class="pill">${moduleCatalog.length} Inhalte</span>
+            <span class="pill">${escapeHtml(moduleCatalog.length)} Inhalte</span>
           </div>
           <div class="overview-strip">
             ${buildModuleOverview(moduleCatalog, state.moduleProgress)
               .map(
                 (entry) => `
                   <div class="overview-pill ${entry.status === 'completed' ? 'done' : ''}">
-                    <span>${entry.title}</span>
-                    <strong>${entry.percent}%</strong>
+                    <span>${escapeHtml(entry.title)}</span>
+                    <strong>${escapeHtml(entry.percent)}%</strong>
                   </div>
                 `,
               )
@@ -422,40 +427,40 @@ function render(): void {
           <div class="section-head">
             <div>
               <p class="eyebrow">Lernmodul</p>
-              <h2>${selectedModule.title}</h2>
+              <h2>${escapeHtml(selectedModule.title)}</h2>
             </div>
-            <span class="pill">${selectedModule.exam}</span>
+            <span class="pill">${escapeHtml(selectedModule.exam)}</span>
           </div>
 
           <div class="stat-row">
             <div class="stat-box">
               <span>Fortschritt</span>
-              <strong>${progress.seen}/${progress.total}</strong>
+              <strong>${escapeHtml(progress.seen)}/${escapeHtml(progress.total)}</strong>
             </div>
             <div class="stat-box">
               <span>Genauigkeit</span>
-              <strong>${computeAccuracy(progress.correct, progress.total)}%</strong>
+              <strong>${escapeHtml(computeAccuracy(progress.correct, progress.total))}%</strong>
             </div>
             <div class="stat-box">
               <span>Schwierigkeit</span>
-              <strong>${selectedModule.difficulty}</strong>
+              <strong>${escapeHtml(selectedModule.difficulty)}</strong>
             </div>
           </div>
 
           <div class="mastery-panel">
             <div class="section-head compact">
               <h3>Mastery</h3>
-              <span class="pill">${getMasteryLevel(progress).label}</span>
+              <span class="pill">${escapeHtml(getMasteryLevel(progress).label)}</span>
             </div>
             <div class="mastery-bar">
-              <span style="width: ${getMasteryLevel(progress).percent}%"></span>
+              <span style="width: ${safePercentWidth(getMasteryLevel(progress).percent)}%"></span>
             </div>
           </div>
 
           <div class="study-panel">
             <div class="section-head compact">
               <h3>Lernabschnitte</h3>
-              <span class="pill">${selectedModule.sections.length} Abschnitte</span>
+              <span class="pill">${escapeHtml(selectedModule.sections.length)} Abschnitte</span>
             </div>
             <div class="study-grid">
               ${selectedModule.sections
@@ -464,10 +469,10 @@ function render(): void {
                     <button
                       type="button"
                       class="study-card ${section.id === state.studySectionId ? 'active' : ''}"
-                      data-section-id="${section.id}"
+                      data-section-id="${escapeHtml(section.id)}"
                     >
-                      <span>${section.type}</span>
-                      <strong>${section.title}</strong>
+                      <span>${escapeHtml(section.type)}</span>
+                      <strong>${escapeHtml(section.title)}</strong>
                     </button>
                   `,
                 )
@@ -476,10 +481,10 @@ function render(): void {
             ${currentSection ? `
               <article class="section-detail">
                 <div class="section-header">
-                  <span>${currentSection.type}</span>
-                  <strong>${currentSection.title}</strong>
+                  <span>${escapeHtml(currentSection.type)}</span>
+                  <strong>${escapeHtml(currentSection.title)}</strong>
                 </div>
-                <p>${currentSection.content}</p>
+                <p>${escapeHtml(currentSection.content)}</p>
                 <ul class="source-list">${renderSourceRefs(currentSection.sourceRefs)}</ul>
               </article>
             ` : ''}
@@ -488,16 +493,16 @@ function render(): void {
           <div class="review-box">
             <div class="section-head compact">
               <h3>Wiederholungs-Queue</h3>
-              <span class="pill">${reviewQueue.length} offen</span>
+              <span class="pill">${escapeHtml(reviewQueue.length)} offen</span>
             </div>
             ${reviewQueue.length > 0 ? `
               <div class="review-list">
                 ${reviewQueue
                   .map(
                     (questionId, index) => `
-                      <button type="button" class="review-item" data-review-question="${questionId}">
-                        <span>${index + 1}</span>
-                        <strong>${questionId.toUpperCase()}</strong>
+                      <button type="button" class="review-item" data-review-question="${escapeHtml(questionId)}">
+                        <span>${escapeHtml(index + 1)}</span>
+                        <strong>${escapeHtml(questionId.toUpperCase())}</strong>
                       </button>
                     `,
                   )
@@ -507,7 +512,7 @@ function render(): void {
           </div>
 
           <div class="objective-list">
-            ${selectedModule.learningObjectives.map((objective) => `<li>${objective}</li>`).join('')}
+            ${selectedModule.learningObjectives.map((objective) => `<li>${escapeHtml(objective)}</li>`).join('')}
           </div>
 
           ${currentQuestion ? renderQuestion(currentQuestion) : '<p>Keine Fragen verfügbar.</p>'}

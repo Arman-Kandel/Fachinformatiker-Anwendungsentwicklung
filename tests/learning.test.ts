@@ -2,10 +2,15 @@ import { describe, expect, it } from 'vitest';
 
 import { getModuleById, getModuleCatalog, getModuleIndex, getQuizByModuleId } from '../src/app/content-loader/content-loader';
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
+import { escapeHtml } from '../src/lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, startExamSession, updateModuleProgressForAnswer, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
+  it('escapes text before inserting it into HTML templates', () => {
+    expect(escapeHtml(`<img src=x onerror='alert("x")'>&`)).toBe('&lt;img src=x onerror=&#39;alert(&quot;x&quot;)&#39;&gt;&amp;');
+  });
+
   it('validates a complete module with source references', () => {
     const module: Module = {
       moduleId: 'ap1-01-datenmodellierung',
