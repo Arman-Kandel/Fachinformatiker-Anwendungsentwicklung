@@ -2,17 +2,19 @@
 
 ## Status 2026-11-10
 
-Die frühere Philosophie der Sicherheits- und Qualitätsarbeit wurde in die technische Projektbasis übersetzt: strenge TypeScript-Checks, zentrale Agenten-Regeln, definierter Qualitätslauf (`npm run check`), modulare Datenquellen und robuste Persistenz-Schicht. Der Stack ist damit deutlich robuster für spätere Erweiterungen und für AI-gestützte Entwicklung.
+Statusmarker: `[x]` umgesetzt, `[~]` teilweise umgesetzt, `[ ]` offen.
+
+Die technischen Basismaßnahmen sind implementiert und `npm run check` besteht aktuell mit 21 Tests, TypeScript und Production-Build. Inhaltliche Breite, vollständige Schema-/Duplicate-ID-Validierung, Rollback und externe Live-Deploy-Prüfung bleiben offen.
 
 ### Reale Produktionsverbesserungen
 
-- Storage-Fallback verhindert Laufzeitfehler in Test- und CI-Umgebungen
-- State-Normalisierung verwirft beschädigte Felder einzeln; gesperrtes oder fehlschlagendes `localStorage` fällt auf Memory-Storage zurück
-- versionierter JSON-Export und validierter Import ermöglichen die lokale Sicherung und Wiederherstellung des Lernstands
-- modulare Lernmodule erlauben klarere Validierung und Erweiterung
-- persistierte Lernabschnitt-Auswahl schützt den Resume-First-Workflow
-- Mastery- und Prüfungslogik unterstützt Lernkontrolle und Wiederholungsstrategie
-- das Projekt erfüllt einen echten Checklauf mit Test- und Build-Evidenz
+- [x] Storage-Fallback verhindert Laufzeitfehler in Test-/CI-Umgebungen
+- [x] State-Normalisierung verwirft beschädigte Felder einzeln; gesperrtes oder fehlschlagendes `localStorage` fällt auf Memory-Storage zurück
+- [x] Versionierter JSON-Export und validierter Import sichern/wiederherstellen den Lernstand lokal
+- [x] Modulare Lernmodule ermöglichen Content-Erweiterung; vollständige dynamische Loader-Discovery fehlt
+- [x] Persistierte Lernabschnitt-Auswahl schützt den Resume-First-Workflow
+- [~] Mastery, Tagesagenda, Kurzprüfung und Wiederholung; kein vollwertiger fachübergreifender Exam Simulator
+- [x] Projektcheck mit TypeScript-, Test- und Build-Evidenz bestanden
 
 ## 1. Ausgangspunkt
 
@@ -59,10 +61,10 @@ Rückwärtslogik:
 - Ohne Vertrauen scheitert jede Lernplattform, selbst wenn UI und Design gut aussehen
 
 Produktionslösung:
-- jedes Modul braucht `sourceRefs`
-- alle fachlichen Aussagen müssen durch Referenzen abgesichert werden
-- jede neue Frage muss mit einer Quelle und einem Zweck verknüpft werden
-- Quellen- und Prüfungsbelege sind Teil des Repos, nicht nur der UI
+- [x] Jedes aktuelle Modul hat `sourceRefs`
+- [~] Aktuelle fachliche Abschnitte und Fragen haben Belege; semantische Prüfung jedes einzelnen Satzes bleibt Review-Aufgabe
+- [x] Jede aktuelle Quizfrage ist mit Quelle und Lernzweck erfasst
+- [x] Quellen- und Prüfungsbelege liegen im Repo und werden in der UI angezeigt
 
 ### 3.2 Inhalte und App-Logik waren nicht sauber getrennt
 
@@ -77,10 +79,10 @@ Rückwärtslogik:
 - Wenn UI und Inhalt nicht getrennt sind, kann keine saubere PR-Strategie funktionieren
 
 Produktionslösung:
-- `content/` ist eigenständiger Bereich
-- UI liest Daten aus einem klaren Schema
-- Content wird validiert, nicht “im Kopf” gepflegt
-- jede Änderung erfolgt über strukturierte Dateiänderungen
+- [x] `content/` ist eigenständiger Bereich
+- [~] UI liest strukturierte Modul-/Quizdaten; das Laufzeitschema wird noch nicht per JSON Schema validiert
+- [~] Content wird durch Modul- und Quellenchecks validiert; weitere Struktur-/ID-Gates fehlen
+- [x] Content wird über strukturierte JSON-Dateien geändert
 
 ### 3.3 Keine Validierung und keine Qualitätsgates
 
@@ -94,11 +96,11 @@ Rückwärtslogik:
 - Ein GitHub-Pages-Launch ohne CI-Checks ist kein produktionsreifer Release
 
 Produktionslösung:
-- Content-Validierung vor Merge
-- strukturelle JSON-Checks
-- Prüfungen für Quellenpflicht
-- Disallow-Checks für leere Inhalte, unvollständige Fragen, fehlende Lernziele
-- release-basierte Qualitätssicherung
+- [~] Content-Validierung vor Merge über `npm run check` und Quellen-Audit; kein CI-Gate für JSON Schema
+- [ ] Strukturelle JSON-Schema-Checks für alle Dateien
+- [x] Automatischer Quellenpflicht-/Zitatregister-Test für aktuellen Content
+- [~] Modulvalidierung prüft Lernziele/Sections; vollständige Quizfeld- und Duplicate-ID-Checks fehlen
+- [~] Qualitätslauf ist vorhanden; formaler Release-Prozess/Changelog fehlt
 
 ### 3.4 Keine robuste User-Data-Strategie
 
@@ -112,10 +114,10 @@ Rückwärtslogik:
 - Die App kann optisch gut sein, aber der Lernfortschritt bricht, sobald der Benutzer die Seite erneut öffnet
 
 Produktionslösung:
-- `storage`-Schema mit Versionskontrolle
-- Migrationslogik bei Datenänderungen
-- Backups / Export-Funktion
-- lokale Daten klar getrennt nach Fortschritt, Notizen, Tests, Wiederholungsdaten
+- [x] Versionierter `storage`-Payload
+- [~] Normalisierung und Legacy-Kompatibilität; kein versionsübergreifendes Migrationsframework
+- [x] JSON-Backup/Import des lokalen App-States
+- [~] Fortschritt, Antworten, Reviews und Prüfungssession sind typisiert; Notizen/Testhistorie fehlen
 
 ### 3.5 Die Testlogik war nicht modular genug
 
@@ -129,10 +131,10 @@ Rückwärtslogik:
 - Ein Test muss als “Fragenpool + Regeln + Auswahllogik” gebaut werden, nicht als hartcodiertes Formular
 
 Produktionslösung:
-- `questionPool` anlegen
-- `testSet` als eigener Datentyp
-- `alternateVariants` als definierte Auswahl-Mechanik
-- `randomizationRules`, `difficultyRules`, `topicRules`
+- [ ] `questionPool` anlegen
+- [ ] `testSet` als eigenen Datentyp implementieren
+- [ ] `alternateVariants` als Auswahl-Mechanik implementieren
+- [ ] Randomisierungs-, Schwierigkeits- und Themenregeln
 
 ### 3.6 Keine reale Operational Readiness
 
@@ -147,10 +149,10 @@ Rückwärtslogik:
 - GitHub Pages macht Deployment leicht, aber nicht automatisch stabil
 
 Produktionslösung:
-- Definition einer Release-Checkliste
-- Deployment nur nach Validierung
-- minimale Produktions-Checks vor Merge in `main`
-- dokumentierte Rollback-Strategie
+- [~] Release-Checkliste ist im Dokument definiert, aber noch nicht als verbindlicher Prozess eingeführt
+- [~] Deployment-Workflow baut bei Push; zusätzliche Content-Gates fehlen
+- [x] Mindestcheck `npm run check` vor Änderungen dokumentiert und lokal verfügbar
+- [ ] Rollback-Strategie dokumentiert
 
 ---
 
@@ -160,21 +162,31 @@ Produktionslösung:
 
 Alle fachlichen Inhalte müssen mit Nachweis kommen. Eine Aussage ohne Referenz ist nicht produktionsreif.
 
+**Status:** `[~]` Quellenkatalog und exakter Zitat-Audit sind aktiv; semantische Prüfung jedes einzelnen Satzes bleibt manuell.
+
 ### 4.2 Datenfirst
 
 Die Lernplattform ist kein Designprojekt, sondern ein Datenprojekt. Wenn die Datenstruktur falsch ist, scheitert die App.
+
+**Status:** `[x]` Content ist vom UI getrennt und Quellenreferenzen sind strukturierte Daten; Schema-/Duplicate-ID-Checks fehlen.
 
 ### 4.3 Modularität vor Schönheit
 
 Design kann nachgezogen werden. Erst die modulare Stabilität macht das System nutzbar.
 
+**Status:** `[~]` Content und Lernlogik sind modular; `main.ts` und Content-Loader sind noch nicht in Feature-Module zerlegt.
+
 ### 4.4 Keine versteckten Abhängigkeiten
 
 Jedes Modul muss eigenständig verstanden werden, ohne die gesamte App zu kennen.
 
+**Status:** `[~]` Module/Quizdateien sind eigenständig, aber jedes neue Modul muss derzeit im Loader registriert werden.
+
 ### 4.5 AI-resistent statt AI-reliant
 
 AI-Agenten dürfen die Plattform unterstützen, aber sie müssen auf klare Strukturen und Regeln treffen, nicht auf unstrukturiertes “Freitext-Wissen”.
+
+**Status:** `[~]` Agentenregeln, Quellenkatalog und Tests bestehen; vollständige automatische Schema-Validierung fehlt.
 
 ---
 
@@ -182,32 +194,32 @@ AI-Agenten dürfen die Plattform unterstützen, aber sie müssen auf klare Struk
 
 ### 5.1 Technische Anforderungen
 
-- GitHub Pages-Deployment nur mit validierten statischen Assets
-- keine geheimen Daten oder Tokens im Frontend
-- Browser-only Datenlokalisierung mit klarer Migration
-- App muss offline-/lokal nutzbar sein, aber ohne Datenverlust
-- keine eklatanten Latenzprobleme bei der Initialisierung
+- [~] GitHub-Pages-Workflow ist eingerichtet; Content-Schema-Validierung vor Deploy fehlt
+- [x] Keine geheimen Daten oder Tokens im Frontend
+- [~] Browser-only Datenlokalisierung und State-Normalisierung vorhanden; Schema-Migration ist nicht vollständig
+- [~] App ist lokal nutzbar und hat JSON-Backup/Import; Memory-Fallback überlebt keinen Seitenneustart
+- [x] Initialisierung und Build sind klein; keine auffälligen Latenzprobleme im lokalen Smoke-Test
 
 ### 5.2 Content-Anforderungen
 
-- Jeder Lernsatz hat eine `sourceRef`
-- jedes Modul verfügt über `id`, `exam`, `title`, `difficulty`, `tags`, `learningObjectives`
-- Quizfragen sind mit Begründung und Quelle dokumentiert
-- Testsets und Alternativen sind in einem definierten Schema erfasst
+- [~] Aktuelle Abschnitte und Fragen besitzen `sourceRefs`; pro Einzelsatz gibt es keine automatisierte semantische Prüfung
+- [x] Module verfügen über `moduleId`, `exam`, `title`, `difficulty`, `tags` und `learningObjectives`
+- [x] Aktuelle Quizfragen haben Erklärung und registrierte Quelle
+- [ ] Testsets und Alternativen in einem definierten Schema
 
 ### 5.3 Qualitätsanforderungen
 
-- alle JSON-Dateien validieren
-- alle Module müssen im Standard-Index gelistet sein
-- keine unvollständigen Quizfragen oder fehlenden Antworten
-- keine doppelten oder widersprüchlichen Content-IDs
+- [ ] Alle JSON-Dateien gegen JSON Schema validieren
+- [x] Alle aktuellen Module sind im AP1-Index gelistet
+- [~] Aktuelle Quizdateien enthalten vollständige Antworten; generischer Pflichtfeld-/Indexbereichscheck fehlt
+- [ ] Automatischer Check auf doppelte oder widersprüchliche Content-IDs
 
 ### 5.4 Release-Anforderungen
 
-- nur merges mit erfolgreichem Validation-Check
-- falls Content-Fehler erkannt werden → Blockierung des Release
-- jede Release hat eine kurze Changelog-Notiz
-- Rollback muss innerhalb kurzer Zeit möglich sein
+- [~] `npm run check` ist vorhanden; Branch Protection/erzwungener Merge-Gate nicht geprüft
+- [~] Build/Test/Quellenfehler schlagen lokal fehl; vollständige Content-Validierung ist offen
+- [ ] Jede Release hat eine Changelog-Notiz
+- [ ] Rollback ist dokumentiert und praktisch geprüft
 
 ---
 
@@ -217,37 +229,37 @@ AI-Agenten dürfen die Plattform unterstützen, aber sie müssen auf klare Struk
 
 Vor dem Merge muss geprüft werden:
 
-- existiert `sourceRefs`?
-- sind alle `sourceIds` im Register enthalten?
-- gibt es leere `question`-Felder?
-- sind Antworten eindeutig?
-- sind Tags und Lernziele vorhanden?
+- [x] `sourceRefs` vorhanden
+- [x] Alle `sourceIds` im Katalog enthalten; aktuelle Zitate werden wortgetreu geprüft
+- [~] Keine leeren `question`-Felder in den aktuellen Dateien; generischer Pflichtfeld-Validator fehlt
+- [~] Antworten sind in den aktuellen Dateien eindeutig; automatischer Bereichs-/Duplikatcheck fehlt
+- [x] Tags und Lernziele an aktuellen Modulen vorhanden
 
 ### 6.2 Testvalidierung
 
 Vor dem Merge muss geprüft werden:
 
-- entspricht der Frage einem vorhandenen Thema?
-- wurde ein korrekter `correctIndex` angegeben?
-- sind Alternativen wirklich alternative Varianten, kein Duplikat?
-- haben Testsets die richtige `questionPool`-Beziehung?
+- [~] Fragen sind Modulen zugeordnet; formale Topic-Validierung fehlt
+- [~] Aktuelle `correctIndex`-Werte sind handgeprüft; automatischer Bereichscheck fehlt
+- [ ] Alternativen auf Varianten und Duplikate prüfen
+- [ ] Testsets gegen ihren `questionPool` validieren
 
 ### 6.3 Storage-Validierung
 
 Vor dem Merge muss geprüft werden:
 
-- Schema-Version vorhanden?
-- Migration bei altem Speicher definiert?
-- Notizen und Fortschritte bleiben konsistent?
+- [x] Schema-Version im Storage-Payload vorhanden
+- [~] Alte Raw-States werden normalisiert; versionsübergreifende Migrationen fehlen
+- [~] Fortschritt und Antworten werden normalisiert; Notizen sind nicht implementiert
 
 ### 6.4 UI-Validierung
 
 Vor dem Merge muss geprüft werden:
 
-- mobile und desktop nutzbar
-- keine Textüberläufe
-- keine unlesbaren Farbkombinationen
-- Animationen stören nicht den Lernfluss
+- [~] Desktop und Mobile manuell geprüft; kein automatisierter Viewport-Check
+- [~] Geprüfte Screens ohne Überlauf; kein systematischer Lauf für alle Zustände
+- [~] Kontrast wurde punktuell geprüft; kein automatisierter Kontrast-Gate
+- [x] Keine Animationen, die den Prüfungs-/Lernfluss blockieren
 
 ---
 
@@ -255,28 +267,28 @@ Vor dem Merge muss geprüft werden:
 
 ### Entwicklung
 
-- [ ] Inhalte sind in `content/` modelliert
-- [ ] `sourceRefs` sind gesetzt
-- [ ] Quellen sind im `sources/`-Register verzeichnet
-- [ ] Module validieren ohne Fehler
-- [ ] Quizfragen validieren ohne konsekutive Fehler
+- [x] Inhalte sind in `content/` modelliert
+- [x] `sourceRefs` sind gesetzt
+- [x] Quellen sind im `sources/`-Register und `sources/catalog.json` verzeichnet
+- [x] Aktuelle Module validieren ohne Fehler
+- [~] Aktuelle Quizfragen sind vollständig; generische Schema-/Indexvalidierung fehlt
 - [ ] Test-Varianten sind definiert
 
 ### Review
 
-- [ ] fachlicher Inhalt wurde geprüft
-- [ ] Quellen wurden nachvollzogen
-- [ ] keine unbewiesenen Aussagen
-- [ ] Design stört die Lernaufnahme nicht
-- [ ] UI bleibt trotz Animationen klar und stabil
+- [~] Aktuelle Inhalte sind mit offiziellen Stellen gegengeprüft; unabhängiges fachliches Review steht aus
+- [x] Quellen und Originalauszüge wurden nachvollzogen
+- [~] Automatischer Quellenbelegtest besteht; semantisches Review aller Aussagen bleibt offen
+- [~] Lern-UI ist funktional; formale Nutzungsprüfung fehlt
+- [x] UI bleibt ohne störende Animationen; Layout wurde in Desktop/Mobile-Stichproben geprüft
 
 ### Release
 
-- [ ] Build erfolgreich
-- [ ] Validierung erfolgreich
-- [ ] GitHub Pages Deployment funktioniert
+- [x] Build erfolgreich (`npm run check`)
+- [~] TypeScript, Tests, Quellen-Audit erfolgreich; vollständige Schema-/Duplicate-ID-Validierung fehlt
+- [~] GitHub-Pages-Workflow vorhanden; Live-Deployment nicht aktuell verifiziert
 - [ ] Rollback-Strategie dokumentiert
-- [ ] Changelog und Status bekannt
+- [ ] Changelog und Release-Status veröffentlicht
 
 ---
 
@@ -286,11 +298,11 @@ AI-Agenten sollen nur unter klaren Regeln agieren. Das verhindert, dass sie Inha
 
 ### Regeln
 
-1. Keine fachliche Aussage ohne Referenz.
-2. Keine neue Testfrage ohne `sourceRefs`.
-3. Keine neue Modul-Definition ohne Schema-Check.
-4. Keine umstrittene Aussage ohne Review.
-5. Jeder neue Inhalt muss in den Quellen-Index gelistet werden.
+1. [x] Keine aktuelle fachliche Aussage ohne Referenz.
+2. [x] Keine aktuelle Testfrage ohne `sourceRefs`.
+3. [~] Neue Module haben Tests/Runtime-Validierung; JSON-Schema-Check fehlt.
+4. [~] Offizielle Belege werden nachvollzogen; unabhängiges fachliches Review ist nicht durchgängig dokumentiert.
+5. [x] Neue Quellen müssen im Quellenkatalog registriert sein.
 
 ### Sinn
 

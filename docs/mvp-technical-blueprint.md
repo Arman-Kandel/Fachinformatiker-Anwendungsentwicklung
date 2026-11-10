@@ -2,18 +2,21 @@
 
 ## Status 2026-11-10
 
-Die Basiskomponenten des MVP sind implementiert: zentrale App-Struktur, modulare Content-Loader, mehrere Lernmodule mit Quellbelegen, lokale State-Persistenz mit Fallback-Mechanik, UI-Shell mit Resume-First-Flow und eine erste Testabdeckung für die Lernlogik. Der Build- und Type-Check läuft erfolgreich, sodass der Code als produktionsnahe Baseline für weitere Module und Features dient.
+Statusmarker: `[x]` umgesetzt, `[~]` teilweise umgesetzt, `[ ]` offen.
+
+Die statische MVP-Basis ist lauffähig. Sie enthält drei belegte AP1-Module, einen maschinenprüfbaren Quellenkatalog, State-Normalisierung, lokalen JSON-Export/Import, Kurzprüfung und Tagesagenda. Der Blueprint unten enthält Zielarchitektur und offene Anforderungen; er beschreibt nicht durchgehend den aktuellen Dateibaum.
 
 ### Erweiterter MVP-Stand
 
-- Content-Model als modulare Struktur im `content/`-Ordner
-- AP1-Module: Datenmodellierung, SQL-Grundlagen und Prüfungsrahmen
-- Storage-Schicht mit Versionskontrolle und Browser-/Node-Absicherung
-- Lernabschnitts-Flow mit persistierter Auswahl des aktuellen Abschnitts
-- Mastery-Status und Prüfungsmodus für Lernfortschritt und Wiederholungsstrategie
-- additive `examSession` und `retryQuestionId` im App-State speichern laufende Kurzprüfungen und Wiederholungsposition; Prüfungsantworten verändern die separate Übungsstatistik nicht
-- neue Übungsantworten sind mit der Modul-ID verschlüsselt im Antwortschlüssel, damit wiederverwendete Frage-IDs nicht zwischen Modulen kollidieren; alte unscoped Einträge bleiben erhalten
-- Prüfungslauf: TypeScript + Vitest + Vite Production Build
+- [x] Content-Model als modulare Struktur im `content/`-Ordner
+- [x] AP1-Module: Datenmodellierung, SQL-Grundlagen und Prüfungsrahmen
+- [x] Versionierte Storage-Schicht mit Browser-/Node-Absicherung und Runtime-Normalisierung
+- [x] Lernabschnitts-Flow mit persistierter Auswahl des aktuellen Abschnitts
+- [x] Mastery-, Tagesagenda-, Retry- und Kurzprüfungslogik
+- [x] Additive `examSession`- und `retryQuestionId`-Felder; Prüfungsantworten verändern nicht die separate Übungsstatistik
+- [x] Modulbezogene Antwortschlüssel; alte unscoped Einträge bleiben erhalten
+- [x] Versionierter JSON-Export/-Import
+- [x] Letzter Check: TypeScript, 21 Tests und Vite Production Build erfolgreich
 
 ## 1. Ziel des MVP
 
@@ -21,13 +24,13 @@ Das erste produktionsfähige MVP soll die Lernplattform als robuste, modular auf
 
 Die Kernanforderungen des MVP sind:
 
-- GitHub Pages Deployment
-- modulare Lerninhalte aus `content/`
-- klare Trennung von UI, Logik und Daten
-- lokale Speicherung im Browser ohne Backend
-- Tests mit alternativen Fragen und Auswahllogik
-- strenge `sourceRefs`-Verpflichtung
-- Validierung vor jedem Release
+- [x] GitHub Pages Deployment-Workflow
+- [x] Modulare Lerninhalte aus `content/`
+- [~] Trennung von UI, Logik und Daten; Loader und Lernlogik sind getrennt, UI bleibt in einer großen `main.ts`
+- [x] Lokale Speicherung im Browser ohne Backend
+- [ ] Tests mit alternativen Fragenpools und Auswahllogik
+- [x] `sourceRefs`-Verpflichtung mit exaktem Audit für aktuellen Content
+- [~] Validierung vor Release: TypeScript, Vitest, Build und Quellenprüfung; JSON-Schema-/ID-Duplikat-Checks fehlen
 
 ---
 
@@ -106,13 +109,15 @@ content/
    └─ test-example.json
 ```
 
+**Status:** Zielstruktur. Tatsächlich vorhanden sind Content-Loader, Storage, Lernlogik, `main.ts`, CSS und Vitest-Tests. Separate Feature-Module, Router, IndexedDB, Service-Worker-Cache, Test-Engine und `public/vendor/` sind offen.
+
 ### Abhängigkeiten und Windows-Setup
 
-- Build-Werkzeuge werden in `package.json` exakt versioniert und über `package-lock.json` reproduzierbar aufgelöst.
-- `scripts/bootstrap-windows.ps1` richtet Node.js lokal unter `.tools/` ein, falls keine kompatible Installation vorhanden ist. Das Windows-Archiv stammt von `nodejs.org` und wird gegen dessen SHA-256-Manifest geprüft.
-- npm-Pakete werden ausschließlich über `https://registry.npmjs.org/` bezogen. Der Bootstrap prüft die Lockfile-URLs und führt anschließend `npm ci` aus.
-- `.tools/`, `node_modules/` und `dist/` sind lokale oder generierte Dateien und werden nicht eingecheckt.
-- `public/vendor/` ist ausschließlich für tatsächlich benötigte Browser-Laufzeitdateien vorgesehen; Build-Werkzeuge gehören nicht dorthin.
+- [x] Build-Werkzeuge sind in `package.json`/`package-lock.json` reproduzierbar fixiert.
+- [x] `scripts/bootstrap-windows.ps1` richtet Node.js lokal ein und prüft das Archiv per SHA-256.
+- [x] Der Bootstrap prüft npm-Registry-URLs und führt `npm ci` aus.
+- [x] `.tools/`, `node_modules/` und `dist/` sind lokale oder generierte Dateien.
+- [x] Keine externen Browser-Runtime-Scripts oder CDN-Abhängigkeiten; `public/vendor/` wird derzeit nicht benötigt.
 
 ---
 
@@ -122,12 +127,11 @@ Die Lernplattform muss als datengetriebene App gebaut werden. UI und Logik werde
 
 Jedes Modul ist ein eigenes Paket mit:
 
-- allgemeine Metadaten
-- fachliche Inhalte
-- Lernziele
-- Quizfragen
-- Karten
-- Quellenbelege
+- [x] Allgemeine Metadaten
+- [x] Fachliche Inhalte und Lernziele
+- [x] Quizfragen in separater `quiz.json`
+- [ ] Karteikarten
+- [x] Quellenbelege an Modul, Abschnitt und Frage
 
 Das ist entscheidend, damit neue Inhalte leicht via PR hinzugefügt werden können.
 
@@ -137,7 +141,9 @@ Zusätzlich gilt eine zentrale UX-Prämisse: Die App arbeitet als Resume-First-L
 
 ## 4. Pflicht-Schema für Lernmodule
 
-Jedes Modul muss dieses Grundschema erfüllen:
+Jedes Modul muss dieses Grundschema erfüllen.
+
+**Status:** Das folgende JSON ist ein Ziel-/Beispielschema, kein aktueller Laufzeitvertrag. Aktuell fehlen `schemaVersion`, Flashcards und eingebettete Quizdaten; `module.json` und `quiz.json` sind getrennt. Quellen-IDs müssen aus `sources/catalog.json` stammen.
 
 ```json
 {
@@ -156,9 +162,9 @@ Jedes Modul muss dieses Grundschema erfüllen:
   "dependencies": ["ap1-00-klausurrahmen"],
   "sourceRefs": [
     {
-      "sourceId": "IHK-AP1-Rahmen-2026",
-      "quote": "...",
-      "section": "Rahmenkonzept",
+      "sourceId": "ORACLE-DB-CONCEPTS",
+      "quote": "A table describes an entity such as employees.",
+      "section": "Schema Objects > Tables",
       "type": "official"
     }
   ],
@@ -178,7 +184,11 @@ Jedes Modul muss dieses Grundschema erfüllen:
       "correctIndex": 1,
       "explanation": "...",
       "sourceRefs": [
-        { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A table describes an entity such as employees.",
+          "section": "Schema Objects > Tables"
+        }
       ]
     }
   ],
@@ -188,7 +198,11 @@ Jedes Modul muss dieses Grundschema erfüllen:
       "front": "Was ist eine Entität?",
       "back": "Eine Entität ist ...",
       "sourceRefs": [
-        { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A table describes an entity such as employees.",
+          "section": "Schema Objects > Tables"
+        }
       ]
     }
   ]
@@ -199,15 +213,11 @@ Jedes Modul muss dieses Grundschema erfüllen:
 
 Ein Modul gilt nur als valid, wenn:
 
-- `moduleId` vorhanden
-- `exam` vorhanden
-- `title` vorhanden
-- `learningObjectives` nicht leer
-- `sourceRefs` vorhanden
-- `quiz` nicht leer
-- jeder `quiz`-Eintrag hat `correctIndex`
-- jede Frage hat eine Erklärung
-- jede fachliche Aussage hat Quellenverweis
+- [x] `moduleId`, `exam` und `title` vorhanden
+- [x] `learningObjectives` und Modul-`sourceRefs` nicht leer
+- [~] Quizfragen haben Erklärungen und Quellen; Bereichsprüfung des `correctIndex` fehlt
+- [x] Aktueller Modul-/Abschnitts-/Quizcontent ist gegen freigegebene Quellenbelege getestet
+- [ ] Vollständige JSON-Schema-Validierung aller Dateien
 
 ---
 
@@ -232,7 +242,11 @@ Ein Test ist kein hartcodierter UI-Block, sondern ein eigener Datentyp mit Frage
       "correctIndex": 2,
       "explanation": "...",
       "sourceRefs": [
-        { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+        {
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Normalization is the process of organizing data in a database. It includes creating tables and establishing relationships between those tables according to rules designed both to protect the data and to make the database more flexible by eliminating redundancy and inconsistent dependency.",
+          "section": "Description of normalization"
+        }
       ]
     }
   ],
@@ -253,7 +267,11 @@ Ein Test ist kein hartcodierter UI-Block, sondern ein eigener Datentyp mit Frage
     "difficultyMix": ["leicht", "mittel", "schwer"]
   },
   "sourceRefs": [
-    { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+    {
+      "sourceId": "MICROSOFT-DB-NORMALIZATION",
+      "quote": "Normalization is the process of organizing data in a database. It includes creating tables and establishing relationships between those tables according to rules designed both to protect the data and to make the database more flexible by eliminating redundancy and inconsistent dependency.",
+      "section": "Description of normalization"
+    }
   ]
 }
 ```
@@ -262,11 +280,11 @@ Ein Test ist kein hartcodierter UI-Block, sondern ein eigener Datentyp mit Frage
 
 Das ermöglicht im MVP bereits:
 
-- mehrere Sets mit alternativen Fragen
-- Auswahl verschiedener Varianten
-- zufällige Wiederholungs-Tests
-- gezielte Wiederholung nach Schwachstellen
-- leichtes Hinzufügen neuer Varianten per PR
+- [ ] Mehrere Sets mit alternativen Fragen
+- [ ] Auswahl verschiedener Varianten
+- [ ] Zufällige Wiederholungs-Tests
+- [~] Gezielte Wiederholung nach Fehlversuchen
+- [~] Neue feste Modul-/Quizdateien per PR; Varianten-Schema fehlt
 
 ---
 
@@ -276,20 +294,20 @@ Die App darf keinen harten, festen einseitigen Quiz-Block verwenden. Stattdessen
 
 ### Grundlogik
 
-1. Nutze `questionPool` des gewählten Themas
-2. wähle basierend auf `selectionRules`
-3. lade `testSet` oder generiere eine neue Auswahl
-4. prüfe Antworten
-5. speichere Ergebnisse lokal
-6. nutze Fehlerstatistiken für nächste Wiederholung
+1. [ ] `questionPool` des gewählten Themas nutzen
+2. [ ] Auswahl anhand von `selectionRules` treffen
+3. [ ] `testSet` laden oder eine neue Auswahl generieren
+4. [x] Antworten in modulbezogenen Quizfragen prüfen
+5. [~] Fortschritt lokal speichern; separate Ergebnisse je Testsitzung fehlen
+6. [~] Fehlversuche zur nächsten Wiederholung nutzen; Fehlerstatistik ist nicht historisiert
 
 ### Auswahltypen
 
-- Standardtest
-- Wiederholungsmodus
-- Schwache-Themen-Modus
-- Zufälliger Alternativtest
-- Klausur-Simulationsmodus
+- [x] Standardtest / Schnelltest
+- [x] Wiederholungsmodus für Fehlversuche
+- [~] Schwächenfokus über offene Wiederholungs-Queue
+- [ ] Zufälliger Alternativtest
+- [~] Zeitbegrenzte Kurzprüfung je Modul; keine fachübergreifende Klausursimulation
 
 ---
 
@@ -298,6 +316,8 @@ Die App darf keinen harten, festen einseitigen Quiz-Block verwenden. Stattdessen
 Die Lernplattform darf keine sensiblen oder wichtigen Nutzerdaten außerhalb des Browsers speichern. Die lokale Speichermodellierung muss versioniert und sauber getrennt sein.
 
 Für die UX ist die State Preservation hier besonders wichtig. Wenn der Nutzer kurz weg ist, muss die App nach dem Neustart exakt in den Lernzustand zurückkehren, den er zuletzt hatte.
+
+**Status:** Der folgende State-Entwurf mit Profil, Notizen, Testhistorie und Spaced-Repetition-Feldern ist ein Zielbild. Der Ist-State enthält Modul-/Abschnittsauswahl, Antworten, Fortschritt, Wiederholungsqueue, aktive Prüfungsrunde und Retry-Cursor.
 
 ```json
 {
@@ -331,10 +351,10 @@ Für die UX ist die State Preservation hier besonders wichtig. Wenn der Nutzer k
 
 ### Anforderungen
 
-- Versionskontrolle für Storage-Schema
-- Migration bei Schema-Änderungen
-- Trennung von Fortschritt, Notizen, Testdaten und Wiederholungsdaten
-- keine unstrukturierten JSON-Blobs
+- [x] Versionskontrolle für Storage-Payload
+- [~] Runtime-Normalisierung und Legacy-Kompatibilität; kein versionsübergreifendes Migrationsframework
+- [~] Fortschritt, Antworten, Wiederholungen und Prüfungssession sind strukturiert; Notizen/Testhistorie fehlen
+- [x] Strukturierter, versionierter App-State; Export verwendet ein eigenes bekanntes Format
 
 ---
 
@@ -344,26 +364,26 @@ Damit die App nicht schon bei frühen Versionsschritten „Live“ ist, müssen 
 
 ### Technische Gates
 
-- JSON-Schema validieren
-- `sourceRefs` vorhanden
-- alle `sourceId` im Register gefunden
-- keine duplizierten `moduleId` oder `testId`
-- Inhalte sind in der richtigen `content/`-Ordnerstruktur
+- [ ] JSON-Schema validieren
+- [x] `sourceRefs` für aktuelle Module, Abschnitte und Fragen vorhanden
+- [x] Alle aktuellen Quellen-IDs und Zitate im Katalog gefunden
+- [ ] Automatischer Check auf duplizierte `moduleId`, `questionId` oder `testId`
+- [x] Aktueller Content liegt in der `content/`-Ordnerstruktur
 
 ### Fachliche Gates
 
-- jede Frage hat Erklärung
-- jede Antwort hat Beleg
-- kein Lerninhalt ohne Quelle
-- Prüfungsbereich klar markiert
+- [x] Jede aktuelle Frage hat Erklärung
+- [~] Beleg ist pro Aussage/Frage referenziert; semantische Deckung bleibt ein Review-Schritt
+- [x] Aktuelle Lerninhalte haben registrierte Quellenbelege
+- [x] Prüfungsbereich ist im Modul markiert
 
 ### Release-Gates
 
-- Build erfolgreich
-- Validierungen erfolgreich
-- GitHub Pages Deployment verifiziert
-- Changelog vorhanden
-- Rollback dokumentiert
+- [x] Build erfolgreich (`npm run check`)
+- [~] TypeScript, Tests, Build und Quellen-Audit laufen; Schema-/Duplikatvalidierung fehlt
+- [~] GitHub-Pages-Workflow ist eingerichtet; aktueller Live-Deploy nicht geprüft
+- [ ] Changelog vorhanden
+- [ ] Rollback dokumentiert
 
 ---
 
@@ -371,41 +391,41 @@ Damit die App nicht schon bei frühen Versionsschritten „Live“ ist, müssen 
 
 ### Phase 1: Datenmodell und Struktur
 
-- `content/`-Layout einrichten
-- `schema/` hinzufügen
-- erste Beispielmodule und Testsets anlegen
-- Validierungen definieren
+- [x] `content/`-Layout einrichten
+- [x] Schema-Beispiele angelegt; automatischer Schema-Check offen
+- [~] Drei belegte AP1-Module; Testsets und AP2-Beispiele fehlen
+- [~] Quellen-/Modulprüfung vorhanden; vollständige Strukturvalidierung offen
 
 ### Phase 2: App-Logik
 
-- Content Loader
-- Modul-Renderer
-- Statistik- und Fortschrittslogik
-- Local Storage Manager
-- Session-State Recovery
-- Resume-First Startscreen
+- [x] Content Loader
+- [x] Modul-Renderer
+- [~] Fortschritt pro Modul; zeitlicher Verlauf/Statistiken fehlen
+- [x] Local Storage Manager mit Fallback und Normalisierung
+- [x] Session-State Recovery und JSON-Sicherung
+- [x] Resume-First Startscreen
 
 ### Phase 3: Test- und Wiederholungslogik
 
-- Fragepool-Engine
-- Testset-Auswahl
-- Wiederholungslogik
-- Ergebnis-Speicherung
-- Test-Resume nach Abbruch
+- [ ] Fragepool-Engine
+- [ ] Testset-Auswahl
+- [x] Wiederholungslogik
+- [~] Modulfortschritt gespeichert; getrennte Testergebnis-Historie fehlt
+- [x] Aktive Kurzprüfung wird nach Reload fortgesetzt
 
 ### Phase 4: Caching und Performance
 
-- Memory Cache für aktuelle Session
-- Session Cache für Abschnitts- und Testzustand
-- IndexedDB für Lernhistorik und Wiederholung
-- Service Worker für App Shell und Asset Caching
+- [~] Memory-Fallback bei blockiertem Storage; kein separater Session-Cache
+- [x] Abschnitts- und Prüfungszustand im App-State gespeichert
+- [ ] IndexedDB für Lernhistorik und Wiederholung
+- [ ] Service Worker für App Shell und Asset Caching
 
 ### Phase 5: Release-Readiness
 
-- SPA-Deployment konfigurieren
-- GitHub Actions einrichten
-- Validierung vor Merge definieren
-- Rollback-Strategie dokumentieren
+- [x] SPA-Deployment konfigurieren
+- [x] GitHub Actions einrichten
+- [~] `npm run check` und Quellen-Audit; JSON-Schema-/Duplicate-ID-Checks offen
+- [ ] Rollback-Strategie dokumentieren
 
 ---
 
@@ -413,14 +433,14 @@ Damit die App nicht schon bei frühen Versionsschritten „Live“ ist, müssen 
 
 Das MVP wird erst dann als tragfähig gelten, wenn es wirklich diese Eigenschaften erfüllt:
 
-- Inhalte sind verifizierbar
-- Testfragen sind wiederverwendbar
-- Alternativfragen können zusätzlich vorhanden sein
-- Lernstatus bleibt lokal und stabil
-- App ist sauber modular und einfach erweiterbar
-- AI-Agenten können neue Inhalte ohne manuelle UI-Umstellung hinzufügen
-- der Nutzer kann nach kurzer Pause ohne Re-Login und ohne Neu-Starten weiterlernen
-- die App hält den aktuellen Lernzustand mit möglichst wenig Klicks und sofort zugänglichem Resume
+- [x] Aktuelle Inhalte sind über Quellenkatalog und Original-URLs prüfbar
+- [~] Quizfragen sind pro Modul wiederverwendbar; Pool-Engine fehlt
+- [ ] Alternativfragen können zusätzlich vorhanden sein
+- [x] Lernstatus bleibt lokal und kann exportiert/importiert werden
+- [~] App ist modular strukturiert, aber Loader und UI brauchen weitere Aufteilung
+- [~] Neue Inhalte sind vom UI getrennt, müssen aber noch im Content-Loader registriert werden
+- [x] Der Nutzer kann nach kurzer Pause ohne Re-Login im gespeicherten Zustand fortsetzen
+- [x] Resume und Tagesagenda sind direkt erreichbar; mehrere Hauptaktionen bleiben sichtbar
 
 ---
 

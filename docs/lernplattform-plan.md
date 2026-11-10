@@ -2,29 +2,42 @@
 
 ## Status 2026-11-10
 
-Der Projektstand ist jetzt konkret umgesetzt: Es existiert eine lauffähige Vite/TypeScript-Basis, eine modulare Lernansicht mit Browser-Persistenz, mehrere AP1-Inhalte aus `content/` und ein strenger TypeScript-/Build-Check als Qualitätsbasis. Die App arbeitet browser-lokal, hält Lernzustand in einer Versioned-Storage-Schicht und dient als stabiler Startpunkt für die Erweiterung auf weitere AP1/AP2-Module.
+Statusmarker: `[x]` umgesetzt, `[~]` teilweise umgesetzt, `[ ]` offen.
+
+Der Projektstand enthält eine lauffähige Vite/TypeScript-Basis, drei belegte AP1-Module, Browser-Persistenz, Quellenregister und GitHub-Pages-Workflow. AP2, alternatives Testset-Management, Karteikarten, Notizen und Spaced Repetition sind noch nicht implementiert.
 
 ### Fortschritt der zweiten Implementierungsstufe
 
-- modulare Content-Loader und zentraler Module-Index
-- zweite AP1-Lernsektion (`SQL-Grundlagen`) inkl. Quiz
-- drittes AP1-Modul zum Prüfungsrahmen, direkt belegt durch §§ 7 und 8 FIAusbV
-- robuste localStorage-Fallback-Logik für Test-/Node-Umgebungen
-- persistierte Lernabschnitt-Auswahl mit Wiederaufnahme im UI
-- erneut beantwortbare Fehlversuche ohne doppelte Fortschrittszählung
-- Mastery-/Prüfungsmodus mit gezielter Wiederholungslogik
-- zeitbegrenzte Kurzprüfung mit browser-lokalem Sitzungsfortschritt und Ergebnisreview
-- Qualitätslauf erfolgreich verifiziert (`npm run check`)
+- [x] Modulare Content-Loader und zentraler Module-Index
+- [x] AP1-Modul `SQL-Grundlagen` inkl. Quiz
+- [x] AP1-Modul `Prüfungsrahmen`, belegt durch §§ 7 und 8 FIAusbV
+- [x] Robuster localStorage-/Memory-Fallback
+- [x] Persistierte Lernabschnitt-Auswahl mit Wiederaufnahme im UI
+- [x] Erneut beantwortbare Fehlversuche ohne doppelte Fortschrittszählung
+- [x] Mastery-, Tagesagenda- und Wiederholungslogik
+- [x] Zeitbegrenzte Kurzprüfung mit lokalem Sitzungsfortschritt und Ergebnisreview
+- [x] Quellenkatalog mit geprüftem Zitat-Audit und klickbaren Originalquellen
+- [x] Versionierter JSON-Export/Import und Runtime-Normalisierung des Lernstands
+- [x] Qualitätslauf (`npm run check`): 21 Tests, TypeScript und Build erfolgreich
+
+### Offene Produktarbeit
+
+- [~] AP1-Content ausbauen: derzeit drei Module; ein vierter Themenbereich ist noch nicht registriert
+- [ ] AP2-Inhalte ergänzen
+- [ ] Alternativ-Fragenpools und zufällige Testvarianten
+- [ ] Karteikarten und Spaced Repetition
+- [ ] Notizen, Favoriten und Lernhistorie
+- [~] Prüfungsmodus ausbauen: aktuell drei Fragen pro ausgewähltem Modul, noch keine fachübergreifende Musterklausur
 
 ## 1. Ziel und Grundidee
 
 Eine modulare Lernplattform für die IHK-Klausurvorbereitung AP1 und AP2, die über GitHub Pages läuft und vollständig clientseitig arbeitet. Die Lerninhalte werden strukturiert und lokal im Browser gespeichert. Der Fokus liegt auf:
 
-- klarer, modulare Lernstruktur für AP1 und AP2
-- einfacher Erweiterbarkeit per Commit/PR
-- lokalem Fortschritt im Browser ohne Backend
-- AI-freundlicher Content-Struktur
-- wiederholbaren Tests mit alternativen Fragen
+- [~] Lernstruktur für AP1 und AP2; aktuell gibt es nur AP1-Module
+- [x] Erweiterbarkeit per Commit/PR
+- [x] Lokaler Fortschritt ohne Backend
+- [~] AI-freundliche Content-Struktur mit Quellenkatalog; automatische Schemaprüfung fehlt
+- [ ] Wiederholbare Tests mit alternativen Fragen
 
 Die Plattform soll als statische Web-App laufen, also ohne Server, ohne Datenbank und ohne Authentifizierung. Das reduziert Komplexität und macht sie ideal für GitHub Pages.
 
@@ -35,23 +48,23 @@ Die Plattform soll als statische Web-App laufen, also ohne Server, ohne Datenban
 Die App besteht aus drei Schichten:
 
 1. Content Layer
-   - Lernmodule
-   - Fragen, Aufgaben, Lösungen, Erklärungen
-   - Meta-Daten wie Bereich, Schwierigkeit, Tags, Prüfungsbezug
+  - [x] Lernmodule
+  - [x] Quizfragen, Lösungen und Erklärungen
+  - [x] Metadaten wie Bereich, Schwierigkeit, Tags und Prüfungsbezug
 
 2. App Layer
-   - Navigation
-   - Lernpfad
-   - Quiz-/Test-Logik
-   - Wiederholungslogik
-   - lokale Speicherung
+  - [x] Navigation zwischen Modulen und Abschnitten
+  - [~] Lernpfad in Katalogreihenfolge; kein konfigurierbarer Pfad
+  - [~] Quiz- und Kurzprüfungslogik; alternative Pools fehlen
+  - [x] Wiederholungslogik für Fehlversuche
+  - [x] Lokale Speicherung
 
 3. User Data Layer
-   - Fortschritt
-   - Notizen
-   - Quiz-Statistiken
-   - Wiederholungsdaten
-   - gespeicherte Tests
+  - [x] Modulfortschritt
+  - [ ] Notizen
+  - [~] Trefferquote je Modul; keine getrennte Quizhistorie
+  - [x] Wiederholungsdaten
+  - [ ] Gespeicherte Testläufe
 
 Diese Trennung macht das Projekt modular und leicht erweiterbar.
 
@@ -61,12 +74,12 @@ Diese Trennung macht das Projekt modular und leicht erweiterbar.
 
 Empfohlene Stack:
 
-- Vite + TypeScript
-- GitHub Pages Deployment
-- CSS mit Design-Tokens und Glassmorphism
-- lokale Speicherung über localStorage oder IndexedDB
-- JSON/Markdown als strukturiertes Content-Format
-- Session- und State-Persistence für Resume-First UX
+- [x] Vite + TypeScript
+- [x] GitHub Pages Deployment via GitHub Actions
+- [~] CSS-Designsystem: bestehende Tokens und Panels, aber kein separates Komponenten-/Theme-System
+- [~] Browser-lokale Speicherung: versioniertes `localStorage` mit Memory-Fallback; IndexedDB ist nicht umgesetzt
+- [x] JSON als strukturiertes Content-Format
+- [x] Session- und State-Persistence für Resume-First UX
 
 Warum diese Richtung?
 
@@ -82,69 +95,29 @@ Warum diese Richtung?
 ## 4. Repository-Struktur
 
 ```text
-/
-├─ public/
-│  ├─ assets/
-│  │  ├─ illustrations/
-│  │  └─ icons/
-│  └─ favicon/
-├─ src/
-│  ├─ app/
-│  │  ├─ router/
-│  │  ├─ state/
-│  │  ├─ storage/
-│  │  ├─ content/
-│  │  ├─ utils/
-│  │  └─ bootstrap/
-│  ├─ features/
-│  │  ├─ dashboard/
-│  │  ├─ learning-path/
-│  │  ├─ module-view/
-│  │  ├─ quiz/
-│  │  ├─ repetition/
-│  │  ├─ exam-sim/
-│  │  └─ notes/
-│  ├─ ui/
-│  │  ├─ components/
-│  │  ├─ layouts/
-│  │  └─ theme/
-│  ├─ styles/
-│  │  ├─ tokens.css
-│  │  ├─ glass.css
-│  │  ├─ animations.css
-│  │  └─ app.css
-│  └─ main.ts
-├─ content/
-│  ├─ ap1/
-│  │  ├─ 01-datenmodellierung/
-│  │  │  ├─ module.json
-│  │  │  ├─ quiz.json
-│  │  │  └─ flashcards.json
-│  │  ├─ 02-sql/
-│  │  └─ index.json
-│  ├─ ap2/
-│  │  ├─ 01-architektur/
-│  │  └─ index.json
-│  ├─ shared/
-│  │  ├─ tags.json
-│  │  ├─ difficulty.json
-│  │  └─ exam-map.json
-│  └─ metadata/
-│     └─ navigation.json
-├─ docs/
-│  ├─ contribution-guide.md
-│  └─ content-schema.md
-├─ package.json
-├─ vite.config.ts
-├─ README.md
-├─ .github/
-│  └─ workflows/
-│     └─ deploy-pages.yml
-├─ LICENSE
-└─ .gitignore
+src/
+├─ app/
+│  ├─ content-loader/
+│  └─ storage/
+├─ lib/
+├─ main.ts
+└─ styles.css
+content/
+└─ ap1/
+  ├─ 01-datenmodellierung/
+  ├─ 02-sql/
+  ├─ 03-pruefungsrahmen/
+  └─ index.json
+sources/
+└─ catalog.json
+tests/
+.github/
+└─ workflows/deploy-pages.yml
 ```
 
 Dieses Layout ist modular, gut lesbar und AI-freundlich.
+
+**Status:** Das Diagramm zeigt die aktuelle Kernstruktur. Offen sind separate `features/`-Module, Router, IndexedDB, Service-Worker-Cache, Karteikarten und AP2-Verzeichnisse.
 
 ---
 
@@ -154,49 +127,41 @@ Lerninhalte sollten nicht frei im UI liegen, sondern als strukturierte Dateien m
 
 ```json
 {
-  "id": "ap1-01-datenmodellierung",
+  "moduleId": "ap1-01-datenmodellierung",
   "exam": "AP1",
   "title": "Datenmodellierung",
   "difficulty": "mittel",
-  "tags": ["DB", "ERM", "Normalformen"],
-  "learningObjectives": [
-    "Entitätstypen erkennen",
-    "Beziehungen modellieren",
-    "ER-Diagramme interpretieren"
+  "tags": ["DB", "ERM"],
+  "learningObjectives": ["Datenmodelle aus Anforderungen ableiten"],
+  "dependencies": [],
+  "sourceRefs": [
+    {
+      "sourceId": "FIAUSBV",
+      "quote": "Datenmodelle und Strukturen aus fachlichen Anforderungen ableiten",
+      "section": "Anlage, Berufsbildposition 4 Buchstabe a",
+      "type": "official"
+    }
   ],
   "sections": [
     {
+      "id": "s1",
       "type": "theory",
       "title": "Grundlagen",
-      "content": "..."
-    },
-    {
-      "type": "example",
-      "title": "Beispiel",
-      "content": "..."
+      "content": "...",
+      "sourceRefs": [
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A table describes an entity such as employees.",
+          "section": "Schema Objects > Tables",
+          "type": "official"
+        }
+      ]
     }
-  ],
-  "quiz": [
-    {
-      "id": "q-01",
-      "question": "Welche Beziehung beschreibt ...?",
-      "options": ["A", "B", "C", "D"],
-      "correctIndex": 1,
-      "explanation": "..."
-    }
-  ],
-  "flashcards": [
-    {
-      "front": "Was ist eine Entität?",
-      "back": "..."
-    }
-  ],
-  "sourceRefs": [
-    { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." },
-    { "sourceId": "BMBF-DSD-2026", "quote": "..." }
   ]
 }
 ```
+
+**Status:** Das Beispiel beschreibt ein konzeptionelles Datenpaket. Im Ist-Zustand liegen Modul- und Quizdaten in getrennten JSON-Dateien; `sourceRefs` werden für Module, Abschnitte und Fragen verlangt und durch `sources/catalog.json` geprüft.
 
 Das ist die zentrale Erkenntnis: Das Thema selbst ist kein UI-Block, sondern ein Datenpaket.
 
@@ -208,12 +173,14 @@ Diese Plattform arbeitet nach einem klaren Prinzip: Jede fachliche Aussage muss 
 
 ### Verbindliche Regeln
 
-1. Jeder Satz, Paragraph oder fachliche Aussage braucht einen nachvollziehbaren Quellenhinweis.
-2. Jede Quelle muss im Repository dokumentiert und referenziert sein.
-3. Inhaltliche Aussagen dürfen nur dann in Lernmodulen, Erklärungen, Quizfragen oder Tests auftauchen, wenn sie mit einer `sourceRefs`-Liste hinterlegt sind.
-4. LLM-generierte oder manuell formulierte Inhalte ohne Referenz zählen als unzulässig.
-5. Die Quelle muss entweder lokal im Repository hinterlegt sein oder als offizielle Verweisquelle mit URL, Titel und Beschreibung im Quellenregister dokumentiert sein.
-6. Wenn eine Aussage nicht belegt ist, muss sie entfernt, überarbeitet oder ersetzt werden.
+1. [~] Jeder fachliche Satz braucht Beleg; `sourceRefs` sind pro Abschnitt/Frage erfasst, Satz-für-Satz-Prüfung fehlt.
+2. [x] Jede Quelle ist im Repository dokumentiert und referenziert.
+3. [x] Aktuelle Module, Abschnitte und Fragen besitzen `sourceRefs`.
+4. [x] Content ohne Referenz wird durch den Quellen-Audit-Test zurückgewiesen.
+5. [x] Quellen sind über ID, URL, Titel und Belege im Register dokumentiert.
+6. [~] Unbelegbare Aussagen werden im Content-Review überarbeitet; automatische semantische Prüfung fehlt.
+
+**Umsetzungsstatus:** Quellenpflicht und Zitatregister sind vorhanden; der automatische Test prüft registrierte Originalauszüge für alle aktuellen Modul-, Abschnitts-, Quiz- und Indexreferenzen. Die semantische Prüfung, ob jedes einzelne Satzteil vollständig durch das Zitat gedeckt ist, bleibt ein Review-Schritt.
 
 ### Verpflichtende Metadaten
 
@@ -223,10 +190,9 @@ Jedes Lernmodul und jede Testfrage sollte zusätzlich zu Inhalt und Lösung die 
 {
   "sourceRefs": [
     {
-      "sourceId": "IHK-AP1-Rahmen-2026",
-      "quote": "...",
-      "page": "...",
-      "section": "...",
+      "sourceId": "POSTGRESQL-TUTORIAL-JOIN",
+      "quote": "They combine rows from one table with rows from a second table, with an expression specifying which rows are to be paired.",
+      "section": "2.6 Joins Between Tables",
       "type": "official"
     }
   ]
@@ -256,12 +222,14 @@ Ein neues Lernmodul oder ein neuer Prüfungsbereich soll einfach per PR hinzugef
 
 Empfohlener Workflow:
 
-1. Neuer Ordner unter `content/ap1/` oder `content/ap2/`
-2. `module.json` anlegen
-3. optional `quiz.json` und `flashcards.json` ergänzen
-4. `index.json` aktualisieren
-5. PR erstellen
-6. Review und Merge
+1. [x] Neuen Ordner unter `content/ap1/` oder `content/ap2/` anlegen.
+2. [x] `module.json` anlegen.
+3. [~] `quiz.json` ergänzen; `flashcards.json` ist noch nicht implementiert.
+4. [x] `index.json` aktualisieren.
+5. [x] PR/Commit erstellen.
+6. [x] Review und Merge durchführen.
+
+**Status:** `[x]` Ordner, Modul-/Quizdateien und AP1-Index; `[x]` Review-/Merge-Workflow über Git; `[ ]` Flashcards; `[ ]` vollständige AP2-Struktur.
 
 Dadurch ist das Repo sauber, nachvollziehbar und für Agenten gut automatisierbar.
 
@@ -273,18 +241,12 @@ Da kein Backend verwendet wird, müssen Daten lokal im Browser verwaltet werden.
 
 ### Speicherarten
 
-- localStorage
-  - Lernpfad
-  - Status pro Modul
-  - Notizen
-  - Favoriten
-  - Einstellungen
+- [x] localStorage: Auswahl von Modul/Abschnitt, Antworten, Wiederholungen, Fortschritt und aktive Prüfung
+- [x] Memory-Fallback bei blockiertem Browser-Storage
+- [x] JSON-Export und validierter Import als lokale Sicherung
+- [ ] Notizen, Favoriten und allgemeine Einstellungen
 
-- IndexedDB
-  - größere Datensätze
-  - Quiz-Verlauf
-  - Wiederholungsdaten
-  - Lernhistorik
+- [ ] IndexedDB für größere Datensätze, Lernhistorik und umfangreiche Wiederholungsdaten
 
 ### Beispielstruktur
 
@@ -355,23 +317,19 @@ Ein Test kann nicht nur aus einer festen Fragenliste bestehen, sondern aus versc
 
 ### Funktionalität
 
-- Nutzer kann Testvarianten wählen
-- mehrere Prüfungs-Sets pro Thema
-- alternative Fragen nach Themenbereich, Schwierigkeit und Lernziel
-- “neuen Test erzeugen” aus einem Pool
-- Auswahl verschiedener Varianten statt eines statischen Frageblocks
+- [ ] Nutzer kann Testvarianten wählen
+- [ ] Mehrere Prüfungs-Sets pro Thema
+- [ ] Alternative Fragen nach Themenbereich, Schwierigkeit und Lernziel
+- [ ] Neuen Test aus einem Fragenpool erzeugen
+- [~] Gezielt üben und Antworten wiederholen; derzeit nur feste Quizfragen pro Modul
 
 ### Sinnvoller Ablauf
 
-1. Thema wird ausgewählt
-2. Fragenpool wird geladen
-3. Nutzer wählt Aufgabenmodus:
-   - klassische Wiederholung
-   - Lernmodus
-   - zufällige Alternative
-   - gezielter Fokus auf Schwachstellen
-4. Test wird zusammengebaut
-5. Ergebnisse werden lokal gespeichert
+1. [x] Thema/Modul wird ausgewählt.
+2. [~] Modulquiz wird geladen; ein eigenständiger Fragenpool fehlt.
+3. [~] Schnelltest, Lernen, Wiederholen und Kurzprüfung sind wählbar; Zufallsalternative fehlt.
+4. [x] Ein Quizdeck oder eine Kurzprüfung wird zusammengestellt.
+5. [~] Antworten/Fortschritt werden lokal gespeichert; separate Ergebnis-Historie fehlt.
 
 Damit kann der Nutzer denselben Themenbereich mehrfach mit unterschiedlichen Fragen durchgehen, ohne neue Inhalte manuell anzulegen.
 
@@ -382,56 +340,58 @@ Damit kann der Nutzer denselben Themenbereich mehrfach mit unterschiedlichen Fra
 Die App sollte folgende Kernfunktionen haben:
 
 ### Dashboard
-- AP1 / AP2 Übersicht
-- Lernfortschritt
-- nächste Aufgaben
-- Favoriten
-- Wiederholungs-Hinweise
+- [~] AP1-/AP2-Übersicht: AP1 vorhanden, AP2 fehlt
+- [x] Lernfortschritt pro Modul
+- [x] Nächste Aufgaben über Tagesagenda
+- [ ] Favoriten
+- [x] Wiederholungs-Hinweise
 
 ### Modullernpfad
-- Reihenfolge nach Themenlogik
-- Abhängigkeiten zwischen Themen
-- Prüfungsrelevanz
+- [~] Reihenfolge nach Themenlogik: Katalogreihenfolge, noch kein frei konfigurierbarer Lernpfad
+- [~] Abhängigkeiten in Metadaten, noch keine UI-seitige Sperr-/Voraussetzungslogik
+- [~] Prüfungsbezug per AP1-Metadaten, noch kein AP2-Katalog
 
 ### Quiz und Testmodi
-- Single Choice
-- Multiple Choice
-- offene Kurzantworten
-- Lückentexte
-- Musterklausur
+- [x] Single Choice
+- [ ] Multiple Choice
+- [ ] Offene Kurzantworten
+- [ ] Lückentexte
+- [~] Kurzprüfung pro Modul mit Timer und Ergebnisreview; keine fachübergreifende Musterklausur
 
 ### Wiederholung
-- Karteikarten
-- Spaced Repetition
-- Fokus auf bisher schwache Bereiche
+- [ ] Karteikarten
+- [ ] Spaced Repetition
+- [~] Fokus auf Fehlversuche über Wiederholungs-Queue und Tagesagenda
 
 ### Exam Simulator
-- Zeitlimit
-- zufälliger Fragenmix
-- Bewertung nach Punkten
-- Analyse der Fehlerquellen
+- [x] Zeitlimit in der Kurzprüfung
+- [ ] Zufälliger, fachübergreifender Fragenmix
+- [~] Trefferquote und Ergebnisreview je Kurzprüfung
+- [~] Fehleranalyse über Antwortfeedback und Wiederholungs-Queue, noch keine Statistik über Versuche
 
 ---
 
 ## 10. Design-Ansatz
 
+**Status:** Das bestehende UI nutzt aktuell dunkle Flächen, Violett, Panels und CSS-Variablen. Das folgende Farb-/Glassmorphism-Konzept ist teilweise umgesetzt und bleibt ein Zielbild, kein Abnahmekriterium.
+
 Thema: lila, modern, leicht futuristisch, aber nicht unübersichtlich.
 
 ### Stilprinzipien
 
-- violett/lila als Grundfarbe
-- dunkler Hintergrund mit leichten Farbverläufen
-- glasartige Karten mit Transparenz
-- starke, weiche Drop Shadows
-- Hover-Effekte und subtile Bewegungen
-- Animationen nur als Unterstützung der Orientierung
+- [x] Violett/Lila als Grundfarbe
+- [x] Dunkler Hintergrund mit Farbverläufen
+- [~] Transparente Panels; kein separates Glassmorphism-Komponentensystem
+- [x] Weiche Drop Shadows
+- [x] Hover-Effekte und subtile Bewegungen
+- [~] Begrenzte Übergänge; keine umfassende Bewegungs-/Accessibility-Prüfung
 
 ### Designziele
 
-- nicht überladen
-- klare Lernhierarchie
-- Fokus auf Inhalt statt auf “Showcase-UI”
-- modulare Panels mit Wiederverwendbarkeit
+- [~] Nicht überladen; UI-Review nur stichprobenartig
+- [x] Klare Lernhierarchie
+- [x] Fokus auf Inhalt statt Showcase
+- [~] Panels sind wiederverwendbar gestylt, aber keine eigenständige Komponentenbibliothek
 
 ---
 
@@ -441,43 +401,43 @@ Damit die Projektentwicklung auch mit KI-Tools sauber funktioniert, müssen Inha
 
 ### Regeln
 
-- jede Inhaltsdatei hat ein eindeutiges Schema
-- Inhalte leben in separates `content/`-Verzeichnis
-- UI keine harte Logik für Inhalte enthalten
-- jeder Modulordner ist eigenständig
-- Metadaten immer enthalten: `id`, `exam`, `title`, `difficulty`, `tags`
+- [~] Eindeutige Content-Schemas: JSON-Formate existieren; automatischer JSON-Schema-Check fehlt
+- [x] Inhalte leben im separaten `content/`-Verzeichnis
+- [~] UI hält Inhalte datengetrieben; Module/Quizsets werden derzeit noch explizit im Loader registriert
+- [x] Modulordner enthalten eigenständige Modul- und Quizdateien
+- [x] Metadaten enthalten `moduleId`, `exam`, `title`, `difficulty` und `tags`
 
 ### Vorteile
 
-- neue Lernmodule lassen sich leicht ergänzen
-- Agenten können automatisch Inhalte strukturieren
-- PRs bleiben kleiner und verständlicher
-- Content-Updates sind weniger fehleranfällig
+- [~] Neue Lernmodule lassen sich ergänzen; Loader-Registrierung erfordert noch Codeänderung
+- [~] Agenten können strukturierte Dateien erzeugen; automatische Schemavalidierung fehlt
+- [x] Contentänderungen sind auf Dateien/Module begrenzt
+- [~] Quellen-Audit reduziert Fehler; fachliche Review bleibt erforderlich
 
 ---
 
 ## 12. Mögliche nächste Entwicklungsschritte
 
 ### Phase 1
-- Grundprojekt strukturieren
-- erste AP1-/AP2-Module als Beispiel
-- Dashboard und Lernpfad bauen
-- lokale Speicherung einrichten
+- [x] Grundprojekt strukturieren
+- [~] Erste AP1-Module als Beispiel; AP2-Beispiel fehlt
+- [~] Dashboard und Resume-First-Lernansicht; kein vollständiger Modullernpfad
+- [x] Lokale Speicherung einrichten
 
 ### Phase 2
-- Quiz-Engine mit alternativen Fragen aufnehmen
-- Wiederholungslogik ergänzen
-- Notizen-Feature einbauen
+- [ ] Quiz-Engine mit alternativen Fragen
+- [x] Wiederholungslogik ergänzen
+- [ ] Notizen-Feature einbauen
 
 ### Phase 3
-- Exam Simulator
-- Lernfortschrittsstatistiken
-- Darstellung von Schwachstellen
+- [~] Exam Simulator: zeitbegrenzte Kurzprüfung je Modul
+- [~] Lernfortschritt pro Modul; Verlaufstrends fehlen
+- [~] Fehlversuche sichtbar; aggregierte Schwachstellenanalyse fehlt
 
 ### Phase 4
-- mehr Inhalte für AP1/AP2
-- Testvarianten und Zufallsgenerator
-- AI-gestützte Erstellung von neuen Fragesets
+- [~] Mehr AP1-Inhalte; AP2-Inhalte fehlen
+- [ ] Testvarianten und Zufallsgenerator
+- [ ] AI-gestützte Erstellung neuer Fragesets
 
 ---
 
@@ -492,10 +452,10 @@ Die Plattform soll nicht einfach nur eine Lernseite sein, sondern ein modular au
 
 Dadurch wird sie:
 
-- leicht erweiterbar
-- gut für GitHub Pages geeignet
-- sauber für PRs und Commits
-- robust für AI-Agenten
-- ideal für wiederholte Tests mit alternativen Fragen
+- [~] Erweiterbar, aber Loader-Registrierung ist noch explizit
+- [x] Für GitHub Pages geeignet
+- [x] Für PRs und Commits strukturiert
+- [~] Für AI-Agenten gut strukturiert; vollständige Schema-Gates fehlen
+- [ ] Für wiederholte Tests mit alternativen Fragen ausgelegt
 
 Das baut die Basis für eine professionelle, skalierbare Lernlösung, ohne Backend-Overhead.
