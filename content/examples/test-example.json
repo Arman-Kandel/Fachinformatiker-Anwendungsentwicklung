@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0.0",
+  "testId": "ap1-repeat-erm-01",
+  "title": "Wiederholung: ERM",
+  "exam": "AP1",
+  "mode": "mixed",
+  "questionPool": [
+    {
+      "id": "q-01",
+      "topic": "ERM",
+      "difficulty": "mittel",
+      "question": "Welche Beziehung beschreibt eine 1:n-Beziehung am sinnvollsten?",
+      "options": [
+        "Eine Person hat mehrere Autos",
+        "Ein Auto hat mehrere Besitzer",
+        "Ein Kunde kauft nur ein Produkt",
+        "Jede Beziehung ist immer 1:1"
+      ],
+      "correctIndex": 0,
+      "explanation": "Eine 1:n-Beziehung bedeutet, dass ein Datensatz in einer Tabelle mehreren Datensätzen in einer anderen Tabelle zugeordnet ist.",
+      "sourceRefs": [
+        { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+      ]
+    },
+    {
+      "id": "q-02",
+      "topic": "ERM",
+      "difficulty": "schwer",
+      "question": "Welche Entität ist in einem ERM typischerweise ein Kandidatenschlüssel?",
+      "options": [
+        "Ein Attribut mit Mehrfachwerten",
+        "Ein eindeutiges Identifikationsmerkmal",
+        "Eine Beziehung zwischen zwei Entitäten",
+        "Ein Wert aus einer Liste"
+      ],
+      "correctIndex": 1,
+      "explanation": "Ein Kandidatenschlüssel ist ein eindeutiges Attribut oder eine Kombination von Attributen, das die Identifikation einer Entität erlaubt.",
+      "sourceRefs": [
+        { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+      ]
+    }
+  ],
+  "testSets": [
+    {
+      "setId": "set-a",
+      "questionIds": ["q-01", "q-02"]
+    },
+    {
+      "setId": "set-b",
+      "questionIds": ["q-02", "q-01"]
+    }
+  ],
+  "selectionRules": {
+    "minQuestions": 2,
+    "maxQuestions": 2,
+    "mustIncludeTopics": ["ERM"],
+    "difficultyMix": ["mittel", "schwer"]
+  },
+  "sourceRefs": [
+    { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+  ]
+}

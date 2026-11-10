@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "moduleId": "ap1-01-datenmodellierung",
+  "exam": "AP1",
+  "title": "Datenmodellierung",
+  "difficulty": "mittel",
+  "status": "draft",
+  "tags": ["DB", "ERM", "Normalformen"],
+  "learningObjectives": [
+    "Entitätstypen erkennen",
+    "Beziehungen modellieren",
+    "ER-Diagramme interpretieren"
+  ],
+  "dependencies": ["ap1-00-klausurrahmen"],
+  "sourceRefs": [
+    {
+      "sourceId": "IHK-AP1-Rahmen-2026",
+      "quote": "Die fachlichen Inhalte für AP1 müssen im Rahmen der Ausbildungs- und Prüfungsanforderungen überprüfbar und nachvollziehbar dokumentiert sein.",
+      "section": "Rahmenkonzept",
+      "type": "official"
+    }
+  ],
+  "sections": [
+    {
+      "id": "s1",
+      "type": "theory",
+      "title": "Grundlagen",
+      "content": "Eine Entität beschreibt eine eigenständige Kategorie von Objekten oder Sachverhalten, die in einem System relevant sind."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "question": "Welche Aussage beschreibt eine Entität korrekt?",
+      "options": [
+        "Ein Attribut einer Tabelle",
+        "Ein eigener relevanter Sachverhalt im System",
+        "Eine einzelne SQL-Anweisung",
+        "Ein Prüfungszeitraum"
+      ],
+      "correctIndex": 1,
+      "explanation": "Eine Entität beschreibt einen eigenständigen relevanten Sachverhalt im Informationssystem.",
+      "sourceRefs": [
+        { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "f1",
+      "front": "Was ist eine Entität?",
+      "back": "Ein eigener, relevanter Sachverhalt oder Objekttyp im System.",
+      "sourceRefs": [
+        { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." }
+      ]
+    }
+  ]
+}

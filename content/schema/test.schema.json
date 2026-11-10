@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TestSet",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "testId",
+    "title",
+    "exam",
+    "mode",
+    "questionPool",
+    "testSets",
+    "selectionRules",
+    "sourceRefs"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "testId": { "type": "string" },
+    "title": { "type": "string" },
+    "exam": { "type": "string", "enum": ["AP1", "AP2"] },
+    "mode": { "type": "string", "enum": ["mixed", "repeat", "focus", "exam-sim"] },
+    "questionPool": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "topic", "difficulty", "question", "options", "correctIndex", "explanation", "sourceRefs"],
+        "properties": {
+          "id": { "type": "string" },
+          "topic": { "type": "string" },
+          "difficulty": { "type": "string", "enum": ["leicht", "mittel", "schwer"] },
+          "question": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "correctIndex": { "type": "integer" },
+          "explanation": { "type": "string" },
+          "sourceRefs": { "type": "array", "items": { "type": "object" } }
+        }
+      }
+    },
+    "testSets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["setId", "questionIds"],
+        "properties": {
+          "setId": { "type": "string" },
+          "questionIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "selectionRules": {
+      "type": "object",
+      "required": ["minQuestions", "maxQuestions"],
+      "properties": {
+        "minQuestions": { "type": "integer" },
+        "maxQuestions": { "type": "integer" },
+        "mustIncludeTopics": { "type": "array", "items": { "type": "string" } },
+        "difficultyMix": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "sourceRefs": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  }
+}

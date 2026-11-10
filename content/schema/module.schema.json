@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LearningModule",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "moduleId",
+    "exam",
+    "title",
+    "difficulty",
+    "tags",
+    "learningObjectives",
+    "sourceRefs",
+    "sections",
+    "quiz",
+    "flashcards"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "moduleId": { "type": "string" },
+    "exam": { "type": "string", "enum": ["AP1", "AP2"] },
+    "title": { "type": "string" },
+    "difficulty": { "type": "string", "enum": ["leicht", "mittel", "schwer"] },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "learningObjectives": { "type": "array", "items": { "type": "string" } },
+    "dependencies": { "type": "array", "items": { "type": "string" } },
+    "sourceRefs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sourceId", "quote"],
+        "properties": {
+          "sourceId": { "type": "string" },
+          "quote": { "type": "string" },
+          "section": { "type": "string" },
+          "type": { "type": "string" }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "title", "content"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "title": { "type": "string" },
+          "content": { "type": "string" }
+        }
+      }
+    },
+    "quiz": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "options", "correctIndex", "explanation", "sourceRefs"],
+        "properties": {
+          "id": { "type": "string" },
+          "question": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "correctIndex": { "type": "integer" },
+          "explanation": { "type": "string" },
+          "sourceRefs": { "type": "array", "items": { "type": "object" } }
+        }
+      }
+    },
+    "flashcards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "front", "back", "sourceRefs"],
+        "properties": {
+          "id": { "type": "string" },
+          "front": { "type": "string" },
+          "back": { "type": "string" },
+          "sourceRefs": { "type": "array", "items": { "type": "object" } }
+        }
+      }
+    }
+  }
+}
