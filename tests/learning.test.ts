@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
-import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, validateModule } from '../src/lib/learning';
+import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, getMasteryLevel, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
@@ -121,6 +121,25 @@ describe('learning logic', () => {
     expect(overview[1]?.title).toBe('SQL-Grundlagen');
     expect(overview[1]?.percent).toBe(33);
     expect(overview[1]?.mastery).toBe('learning');
+  });
+
+  it('prioritizes reviews in the study agenda before unanswered questions', () => {
+    const agenda = buildStudyAgenda(
+      [
+        { moduleId: 'module-one', exam: 'AP1', title: 'Modul Eins', difficulty: 'mittel', status: 'draft', tags: [], learningObjectives: [], dependencies: [], sourceRefs: [], sections: [] },
+        { moduleId: 'module-two', exam: 'AP1', title: 'Modul Zwei', difficulty: 'mittel', status: 'draft', tags: [], learningObjectives: [], dependencies: [], sourceRefs: [], sections: [] },
+      ],
+      { 'module-one': ['q1', 'q2'], 'module-two': ['q3', 'q4'] },
+      { 'module-one': ['q1'], 'module-two': [] },
+      { q1: 0, q3: 1 },
+      3,
+    );
+
+    expect(agenda).toEqual([
+      { moduleId: 'module-one', title: 'Modul Eins', kind: 'review', questionId: 'q1', pendingCount: 1 },
+      { moduleId: 'module-one', title: 'Modul Eins', kind: 'continue', questionId: 'q2', pendingCount: 1 },
+      { moduleId: 'module-two', title: 'Modul Zwei', kind: 'continue', questionId: 'q4', pendingCount: 1 },
+    ]);
   });
 
   it('persists and loads app state from local storage', () => {

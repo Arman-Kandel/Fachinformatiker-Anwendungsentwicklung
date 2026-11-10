@@ -1,8 +1,8 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
-import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, getQuestionById, validateModule } from './lib/learning';
-import type { AppState, Module, ModuleOverview, ModuleProgress, Question } from './types';
+import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, getMasteryLevel, getQuestionById, validateModule } from './lib/learning';
+import type { AppState, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
 const moduleCatalog = getModuleCatalog();
@@ -80,6 +80,33 @@ function getCurrentReviewQueue(): string[] {
 
   state.reviewQueue[selectedModule.moduleId] = validQueue;
   return validQueue;
+}
+
+function getStudyAgenda(): StudyAgendaItem[] {
+  const questionIdsByModule: Record<string, string[]> = {};
+  const reviewQueues: Record<string, string[]> = {};
+
+  for (const module of moduleCatalog) {
+    const questions = getQuizByModuleId(module.moduleId)?.questions ?? [];
+    questionIdsByModule[module.moduleId] = questions.map((question) => question.id);
+    reviewQueues[module.moduleId] = [...new Set([
+      ...buildReviewQueue(questions, state.answeredQuestions),
+      ...(state.reviewQueue[module.moduleId] ?? []),
+    ])].filter((id) => questions.some((question) => question.id === id));
+  }
+
+  return buildStudyAgenda(moduleCatalog, questionIdsByModule, reviewQueues, state.answeredQuestions);
+}
+
+function openAgendaItem(item: StudyAgendaItem): void {
+  const module = getModuleById(item.moduleId);
+  state.selectedModuleId = item.moduleId;
+  state.resumeModuleId = item.moduleId;
+  state.studySectionId = module?.sections[0]?.id ?? null;
+  state.currentQuestionId = item.questionId;
+  ensureModuleState(item.moduleId);
+  saveCurrentState();
+  render();
 }
 
 function getCurrentSection() {
@@ -189,6 +216,7 @@ function render(): void {
   const validationErrors = validateModule(selectedModule);
   const progress = getCurrentProgress();
   const reviewQueue = getCurrentReviewQueue();
+  const studyAgenda = getStudyAgenda();
   const currentQuestion = getQuestionById(currentQuiz.questions, state.currentQuestionId);
   ensureModuleState(selectedModule.moduleId);
 
@@ -213,7 +241,7 @@ function render(): void {
           </div>
           <div class="cta-row">
             <button class="primary" type="button" data-action="resume">Fortsetzen</button>
-            <button type="button" data-action="study-today">Heute üben</button>
+            <button type="button" data-action="study-today" ${studyAgenda.length === 0 ? 'disabled' : ''}>Heute üben</button>
             <button type="button" data-action="quick-test">Schnelltest</button>
             <button type="button" data-action="exam-mode">Prüfungsmodus</button>
             <button type="button" data-action="review-next" ${reviewQueue.length === 0 ? 'disabled' : ''}>Wiederholen</button>
@@ -222,6 +250,34 @@ function render(): void {
             ${selectedModule.title} · ${computeAccuracy(progress.correct, progress.total)}% Trefferquote · ${getMasteryLevel(progress).label} · ${selectedModule.learningObjectives[0]}
           </p>
           ${validationErrors.length > 0 ? `<p class="validation-warning">Warnung: ${validationErrors.join(', ')}</p>` : ''}
+        </section>
+
+        <section class="panel agenda-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Nächste Schritte</p>
+              <h2>Heute üben</h2>
+            </div>
+            <span class="pill">${studyAgenda.length} Vorschläge</span>
+          </div>
+          ${studyAgenda.length > 0 ? `
+            <div class="agenda-list">
+              ${studyAgenda
+                .map(
+                  (item, index) => `
+                    <button class="agenda-item" type="button" data-agenda-module="${item.moduleId}" data-agenda-question="${item.questionId}">
+                      <span class="agenda-order">${String(index + 1).padStart(2, '0')}</span>
+                      <span class="agenda-copy">
+                        <strong>${item.title}</strong>
+                        <small>${item.kind === 'review' ? `Wiederholen · ${item.pendingCount} offen` : `Weiterlernen · ${item.pendingCount} unbeantwortet`}</small>
+                      </span>
+                      <span class="agenda-arrow" aria-hidden="true">→</span>
+                    </button>
+                  `,
+                )
+                .join('')}
+            </div>
+          ` : '<p>Alles erledigt. Neue Module oder Fragen erscheinen hier, sobald Inhalte verfügbar sind.</p>'}
         </section>
 
         <section class="panel">
@@ -426,6 +482,15 @@ function render(): void {
     });
   });
 
+  document.querySelectorAll('[data-agenda-module]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const moduleId = button.getAttribute('data-agenda-module');
+      const questionId = button.getAttribute('data-agenda-question');
+      const item = studyAgenda.find((entry) => entry.moduleId === moduleId && entry.questionId === questionId);
+      if (item) openAgendaItem(item);
+    });
+  });
+
   document.querySelectorAll('[data-action]').forEach((button) => {
     button.addEventListener('click', () => {
       const action = button.getAttribute('data-action');
@@ -445,6 +510,12 @@ function render(): void {
         state.currentQuestionId = examDeck[0] ?? currentQuiz.questions[0]?.id ?? null;
         saveCurrentState();
         render();
+        return;
+      }
+
+      if (action === 'study-today') {
+        const firstAgendaItem = studyAgenda[0];
+        if (firstAgendaItem) openAgendaItem(firstAgendaItem);
         return;
       }
 

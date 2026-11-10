@@ -1,4 +1,4 @@
-import type { Module, ModuleOverview, ModuleProgress, Question, SourceRef } from '../types';
+import type { Module, ModuleOverview, ModuleProgress, Question, SourceRef, StudyAgendaItem } from '../types';
 
 export type MasteryLevel = 'starter' | 'learning' | 'ready' | 'mastered';
 
@@ -101,6 +101,49 @@ export function buildModuleOverview(
       status: progress.status,
     };
   });
+}
+
+export function buildStudyAgenda(
+  modules: Module[],
+  questionIdsByModule: Record<string, string[]>,
+  reviewQueues: Record<string, string[]>,
+  answeredQuestions: Record<string, number>,
+  limit = 3,
+): StudyAgendaItem[] {
+  const reviews: StudyAgendaItem[] = [];
+  const continuations: StudyAgendaItem[] = [];
+
+  for (const module of modules) {
+    const questionIds = questionIdsByModule[module.moduleId] ?? [];
+    const questionIdSet = new Set(questionIds);
+    const reviewIds = [...new Set(reviewQueues[module.moduleId] ?? [])].filter((id) => questionIdSet.has(id));
+    const nextReviewId = reviewIds[0];
+
+    if (nextReviewId) {
+      reviews.push({
+        moduleId: module.moduleId,
+        title: module.title,
+        kind: 'review',
+        questionId: nextReviewId,
+        pendingCount: reviewIds.length,
+      });
+    }
+
+    const unansweredIds = questionIds.filter((id) => answeredQuestions[id] === undefined);
+    const nextQuestionId = unansweredIds[0];
+
+    if (nextQuestionId) {
+      continuations.push({
+        moduleId: module.moduleId,
+        title: module.title,
+        kind: 'continue',
+        questionId: nextQuestionId,
+        pendingCount: unansweredIds.length,
+      });
+    }
+  }
+
+  return [...reviews, ...continuations].slice(0, Math.max(0, limit));
 }
 
 export function buildModuleProgress(

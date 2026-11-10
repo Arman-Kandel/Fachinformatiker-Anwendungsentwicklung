@@ -69,6 +69,14 @@ export type ModuleOverview = {
   status: 'not-started' | 'in-progress' | 'completed';
 };
 
+export type StudyAgendaItem = {
+  moduleId: string;
+  title: string;
+  kind: 'review' | 'continue';
+  questionId: string;
+  pendingCount: number;
+};
+
 export type AppState = {
   resumeModuleId: string | null;
   currentQuestionId: string | null;

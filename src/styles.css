@@ -167,6 +167,54 @@ button.primary {
   gap: 14px;
 }
 
+.agenda-panel {
+  grid-column: 1 / -1;
+}
+
+.agenda-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 10px;
+}
+
+.agenda-item {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-align: left;
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.agenda-order {
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.agenda-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.agenda-copy strong,
+.agenda-copy small {
+  overflow-wrap: anywhere;
+}
+
+.agenda-copy small {
+  color: var(--purple-soft);
+}
+
+.agenda-arrow {
+  color: var(--green);
+  font-size: 1.2rem;
+}
+
 .overview-strip {
   display: flex;
   flex-wrap: wrap;
