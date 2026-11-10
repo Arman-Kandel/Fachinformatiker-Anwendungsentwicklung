@@ -75,3 +75,19 @@ Wenn eine Aussage nicht belegt ist, gilt sie als unzulässig. In solchen Fällen
 2. angepasst,
 3. oder entfernt werden.
 
+## URL-Recherche und Freigabe
+
+Neue URLs werden zuerst als Kandidaten gesammelt und geprüft. Das Windows-Skript `scripts/research-source-urls.ps1` schreibt einen Bericht nach `sources/url-review/`; es ändert weder dieses Register noch Lerninhalte.
+
+```powershell
+./scripts/research-source-urls.ps1 `
+  -Query "site:ihk.de Fachinformatiker Anwendungsentwicklung Abschlussprüfung" `
+  -AllowedDomain ihk.de
+
+./scripts/research-source-urls.ps1 `
+  -CandidateUrl https://example.org/dokument `
+  -AllowedDomain example.org
+```
+
+Ein erfolgreicher HTTP-Status bestätigt nur Erreichbarkeit, nicht fachliche Autorität oder Aktualität. Erst nach menschlicher Prüfung von Herausgeber, Dokumentstand und Belegbezug darf eine URL in `sources/reference-index.md` übernommen und in Lerninhalten verwendet werden. Suchergebnisse sind best effort; bei blockierter oder geänderter Suchseite können Kandidaten direkt mit `-CandidateUrl` geprüft werden.
+

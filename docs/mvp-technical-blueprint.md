@@ -58,6 +58,13 @@ src/
 │  └─ app.css
 └─ main.ts
 
+public/
+└─ vendor/            # checked-in browser dependencies served locally; no CDN runtime code
+
+scripts/
+├─ bootstrap-windows.ps1
+└─ validate-lock.mjs
+
 content/
 ├─ README.md
 ├─ schema/
@@ -83,6 +90,14 @@ content/
    ├─ module-example.json
    └─ test-example.json
 ```
+
+### Abhängigkeiten und Windows-Setup
+
+- Build-Werkzeuge werden in `package.json` exakt versioniert und über `package-lock.json` reproduzierbar aufgelöst.
+- `scripts/bootstrap-windows.ps1` richtet Node.js lokal unter `.tools/` ein, falls keine kompatible Installation vorhanden ist. Das Windows-Archiv stammt von `nodejs.org` und wird gegen dessen SHA-256-Manifest geprüft.
+- npm-Pakete werden ausschließlich über `https://registry.npmjs.org/` bezogen. Der Bootstrap prüft die Lockfile-URLs und führt anschließend `npm ci` aus.
+- `.tools/`, `node_modules/` und `dist/` sind lokale oder generierte Dateien und werden nicht eingecheckt.
+- `public/vendor/` ist ausschließlich für tatsächlich benötigte Browser-Laufzeitdateien vorgesehen; Build-Werkzeuge gehören nicht dorthin.
 
 ---
 
