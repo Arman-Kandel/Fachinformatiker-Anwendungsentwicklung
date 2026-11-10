@@ -1,10 +1,12 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
-import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, getMasteryLevel, getQuestionById, validateModule } from './lib/learning';
-import type { AppState, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
+import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionById, startExamSession, validateModule } from './lib/learning';
+import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
+const EXAM_QUESTION_LIMIT = 3;
+const EXAM_DURATION_SECONDS = 5 * 60;
 const moduleCatalog = getModuleCatalog();
 const moduleIndex = getModuleIndex();
 const firstModule = moduleCatalog[0];
@@ -16,11 +18,13 @@ const defaultState: AppState = {
   reviewQueue: {},
   moduleProgress: {},
   answeredQuestions: {},
+  examSession: null,
   lastUpdatedAt: null,
 };
 
 const state = loadAppState<AppState>(STORAGE_KEY, defaultState);
 const app = document.querySelector('#app') as HTMLElement;
+let examTimer: number | null = null;
 
 function ensureModuleState(moduleId: string): void {
   const module = getModuleById(moduleId);
@@ -204,12 +208,116 @@ function renderQuestion(question: Question): string {
   `;
 }
 
+function formatExamTime(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function renderExamSession(session: ExamSession): string {
+  const module = getModuleById(session.moduleId);
+  const quiz = getQuizByModuleId(session.moduleId);
+  if (!module || !quiz) {
+    return '<section class="panel exam-panel"><p>Diese Prüfung kann nicht mehr geladen werden.</p><button type="button" data-action="close-exam">Schließen</button></section>';
+  }
+
+  if (session.status === 'active') {
+    const questionId = session.questionIds[session.currentIndex];
+    const question = quiz.questions.find((item) => item.id === questionId);
+    if (!question) {
+      return '<section class="panel exam-panel"><p>Die aktuelle Prüfungsfrage fehlt im Inhalt.</p><button type="button" data-action="close-exam">Prüfung beenden</button></section>';
+    }
+
+    const remaining = getExamRemainingSeconds(session, Date.now());
+    return `
+      <section class="panel exam-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Kurzprüfung · 5 Minuten</p>
+            <h2>${module.title}</h2>
+          </div>
+          <button type="button" data-action="close-exam">Prüfung abbrechen</button>
+        </div>
+        <div class="exam-progress-line">
+          <span>Frage ${session.currentIndex + 1} von ${session.questionIds.length}</span>
+          <strong data-exam-timer>${formatExamTime(remaining)}</strong>
+        </div>
+        <div class="exam-progress-track"><span style="width: ${(session.currentIndex / session.questionIds.length) * 100}%"></span></div>
+        <div class="question-box">
+          <div class="question-meta"><span>Prüfungsfrage</span><strong>${question.id.toUpperCase()}</strong></div>
+          <h3>${question.question}</h3>
+          <div class="options">
+            ${question.options
+              .map(
+                (option, index) => `
+                  <button type="button" class="answer-option" data-exam-answer="${index}">
+                    <span>${String.fromCharCode(65 + index)}</span>
+                    <span>${option}</span>
+                  </button>
+                `,
+              )
+              .join('')}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  const result = getExamResult(session, quiz.questions);
+  return `
+    <section class="panel exam-panel exam-result">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">${session.status === 'expired' ? 'Zeit abgelaufen' : 'Prüfung abgeschlossen'}</p>
+          <h2>${module.title}</h2>
+        </div>
+        <button type="button" data-action="close-exam">Zurück zum Lernen</button>
+      </div>
+      <div class="exam-score">
+        <strong>${result.correct}<span>/${result.total}</span></strong>
+        <span>${result.percent}% richtig</span>
+      </div>
+      <div class="exam-review-list">
+        ${session.questionIds
+          .map((questionId, index) => {
+            const question = quiz.questions.find((item) => item.id === questionId);
+            if (!question) return '';
+            const answerIndex = session.answers[questionId];
+            const isCorrect = answerIndex === question.correctIndex;
+            return `
+              <article class="exam-review-item ${isCorrect ? 'correct' : 'incorrect'}">
+                <div class="exam-review-heading"><strong>${index + 1}. ${question.question}</strong><span>${isCorrect ? 'Richtig' : answerIndex === undefined ? 'Keine Antwort' : 'Falsch'}</span></div>
+                <p>Deine Antwort: ${answerIndex === undefined ? 'Keine Antwort' : question.options[answerIndex] ?? 'Ungültige Auswahl'}</p>
+                <p>Richtige Antwort: ${question.options[question.correctIndex]}</p>
+                <p>${question.explanation}</p>
+                <ul class="source-list">${renderSourceRefs(question.sourceRefs)}</ul>
+              </article>
+            `;
+          })
+          .join('')}
+      </div>
+    </section>
+  `;
+}
+
 function saveCurrentState(): void {
   state.lastUpdatedAt = new Date().toISOString();
   saveAppState(STORAGE_KEY, state);
 }
 
 function render(): void {
+  if (examTimer !== null) {
+    window.clearInterval(examTimer);
+    examTimer = null;
+  }
+
+  const storedExamSession = state.examSession ?? null;
+  if (storedExamSession?.status === 'active' && Date.now() >= storedExamSession.deadlineAt) {
+    state.examSession = expireExamSession(storedExamSession, Date.now());
+    saveCurrentState();
+  }
+
+  const examSession = state.examSession ?? null;
   const selectedModule = getSelectedModule();
   const currentQuiz = getCurrentQuiz();
   const currentSection = getCurrentSection();
@@ -302,7 +410,9 @@ function render(): void {
           </div>
         </section>
 
-        <section class="panel practice">
+        ${examSession ? renderExamSession(examSession) : ''}
+
+        <section class="panel practice ${examSession ? 'session-paused' : ''}">
           <div class="section-head">
             <div>
               <p class="eyebrow">Lernmodul</p>
@@ -491,6 +601,19 @@ function render(): void {
     });
   });
 
+  document.querySelectorAll('[data-exam-answer]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const session = state.examSession;
+      const questionId = session?.questionIds[session.currentIndex];
+      const answerIndex = Number(button.getAttribute('data-exam-answer'));
+      if (!session || !questionId || Number.isNaN(answerIndex)) return;
+
+      state.examSession = answerExamQuestion(session, questionId, answerIndex, Date.now());
+      saveCurrentState();
+      render();
+    });
+  });
+
   document.querySelectorAll('[data-action]').forEach((button) => {
     button.addEventListener('click', () => {
       const action = button.getAttribute('data-action');
@@ -506,8 +629,15 @@ function render(): void {
       }
 
       if (action === 'exam-mode') {
-        const examDeck = buildExamDeck(currentQuiz.questions, reviewQueue, 3);
-        state.currentQuestionId = examDeck[0] ?? currentQuiz.questions[0]?.id ?? null;
+        const examDeck = buildExamDeck(currentQuiz.questions, reviewQueue, EXAM_QUESTION_LIMIT);
+        state.examSession = startExamSession(selectedModule.moduleId, examDeck, Date.now(), EXAM_DURATION_SECONDS);
+        saveCurrentState();
+        render();
+        return;
+      }
+
+      if (action === 'close-exam') {
+        state.examSession = null;
         saveCurrentState();
         render();
         return;
@@ -528,6 +658,24 @@ function render(): void {
       render();
     });
   });
+
+  const activeSession = state.examSession;
+  if (activeSession?.status === 'active') {
+    examTimer = window.setInterval(() => {
+      const session = state.examSession;
+      if (!session || session.status !== 'active') return;
+
+      const remaining = getExamRemainingSeconds(session, Date.now());
+      const timerElement = app.querySelector('[data-exam-timer]');
+      if (timerElement) timerElement.textContent = formatExamTime(remaining);
+
+      if (remaining === 0) {
+        state.examSession = expireExamSession(session, Date.now());
+        saveCurrentState();
+        render();
+      }
+    }, 1_000);
+  }
 }
 
 render();

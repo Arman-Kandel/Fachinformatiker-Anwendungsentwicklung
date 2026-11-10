@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
-import { buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, getMasteryLevel, validateModule } from '../src/lib/learning';
+import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, startExamSession, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
@@ -103,6 +103,39 @@ describe('learning logic', () => {
     expect(examDeck).toEqual(['q3', 'q1']);
   });
 
+  it('runs a timed exam session and calculates its final result', () => {
+    const started = startExamSession('module-one', ['q1', 'q2', 'q3'], 1_000, 60);
+    expect(started).not.toBeNull();
+    if (!started) return;
+
+    expect(getExamRemainingSeconds(started, 1_000)).toBe(60);
+    const firstAnswer = answerExamQuestion(started, 'q1', 1, 2_000);
+    expect(firstAnswer.currentIndex).toBe(1);
+    expect(firstAnswer.status).toBe('active');
+
+    const secondAnswer = answerExamQuestion(firstAnswer, 'q2', 1, 3_000);
+    const completed = answerExamQuestion(secondAnswer, 'q3', 0, 4_000);
+    expect(completed.status).toBe('completed');
+    expect(completed.completedAt).toBe(4_000);
+    expect(getExamResult(completed, [
+      { id: 'q1', correctIndex: 1, question: 'Q1', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+      { id: 'q2', correctIndex: 0, question: 'Q2', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+      { id: 'q3', correctIndex: 0, question: 'Q3', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+    ])).toEqual({ correct: 2, total: 3, percent: 67 });
+  });
+
+  it('expires an unanswered exam at its deadline', () => {
+    const started = startExamSession('module-one', ['q1', 'q2'], 1_000, 60);
+    expect(started).not.toBeNull();
+    if (!started) return;
+
+    expect(getExamRemainingSeconds(started, 60_999)).toBe(1);
+    const expired = answerExamQuestion(started, 'q1', 1, 61_000);
+    expect(expired.status).toBe('expired');
+    expect(expired.completedAt).toBe(61_000);
+    expect(expireExamSession(started, 61_000)).toEqual(expired);
+  });
+
   it('builds a module overview for the curriculum', () => {
     const overview = buildModuleOverview(
       [
@@ -152,6 +185,7 @@ describe('learning logic', () => {
       reviewQueue: {},
       moduleProgress: {},
       answeredQuestions: {},
+      examSession: null,
       lastUpdatedAt: null,
     };
 

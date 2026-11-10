@@ -11,6 +11,7 @@ Der Projektstand ist jetzt konkret umgesetzt: Es existiert eine lauffähige Vite
 - robuste localStorage-Fallback-Logik für Test-/Node-Umgebungen
 - persistierte Lernabschnitt-Auswahl mit Wiederaufnahme im UI
 - Mastery-/Prüfungsmodus mit gezielter Wiederholungslogik
+- zeitbegrenzte Kurzprüfung mit browser-lokalem Sitzungsfortschritt und Ergebnisreview
 - Qualitätslauf erfolgreich verifiziert (`npm run check`)
 
 ## 1. Ziel und Grundidee

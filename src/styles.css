@@ -215,6 +215,95 @@ button.primary {
   font-size: 1.2rem;
 }
 
+.exam-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 18px;
+  border-color: rgba(126, 240, 176, 0.35);
+}
+
+.practice.session-paused {
+  display: none;
+}
+
+.exam-progress-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--purple-soft);
+}
+
+.exam-progress-line strong {
+  color: var(--green);
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.exam-progress-track {
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.exam-progress-track span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  transition: width 0.2s ease;
+}
+
+.exam-score {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  color: var(--green);
+}
+
+.exam-score strong {
+  font-size: 2rem;
+}
+
+.exam-score strong span {
+  color: var(--purple-soft);
+  font-size: 1rem;
+}
+
+.exam-review-list {
+  display: grid;
+  gap: 12px;
+}
+
+.exam-review-item {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.exam-review-item.correct {
+  border-left: 3px solid var(--green);
+}
+
+.exam-review-item.incorrect {
+  border-left: 3px solid var(--red);
+}
+
+.exam-review-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.exam-review-heading span {
+  flex: 0 0 auto;
+  color: var(--purple-soft);
+}
+
 .overview-strip {
   display: flex;
   flex-wrap: wrap;

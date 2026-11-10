@@ -77,6 +77,17 @@ export type StudyAgendaItem = {
   pendingCount: number;
 };
 
+export type ExamSession = {
+  moduleId: string;
+  questionIds: string[];
+  answers: Record<string, number>;
+  currentIndex: number;
+  startedAt: number;
+  deadlineAt: number;
+  status: 'active' | 'completed' | 'expired';
+  completedAt: number | null;
+};
+
 export type AppState = {
   resumeModuleId: string | null;
   currentQuestionId: string | null;
@@ -85,5 +96,6 @@ export type AppState = {
   reviewQueue: Record<string, string[]>;
   moduleProgress: Record<string, ModuleProgress>;
   answeredQuestions: Record<string, number>;
+  examSession?: ExamSession | null;
   lastUpdatedAt: string | null;
 };

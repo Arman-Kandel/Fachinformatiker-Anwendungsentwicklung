@@ -1,4 +1,4 @@
-import type { Module, ModuleOverview, ModuleProgress, Question, SourceRef, StudyAgendaItem } from '../types';
+import type { ExamSession, Module, ModuleOverview, ModuleProgress, Question, SourceRef, StudyAgendaItem } from '../types';
 
 export type MasteryLevel = 'starter' | 'learning' | 'ready' | 'mastered';
 
@@ -54,6 +54,95 @@ export function buildReviewQueue(questions: Question[], answeredQuestions: Recor
 export function buildExamDeck(questions: Question[], reviewQueue: string[], limit = 3): string[] {
   const uniqueQueue = [...new Set([...reviewQueue, ...questions.map((question) => question.id)])];
   return uniqueQueue.slice(0, Math.min(limit, uniqueQueue.length));
+}
+
+export function startExamSession(
+  moduleId: string,
+  questionIds: string[],
+  startedAt: number,
+  durationSeconds: number,
+): ExamSession | null {
+  const uniqueQuestionIds = [...new Set(questionIds)];
+  if (!moduleId || uniqueQuestionIds.length === 0 || durationSeconds <= 0) {
+    return null;
+  }
+
+  return {
+    moduleId,
+    questionIds: uniqueQuestionIds,
+    answers: {},
+    currentIndex: 0,
+    startedAt,
+    deadlineAt: startedAt + durationSeconds * 1_000,
+    status: 'active',
+    completedAt: null,
+  };
+}
+
+export function answerExamQuestion(
+  session: ExamSession,
+  questionId: string,
+  answerIndex: number,
+  answeredAt: number,
+): ExamSession {
+  if (session.status !== 'active') {
+    return session;
+  }
+
+  if (answeredAt >= session.deadlineAt) {
+    return expireExamSession(session, answeredAt);
+  }
+
+  if (
+    session.questionIds[session.currentIndex] !== questionId
+    || session.answers[questionId] !== undefined
+    || !Number.isInteger(answerIndex)
+    || answerIndex < 0
+  ) {
+    return session;
+  }
+
+  const answers = { ...session.answers, [questionId]: answerIndex };
+  const currentIndex = session.currentIndex + 1;
+  const isComplete = currentIndex >= session.questionIds.length;
+
+  return {
+    ...session,
+    answers,
+    currentIndex,
+    status: isComplete ? 'completed' : 'active',
+    completedAt: isComplete ? answeredAt : null,
+  };
+}
+
+export function expireExamSession(session: ExamSession, expiredAt: number): ExamSession {
+  if (session.status !== 'active') {
+    return session;
+  }
+
+  return {
+    ...session,
+    status: 'expired',
+    completedAt: Math.min(expiredAt, session.deadlineAt),
+  };
+}
+
+export function getExamRemainingSeconds(session: ExamSession, now: number): number {
+  return Math.max(0, Math.ceil((session.deadlineAt - now) / 1_000));
+}
+
+export function getExamResult(session: ExamSession, questions: Question[]): { correct: number; total: number; percent: number } {
+  const questionsById = new Map(questions.map((question) => [question.id, question]));
+  const correct = session.questionIds.filter((questionId) => {
+    const question = questionsById.get(questionId);
+    return question !== undefined && session.answers[questionId] === question.correctIndex;
+  }).length;
+
+  return {
+    correct,
+    total: session.questionIds.length,
+    percent: computeAccuracy(correct, session.questionIds.length),
+  };
 }
 
 export function getMasteryLevel(progress: ModuleProgress): { label: MasteryLevel; percent: number } {
