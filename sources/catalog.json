@@ -1,0 +1,154 @@
+{
+  "sources": [
+    {
+      "sourceId": "FIAUSBV",
+      "title": "Fachinformatikerausbildungsverordnung",
+      "publisher": "Bundesministerium der Justiz / Bundesamt für Justiz",
+      "type": "official-regulation",
+      "status": "approved",
+      "url": "https://www.gesetze-im-internet.de/fiausbv/BJNR025000020.html",
+      "retrievedAt": "2026-11-10",
+      "reviewedAt": "2026-11-10",
+      "relevance": ["AP1", "AP2-Anwendungsentwicklung"],
+      "notes": "Amtliche Verordnung einschließlich Ausbildungsrahmenplan und Abschlussprüfungsregelungen.",
+      "evidence": [
+        {
+          "section": "Anlage, Berufsbildposition 4 Buchstabe a",
+          "quote": "Datenmodelle und Strukturen aus fachlichen Anforderungen ableiten"
+        },
+        {
+          "section": "Anlage, Berufsbildposition 4 Buchstabe e",
+          "quote": "Datenbankmodelle unterscheiden, Daten organisieren und speichern sowie Abfragen erstellen"
+        },
+        {
+          "section": "§ 7 Absatz 1",
+          "quote": "Die Abschlussprüfung besteht aus den Teilen 1 und 2."
+        },
+        {
+          "section": "§ 7 Absatz 2",
+          "quote": "Teil 1 findet im vierten Ausbildungshalbjahr statt, Teil 2 am Ende der Berufsausbildung. Den jeweiligen Zeitpunkt legt die zuständige Stelle fest."
+        },
+        {
+          "section": "§ 7 Absatz 2",
+          "quote": "Teil 1 findet im vierten Ausbildungshalbjahr statt"
+        },
+        {
+          "section": "§ 7 Absatz 2",
+          "quote": "Den jeweiligen Zeitpunkt legt die zuständige Stelle fest."
+        },
+        {
+          "section": "§ 8 Nummer 1",
+          "quote": "die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7"
+        },
+        {
+          "section": "§ 8 Nummer 1",
+          "quote": "Teil 1 der Abschlussprüfung erstreckt sich auf die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7"
+        },
+        {
+          "section": "§ 8 Nummer 1",
+          "quote": "die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten"
+        },
+        {
+          "section": "§ 8 Nummer 2",
+          "quote": "den im Berufsschulunterricht zu vermittelnden Lehrstoff, soweit er den im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnissen und Fähigkeiten entspricht"
+        },
+        {
+          "section": "§ 8 Nummer 2",
+          "quote": "soweit er den im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnissen und Fähigkeiten entspricht"
+        }
+      ]
+    },
+    {
+      "sourceId": "ORACLE-DB-CONCEPTS",
+      "title": "Oracle Database Concepts: Introduction to Oracle Database",
+      "publisher": "Oracle",
+      "type": "official-documentation",
+      "status": "approved",
+      "url": "https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/introduction-to-oracle-database.html",
+      "retrievedAt": "2026-11-10",
+      "reviewedAt": "2026-11-10",
+      "relevance": ["AP1-Datenmodellierung"],
+      "notes": "Official database concepts documentation; cited for tables, entities, attributes, and row instances.",
+      "evidence": [
+        {
+          "section": "Schema Objects > Tables",
+          "quote": "A table describes an entity such as employees."
+        },
+        {
+          "section": "Schema Objects > Tables",
+          "quote": "A column identifies an attribute of the entity described by the table"
+        },
+        {
+          "section": "Schema Objects > Tables",
+          "quote": "A row identifies an instance of the entity."
+        }
+      ]
+    },
+    {
+      "sourceId": "MICROSOFT-DB-NORMALIZATION",
+      "title": "Database normalization description",
+      "publisher": "Microsoft Learn",
+      "type": "official-documentation",
+      "status": "approved",
+      "url": "https://learn.microsoft.com/en-us/previous-versions/troubleshoot/microsoft-365/microsoft-365-apps/access/database-normalization-description",
+      "retrievedAt": "2026-11-10",
+      "reviewedAt": "2026-11-10",
+      "relevance": ["AP1-Datenmodellierung"],
+      "notes": "Microsoft's archived relational database design article; cited for relationships between tables and separating repeating groups.",
+      "evidence": [
+        {
+          "section": "Description of normalization",
+          "quote": "Normalization is the process of organizing data in a database. It includes creating tables and establishing relationships between those tables according to rules designed both to protect the data and to make the database more flexible by eliminating redundancy and inconsistent dependency."
+        },
+        {
+          "section": "Normalizing an example table",
+          "quote": "Instead, create another table in first normal form by eliminating the repeating group (Class#), as shown below:"
+        }
+      ]
+    },
+    {
+      "sourceId": "POSTGRESQL-TUTORIAL-SELECT",
+      "title": "PostgreSQL Tutorial: Querying a Table",
+      "publisher": "The PostgreSQL Global Development Group",
+      "type": "official-documentation",
+      "status": "approved",
+      "url": "https://www.postgresql.org/docs/18/tutorial-select.html",
+      "retrievedAt": "2026-11-10",
+      "reviewedAt": "2026-11-10",
+      "relevance": ["AP1-SQL"],
+      "notes": "Official PostgreSQL tutorial for SELECT queries, result columns, and WHERE qualifications.",
+      "evidence": [
+        {
+          "section": "2.5 Querying a Table",
+          "quote": "An SQL SELECT statement is used to do this."
+        },
+        {
+          "section": "2.5 Querying a Table",
+          "quote": "A query can be “qualified” by adding a WHERE clause that specifies which rows are wanted."
+        }
+      ]
+    },
+    {
+      "sourceId": "POSTGRESQL-TUTORIAL-JOIN",
+      "title": "PostgreSQL Tutorial: Joins Between Tables",
+      "publisher": "The PostgreSQL Global Development Group",
+      "type": "official-documentation",
+      "status": "approved",
+      "url": "https://www.postgresql.org/docs/18/tutorial-join.html",
+      "retrievedAt": "2026-11-10",
+      "reviewedAt": "2026-11-10",
+      "relevance": ["AP1-SQL"],
+      "notes": "Official PostgreSQL tutorial for combining rows through join queries and pairing expressions.",
+      "evidence": [
+        {
+          "section": "2.6 Joins Between Tables",
+          "quote": "Queries that access multiple tables (or multiple instances of the same table) at one time are called join queries."
+        },
+        {
+          "section": "2.6 Joins Between Tables",
+          "quote": "They combine rows from one table with rows from a second table, with an expression specifying which rows are to be paired."
+        }
+      ]
+    }
+  ]
+}

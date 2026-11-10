@@ -1,5 +1,5 @@
 import './styles.css';
-import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
+import { getApprovedSourceUrl, getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
 import { escapeHtml } from './lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
@@ -133,15 +133,21 @@ function getCurrentSection() {
 
 function renderSourceRefs(sourceRefs: Array<{ sourceId: string; quote: string; section: string; type?: string }>): string {
   return sourceRefs
-    .map(
-      (ref) => `
+    .map((ref) => {
+      const sourceUrl = getApprovedSourceUrl(ref.sourceId);
+      const sourceLink = sourceUrl
+        ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Originalquelle öffnen</a>`
+        : '<span>Quelle nicht im Register</span>';
+
+      return `
         <li>
           <span>${escapeHtml(ref.sourceId)}</span>
           <strong>${escapeHtml(ref.section)}</strong>
           <p>${escapeHtml(ref.quote)}</p>
+          ${sourceLink}
         </li>
-      `,
-    )
+      `;
+    })
     .join('');
 }
 

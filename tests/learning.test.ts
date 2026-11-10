@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { getModuleById, getModuleCatalog, getModuleIndex, getQuizByModuleId } from '../src/app/content-loader/content-loader';
+import { getApprovedSourceUrl, getModuleById, getModuleCatalog, getModuleIndex, getQuizByModuleId } from '../src/app/content-loader/content-loader';
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
 import { escapeHtml } from '../src/lib/html';
 import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, startExamSession, updateModuleProgressForAnswer, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
+import sourceCatalog from '../sources/catalog.json';
 
 describe('learning logic', () => {
   it('escapes text before inserting it into HTML templates', () => {
@@ -63,6 +64,29 @@ describe('learning logic', () => {
     expect(validateModule(module)).toEqual([]);
     expect(module.sourceRefs.every((ref) => ref.sourceId === 'FIAUSBV' && ref.quote.length > 0)).toBe(true);
     expect(quiz.questions.every((question) => question.sourceRefs.some((ref) => ref.sourceId === 'FIAUSBV' && ref.quote.length > 0))).toBe(true);
+  });
+
+  it('uses only approved source excerpts for module and quiz claims', () => {
+    const approvedEvidence = new Set(sourceCatalog.sources
+      .filter((source) => source.status === 'approved')
+      .flatMap((source) => source.evidence.map((evidence) => `${source.sourceId}::${evidence.section}::${evidence.quote}`)));
+    const modules = getModuleCatalog();
+    const refs = modules.flatMap((module) => [
+      ...module.sourceRefs,
+      ...module.sections.flatMap((section) => section.sourceRefs),
+      ...(getQuizByModuleId(module.moduleId)?.questions.flatMap((question) => question.sourceRefs) ?? []),
+    ]).concat(getModuleIndex().flatMap((entry) => entry.sourceRefs));
+    const unresolvedRefs = refs.filter((ref) => !approvedEvidence.has(`${ref.sourceId}::${ref.section}::${ref.quote}`));
+
+    expect(refs.length).toBeGreaterThan(0);
+    expect(modules.every((module) => module.sections.every((section) => section.sourceRefs.length > 0))).toBe(true);
+    expect(modules.every((module) => (getQuizByModuleId(module.moduleId)?.questions ?? []).every((question) => question.sourceRefs.length > 0))).toBe(true);
+    expect(unresolvedRefs).toEqual([]);
+  });
+
+  it('resolves only registered source ids to external references', () => {
+    expect(getApprovedSourceUrl('POSTGRESQL-TUTORIAL-SELECT')).toBe('https://www.postgresql.org/docs/18/tutorial-select.html');
+    expect(getApprovedSourceUrl('unknown-source')).toBeNull();
   });
 
   it('computes a normal accuracy percentage', () => {

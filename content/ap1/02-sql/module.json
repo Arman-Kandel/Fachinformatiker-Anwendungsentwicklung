@@ -14,8 +14,14 @@
   "sourceRefs": [
     {
       "sourceId": "FIAUSBV",
-      "quote": "SQL und Datenbankabfragen gehören zu den fachlichen Grundlagen der Anwendungsentwicklung und Datenmodellierung.",
-      "section": "Ausbildungsrahmen",
+      "quote": "Datenbankmodelle unterscheiden, Daten organisieren und speichern sowie Abfragen erstellen",
+      "section": "Anlage, Berufsbildposition 4 Buchstabe e",
+      "type": "official"
+    },
+    {
+      "sourceId": "POSTGRESQL-TUTORIAL-SELECT",
+      "quote": "An SQL SELECT statement is used to do this.",
+      "section": "2.5 Querying a Table",
       "type": "official"
     }
   ],
@@ -24,12 +30,18 @@
       "id": "s1",
       "type": "theory",
       "title": "Grundlagen",
-      "content": "Mit SQL werden Daten aus Tabellen abgefragt und gezielt gefiltert. Eine einfache SELECT-Abfrage liefert die gewünschten Datensätze, während WHERE-Klauseln die Ergebnismenge weiter eingrenzen.",
+      "content": "SELECT-Abfragen lesen Daten aus Tabellen. Eine WHERE-Klausel legt fest, welche Zeilen zurückgegeben werden.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Datenbankabfragen und deren fachliche Interpretation sind Teil der Ausbildung in der Anwendungsentwicklung.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "POSTGRESQL-TUTORIAL-SELECT",
+          "quote": "An SQL SELECT statement is used to do this.",
+          "section": "2.5 Querying a Table",
+          "type": "official"
+        },
+        {
+          "sourceId": "POSTGRESQL-TUTORIAL-SELECT",
+          "quote": "A query can be “qualified” by adding a WHERE clause that specifies which rows are wanted.",
+          "section": "2.5 Querying a Table",
           "type": "official"
         }
       ]
@@ -38,12 +50,18 @@
       "id": "s2",
       "type": "theory",
       "title": "JOINs",
-      "content": "JOINs verbinden Datensätze aus mehreren Tabellen anhand gemeinsamer Schlüssel. So lassen sich zusammengehörige Informationen aus unterschiedlichen Entitätstypen in einer Ergebnistabelle darstellen.",
+      "content": "Join-Abfragen greifen auf mehrere Tabellen zu und kombinieren Zeilen anhand eines Ausdrucks, der festlegt, welche Zeilen zusammengehören.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Die fachliche Verknüpfung von Datensätzen über gemeinsame Schlüssel ist eine zentrale Datenbankkompetenz.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "POSTGRESQL-TUTORIAL-JOIN",
+          "quote": "Queries that access multiple tables (or multiple instances of the same table) at one time are called join queries.",
+          "section": "2.6 Joins Between Tables",
+          "type": "official"
+        },
+        {
+          "sourceId": "POSTGRESQL-TUTORIAL-JOIN",
+          "quote": "They combine rows from one table with rows from a second table, with an expression specifying which rows are to be paired.",
+          "section": "2.6 Joins Between Tables",
           "type": "official"
         }
       ]
@@ -52,12 +70,18 @@
       "id": "s3",
       "type": "summary",
       "title": "Fazit",
-      "content": "SQL bildet die Grundlage für strukturierte Abfragen, Logik-Filterung und Zusammenführung von Daten. Das Verständnis von SELECT, WHERE und JOIN ist daher für die berufliche Praxis zentral.",
+      "content": "SELECT und WHERE bestimmen Ausgabespalten und Zeilenfilter. JOIN-Abfragen kombinieren Zeilen aus mehreren Tabellen anhand eines Paarungsausdrucks.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Eine fachlich sichere Datenbankabfrage ist eine zentrale Grundlage für die Umsetzung und Prüfung von Anwendungslösungen.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "POSTGRESQL-TUTORIAL-SELECT",
+          "quote": "A query can be “qualified” by adding a WHERE clause that specifies which rows are wanted.",
+          "section": "2.5 Querying a Table",
+          "type": "official"
+        },
+        {
+          "sourceId": "POSTGRESQL-TUTORIAL-JOIN",
+          "quote": "They combine rows from one table with rows from a second table, with an expression specifying which rows are to be paired.",
+          "section": "2.6 Joins Between Tables",
           "type": "official"
         }
       ]

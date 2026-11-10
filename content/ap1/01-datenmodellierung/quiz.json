@@ -4,60 +4,80 @@
   "questions": [
     {
       "id": "q1",
-      "question": "Welche Aussage beschreibt einen Entitätstyp im ER-Modell am treffendsten?",
+      "question": "Wie beschreibt Oracle Database Concepts eine Tabelle?",
       "options": [
-        "Eine einzelne Speicherstelle eines Datensatzes.",
-        "Eine Menge logisch zusammengehöriger Objekte mit gemeinsamen Merkmalen.",
-        "Ein SQL-Befehl zum Erzeugen einer Tabelle.",
-        "Ein prozessualer Ablauf im Frontend."
+        "Als Beschreibung einer Entität.",
+        "Als SQL-Abfrage ohne gespeicherte Struktur.",
+        "Als einzelnes Attribut ohne Zeilen.",
+        "Als eine Gruppe von Programmiersprachen."
       ],
-      "correctIndex": 1,
-      "explanation": "Ein Entitätstyp beschreibt eine Menge gleichartiger Objekte mit gemeinsamen Eigenschaften und Beziehungen. Das ist die fachliche Grundlage für Modellierung und Datenanalyse.",
+      "correctIndex": 0,
+      "explanation": "Oracle Database Concepts beschreibt eine Tabelle als Beschreibung einer Entität.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Datenmodellierung und fachliche Analyse bilden die Grundlage für die spätere Umsetzung in Anwendungen.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A table describes an entity such as employees.",
+          "section": "Schema Objects > Tables",
           "type": "official"
         }
       ]
     },
     {
       "id": "q2",
-      "question": "Warum werden Beziehungen in einem ER-Diagramm modelliert?",
+      "question": "Wofür steht eine Spalte in der beschriebenen Tabelle?",
       "options": [
-        "Um Programmiersprachen zu vergleichen.",
-        "Um fachliche Verknüpfungen zwischen Objekten sichtbar zu machen.",
-        "Um Stylesheets automatisch zu erzeugen.",
-        "Um den Browsercache zu optimieren."
+        "Für eine Instanz der Entität.",
+        "Für ein Attribut der beschriebenen Entität.",
+        "Für eine zweite Tabelle.",
+        "Für eine SQL-Transaktion."
       ],
       "correctIndex": 1,
-      "explanation": "Beziehungen zeigen, wie Entitätstypen inhaltlich miteinander verknüpft sind. Diese Verknüpfungen sind für fachliche Logik und spätere Datenbankstrukturen essenziell.",
+      "explanation": "Oracle Database Concepts ordnet Spalten den Attributen der beschriebenen Entität zu.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Die fachliche Modellierung von Beziehungen ist ein zentraler Bestandteil der Datenanalyse und Anwendungsentwicklung.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A column identifies an attribute of the entity described by the table",
+          "section": "Schema Objects > Tables",
           "type": "official"
         }
       ]
     },
     {
       "id": "q3",
-      "question": "Welche Lösung ist bei einer n:m-Beziehung typischerweise sinnvoll?",
+      "question": "Wofür steht eine Zeile in der beschriebenen Tabelle?",
       "options": [
-        "Eine einzelne Tabelle ohne Schlüssel.",
-        "Eine zusätzliche Verbindungstabelle.",
-        "Ein CSS-Layout.",
-        "Eine lokale Datei im Browser."
+        "Für ein Attribut.",
+        "Für eine Instanz der Entität.",
+        "Für eine Beziehung zwischen zwei Datenbanken.",
+        "Für eine SQL-Klausel."
       ],
       "correctIndex": 1,
-      "explanation": "Bei n:m-Beziehungen werden häufig Hilfstabellen verwendet, damit Beziehungen sauber und ohne Redundanzen modelliert werden können.",
+      "explanation": "Oracle Database Concepts beschreibt eine Zeile als eine Instanz der durch die Tabelle beschriebenen Entität.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Die fachliche Modellierung von Beziehungen ist ein zentraler Bestandteil der Datenanalyse und Anwendungsentwicklung.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A row identifies an instance of the entity.",
+          "section": "Schema Objects > Tables",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-01-datenmodellierung-q4",
+      "question": "Was empfiehlt das Microsoft-Beispiel bei wiederholten Kurswerten in einer Studententabelle?",
+      "options": [
+        "Die Tabelle um eine Spalte pro Kurs erweitern.",
+        "Eine separate Tabelle für die wiederholte Gruppe anlegen.",
+        "Alle Kurswerte in ein Stylesheet übertragen.",
+        "Die wiederholten Werte unverändert duplizieren."
+      ],
+      "correctIndex": 1,
+      "explanation": "Das Beispiel lagert die wiederholte Kursgruppe in eine eigene Registration-Tabelle aus.",
+      "sourceRefs": [
+        {
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Instead, create another table in first normal form by eliminating the repeating group (Class#), as shown below:",
+          "section": "Normalizing an example table",
           "type": "official"
         }
       ]

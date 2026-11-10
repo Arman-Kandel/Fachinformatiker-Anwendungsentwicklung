@@ -6,16 +6,22 @@
   "status": "draft",
   "tags": ["DB", "ERM", "Normalformen"],
   "learningObjectives": [
-    "Entitätstypen erkennen",
-    "Beziehungen modellieren",
-    "ER-Diagramme interpretieren"
+    "Datenmodelle und Strukturen aus fachlichen Anforderungen ableiten",
+    "Tabellen, Attribute und Instanzen unterscheiden",
+    "Beziehungen zwischen Tabellen anhand belegter Beispiele erklären"
   ],
   "dependencies": [],
   "sourceRefs": [
     {
       "sourceId": "FIAUSBV",
-      "quote": "Der fachliche Rahmen für Datenmodellierung und -analyse ist Teil der beruflichen Grundlagen und dient der fachgerechten Anwendungsentwicklung.",
-      "section": "Ausbildungsrahmen",
+      "quote": "Datenmodelle und Strukturen aus fachlichen Anforderungen ableiten",
+      "section": "Anlage, Berufsbildposition 4 Buchstabe a",
+      "type": "official"
+    },
+    {
+      "sourceId": "ORACLE-DB-CONCEPTS",
+      "quote": "A table describes an entity such as employees.",
+      "section": "Schema Objects > Tables",
       "type": "official"
     }
   ],
@@ -24,12 +30,30 @@
       "id": "s1",
       "type": "theory",
       "title": "Grundlagen",
-      "content": "Ein Entitätstyp beschreibt eine Menge logisch zusammengehöriger Objekte, die über gleiche Merkmale und Beziehungen definiert werden. Beispielsweise kann eine Person, ein Produkt oder eine Bestellung als eigener Entitätstyp modelliert werden.",
+      "content": "Die FIAusbV nennt das Ableiten von Datenmodellen und -strukturen aus fachlichen Anforderungen. Oracle Database Concepts ordnet eine Tabelle als Beschreibung einer Entität ein; Spalten stehen für Attribute und Zeilen für Instanzen.",
       "sourceRefs": [
         {
           "sourceId": "FIAUSBV",
-          "quote": "Datenmodellierung und fachliche Analyse bilden die Grundlage für die spätere Umsetzung in Anwendungen.",
-          "section": "Ausbildungsrahmen",
+          "quote": "Datenmodelle und Strukturen aus fachlichen Anforderungen ableiten",
+          "section": "Anlage, Berufsbildposition 4 Buchstabe a",
+          "type": "official"
+        },
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A table describes an entity such as employees.",
+          "section": "Schema Objects > Tables",
+          "type": "official"
+        },
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A column identifies an attribute of the entity described by the table",
+          "section": "Schema Objects > Tables",
+          "type": "official"
+        },
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A row identifies an instance of the entity.",
+          "section": "Schema Objects > Tables",
           "type": "official"
         }
       ]
@@ -38,12 +62,18 @@
       "id": "s2",
       "type": "theory",
       "title": "Beziehungen",
-      "content": "Beziehungen dokumentieren, wie Entitätstypen miteinander verknüpft sind. Eine 1:n-Beziehung ist häufig bei Kunden und Bestellungen zu sehen, während n:m-Beziehungen meist durch eine zusätzliche Verbindungstabelle gelöst werden.",
+      "content": "Relationale Datenbankentwürfe stellen Beziehungen zwischen Tabellen her. Das Microsoft-Beispiel zur Normalisierung lagert wiederholte Kurswerte aus einer Studententabelle in eine separate Registration-Tabelle aus.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Die fachliche Modellierung von Beziehungen ist ein zentraler Bestandteil der Datenanalyse und Anwendungsentwicklung.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Normalization is the process of organizing data in a database. It includes creating tables and establishing relationships between those tables according to rules designed both to protect the data and to make the database more flexible by eliminating redundancy and inconsistent dependency.",
+          "section": "Description of normalization",
+          "type": "official"
+        },
+        {
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Instead, create another table in first normal form by eliminating the repeating group (Class#), as shown below:",
+          "section": "Normalizing an example table",
           "type": "official"
         }
       ]
@@ -52,12 +82,24 @@
       "id": "s3",
       "type": "summary",
       "title": "Fazit",
-      "content": "Ziel der Datenmodellierung ist es, fachliche Sachverhalte klar, konsistent und verlässlich in Strukturen zu übersetzen, damit Anwendungen später verständlich und wartbar bleiben.",
+      "content": "Datenmodelle und Strukturen werden aus fachlichen Anforderungen abgeleitet. Tabellen beschreiben Entitäten; Beziehungen zwischen Tabellen und wiederholte Gruppen werden anhand expliziter Tabellenstrukturen dargestellt.",
       "sourceRefs": [
         {
           "sourceId": "FIAUSBV",
-          "quote": "Ein nachvollziehbares, fachlich korrektes Datenmodell ist für die Entwicklung und Dokumentation von Anwendungen erforderlich.",
-          "section": "Ausbildungsrahmen",
+          "quote": "Datenmodelle und Strukturen aus fachlichen Anforderungen ableiten",
+          "section": "Anlage, Berufsbildposition 4 Buchstabe a",
+          "type": "official"
+        },
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A table describes an entity such as employees.",
+          "section": "Schema Objects > Tables",
+          "type": "official"
+        },
+        {
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Normalization is the process of organizing data in a database. It includes creating tables and establishing relationships between those tables according to rules designed both to protect the data and to make the database more flexible by eliminating redundancy and inconsistent dependency.",
+          "section": "Description of normalization",
           "type": "official"
         }
       ]

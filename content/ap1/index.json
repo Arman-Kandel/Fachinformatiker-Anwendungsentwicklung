@@ -9,8 +9,8 @@
       "sourceRefs": [
         {
           "sourceId": "FIAUSBV",
-          "quote": "Die Ausbildung fokussiert auf fachliche Grundlagen, Datenmodellierung und fachgerechte Dokumentation.",
-          "section": "Ausbildungsrahmen",
+          "quote": "Datenmodelle und Strukturen aus fachlichen Anforderungen ableiten",
+          "section": "Anlage, Berufsbildposition 4 Buchstabe a",
           "type": "official"
         }
       ]
@@ -23,8 +23,8 @@
       "sourceRefs": [
         {
           "sourceId": "FIAUSBV",
-          "quote": "SQL und Datenbankabfragen sind fachliche Kernkompetenzen der Anwendungsentwicklung.",
-          "section": "Ausbildungsrahmen",
+          "quote": "Datenbankmodelle unterscheiden, Daten organisieren und speichern sowie Abfragen erstellen",
+          "section": "Anlage, Berufsbildposition 4 Buchstabe e",
           "type": "official"
         }
       ]
@@ -37,8 +37,8 @@
       "sourceRefs": [
         {
           "sourceId": "FIAUSBV",
-          "quote": "Teil 1 der Abschlussprüfung erstreckt sich auf die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten",
-          "section": "§ 8 FIAusbV",
+          "quote": "die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7",
+          "section": "§ 8 Nummer 1",
           "type": "official"
         }
       ]

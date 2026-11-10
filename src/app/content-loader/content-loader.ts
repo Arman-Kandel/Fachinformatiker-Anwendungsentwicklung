@@ -6,6 +6,7 @@ import moduleThreeData from '../../../content/ap1/03-pruefungsrahmen/module.json
 import quizOneData from '../../../content/ap1/01-datenmodellierung/quiz.json';
 import quizTwoData from '../../../content/ap1/02-sql/quiz.json';
 import quizThreeData from '../../../content/ap1/03-pruefungsrahmen/quiz.json';
+import sourceCatalogData from '../../../sources/catalog.json';
 
 const moduleCatalog: Module[] = [moduleOneData as Module, moduleTwoData as Module, moduleThreeData as Module];
 const quizCatalog: Record<string, QuizSet> = {
@@ -35,6 +36,11 @@ export function getModuleSummaryList(): ModuleSummary[] {
 
 export function getQuizByModuleId(moduleId: string): QuizSet | undefined {
   return quizCatalog[moduleId];
+}
+
+export function getApprovedSourceUrl(sourceId: string): string | null {
+  const source = sourceCatalogData.sources.find((entry) => entry.sourceId === sourceId && entry.status === 'approved');
+  return source?.url ?? null;
 }
 
 export function getModuleIndex(): Array<{ moduleId: string; title: string; difficulty: string; estimatedMinutes: number; sourceRefs: Array<{ sourceId: string; quote: string; section: string; type?: string }> }> {

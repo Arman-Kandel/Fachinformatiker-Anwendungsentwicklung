@@ -15,9 +15,9 @@
       "explanation": "Die WHERE-Klausel schränkt die Ergebnismenge anhand einer Bedingung ein und ist daher für gezielte Abfragen entscheidend.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "SQL-Abfragen und deren fachliche Filterlogik sind zentrale Bestandteile der Anwendungsentwicklung.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "POSTGRESQL-TUTORIAL-SELECT",
+          "quote": "A query can be “qualified” by adding a WHERE clause that specifies which rows are wanted.",
+          "section": "2.5 Querying a Table",
           "type": "official"
         }
       ]
@@ -35,9 +35,9 @@
       "explanation": "JOINs verbinden Daten aus unterschiedlichen Tabellen über gemeinsame Schlüssel und ermöglichen so die fachlich sinnvolle Kombination von Informationen.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Die fachliche Verknüpfung von Datensätzen über gemeinsame Schlüssel ist eine zentrale Datenbankkompetenz.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "POSTGRESQL-TUTORIAL-JOIN",
+          "quote": "They combine rows from one table with rows from a second table, with an expression specifying which rows are to be paired.",
+          "section": "2.6 Joins Between Tables",
           "type": "official"
         }
       ]
@@ -55,9 +55,9 @@
       "explanation": "SELECT definiert, welche Spalten bzw. Daten aus einer oder mehreren Tabellen in der Ergebnismenge zurückgegeben werden.",
       "sourceRefs": [
         {
-          "sourceId": "FIAUSBV",
-          "quote": "Datenbankabfragen und deren fachliche Interpretation sind Teil der Ausbildung in der Anwendungsentwicklung.",
-          "section": "Ausbildungsrahmen",
+          "sourceId": "POSTGRESQL-TUTORIAL-SELECT",
+          "quote": "An SQL SELECT statement is used to do this.",
+          "section": "2.5 Querying a Table",
           "type": "official"
         }
       ]

@@ -664,6 +664,12 @@ button.primary {
   color: #f4ecff;
 }
 
+.source-list a {
+  width: fit-content;
+  color: var(--green);
+  text-underline-offset: 3px;
+}
+
 @media (max-width: 870px) {
   .layout {
     grid-template-columns: 1fr;
