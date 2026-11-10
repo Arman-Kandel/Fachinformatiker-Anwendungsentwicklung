@@ -1,7 +1,7 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
-import { buildModuleProgress, buildReviewQueue, computeAccuracy, getQuestionById, validateModule } from './lib/learning';
+import { buildExamDeck, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, getQuestionById, validateModule } from './lib/learning';
 import type { AppState, Module, ModuleProgress, Question } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
@@ -201,10 +201,11 @@ function render(): void {
             <button class="primary" type="button" data-action="resume">Fortsetzen</button>
             <button type="button" data-action="study-today">Heute üben</button>
             <button type="button" data-action="quick-test">Schnelltest</button>
+            <button type="button" data-action="exam-mode">Prüfungsmodus</button>
             <button type="button" data-action="review-next" ${reviewQueue.length === 0 ? 'disabled' : ''}>Wiederholen</button>
           </div>
           <p class="summary">
-            ${selectedModule.title} · ${computeAccuracy(progress.correct, progress.total)}% Trefferquote · ${selectedModule.learningObjectives[0]}
+            ${selectedModule.title} · ${computeAccuracy(progress.correct, progress.total)}% Trefferquote · ${getMasteryLevel(progress).label} · ${selectedModule.learningObjectives[0]}
           </p>
           ${validationErrors.length > 0 ? `<p class="validation-warning">Warnung: ${validationErrors.join(', ')}</p>` : ''}
         </section>
@@ -240,6 +241,16 @@ function render(): void {
             <div class="stat-box">
               <span>Schwierigkeit</span>
               <strong>${selectedModule.difficulty}</strong>
+            </div>
+          </div>
+
+          <div class="mastery-panel">
+            <div class="section-head compact">
+              <h3>Mastery</h3>
+              <span class="pill">${getMasteryLevel(progress).label}</span>
+            </div>
+            <div class="mastery-bar">
+              <span style="width: ${getMasteryLevel(progress).percent}%"></span>
             </div>
           </div>
 
@@ -398,6 +409,14 @@ function render(): void {
 
       if (action === 'review-next' && reviewQueue.length > 0) {
         state.currentQuestionId = reviewQueue[0] ?? currentQuiz.questions[0]?.id ?? null;
+        saveCurrentState();
+        render();
+        return;
+      }
+
+      if (action === 'exam-mode') {
+        const examDeck = buildExamDeck(currentQuiz.questions, reviewQueue, 3);
+        state.currentQuestionId = examDeck[0] ?? currentQuiz.questions[0]?.id ?? null;
         saveCurrentState();
         render();
         return;

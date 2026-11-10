@@ -1,5 +1,7 @@
 import type { Module, ModuleProgress, Question, SourceRef } from '../types';
 
+export type MasteryLevel = 'starter' | 'learning' | 'ready' | 'mastered';
+
 export function validateModule(module: Module): string[] {
   const errors: string[] = [];
 
@@ -47,6 +49,29 @@ export function buildReviewQueue(questions: Question[], answeredQuestions: Recor
   return questions
     .filter((question) => answeredQuestions[question.id] !== undefined && answeredQuestions[question.id] !== question.correctIndex)
     .map((question) => question.id);
+}
+
+export function buildExamDeck(questions: Question[], reviewQueue: string[], limit = 3): string[] {
+  const uniqueQueue = [...new Set([...reviewQueue, ...questions.map((question) => question.id)])];
+  return uniqueQueue.slice(0, Math.min(limit, uniqueQueue.length));
+}
+
+export function getMasteryLevel(progress: ModuleProgress): { label: MasteryLevel; percent: number } {
+  const percent = computeAccuracy(progress.correct, progress.total);
+
+  if (percent >= 90) {
+    return { label: 'mastered', percent };
+  }
+
+  if (percent >= 70) {
+    return { label: 'ready', percent };
+  }
+
+  if (percent >= 40) {
+    return { label: 'learning', percent };
+  }
+
+  return { label: 'starter', percent };
 }
 
 export function buildModuleProgress(

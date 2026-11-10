@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
-import { buildModuleProgress, buildReviewQueue, computeAccuracy, validateModule } from '../src/lib/learning';
+import { buildExamDeck, buildModuleProgress, buildReviewQueue, computeAccuracy, getMasteryLevel, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
@@ -73,6 +73,34 @@ describe('learning logic', () => {
     );
 
     expect(reviewQueue).toEqual(['q1', 'q2']);
+  });
+
+  it('derives mastery level from progress', () => {
+    const mastery = getMasteryLevel({
+      moduleId: 'ap1-01-datenmodellierung',
+      seen: 3,
+      correct: 3,
+      total: 3,
+      lastPracticedAt: '2026-11-10T12:00:00.000Z',
+      status: 'completed',
+    });
+
+    expect(mastery.label).toBe('mastered');
+    expect(mastery.percent).toBe(100);
+  });
+
+  it('builds a targeted exam deck from review and general questions', () => {
+    const examDeck = buildExamDeck(
+      [
+        { id: 'q1', correctIndex: 0, question: 'Q1', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+        { id: 'q2', correctIndex: 1, question: 'Q2', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+        { id: 'q3', correctIndex: 0, question: 'Q3', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+      ],
+      ['q3'],
+      2,
+    );
+
+    expect(examDeck).toEqual(['q3', 'q1']);
   });
 
   it('persists and loads app state from local storage', () => {

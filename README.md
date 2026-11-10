@@ -8,6 +8,7 @@ Eine statische Lernplattform für IHK-relevante Inhalte mit lokalem Browser-Stat
 - lokale, browser-basierte Persistenz ohne Backend
 - Quellenbelege je Lernmodul und Frage
 - Wiederholungs-Queue für falsch beantwortete Fragen
+- Mastery-Status und Prüfungsmodus für gezielte Wiederholung
 - statische Auslieferung über GitHub Pages
 
 ## Lokale Entwicklung
