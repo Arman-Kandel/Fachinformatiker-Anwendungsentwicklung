@@ -7,11 +7,12 @@ Die Basiskomponenten des MVP sind implementiert: zentrale App-Struktur, modulare
 ### Erweiterter MVP-Stand
 
 - Content-Model als modulare Struktur im `content/`-Ordner
-- AP1-Module: Datenmodellierung + SQL-Grundlagen
+- AP1-Module: Datenmodellierung, SQL-Grundlagen und Prüfungsrahmen
 - Storage-Schicht mit Versionskontrolle und Browser-/Node-Absicherung
 - Lernabschnitts-Flow mit persistierter Auswahl des aktuellen Abschnitts
 - Mastery-Status und Prüfungsmodus für Lernfortschritt und Wiederholungsstrategie
 - additive `examSession` und `retryQuestionId` im App-State speichern laufende Kurzprüfungen und Wiederholungsposition; Prüfungsantworten verändern die separate Übungsstatistik nicht
+- neue Übungsantworten sind mit der Modul-ID verschlüsselt im Antwortschlüssel, damit wiederverwendete Frage-IDs nicht zwischen Modulen kollidieren; alte unscoped Einträge bleiben erhalten
 - Prüfungslauf: TypeScript + Vitest + Vite Production Build
 
 ## 1. Ziel des MVP

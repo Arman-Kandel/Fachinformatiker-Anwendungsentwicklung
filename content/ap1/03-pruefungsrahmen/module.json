@@ -1,0 +1,89 @@
+{
+  "moduleId": "ap1-03-pruefungsrahmen",
+  "exam": "AP1",
+  "title": "AP1-Prüfungsrahmen",
+  "difficulty": "leicht",
+  "status": "draft",
+  "tags": ["AP1", "Prüfung", "FIAusbV"],
+  "learningObjectives": [
+    "Die zeitliche Einordnung der Teile 1 und 2 nach § 7 FIAusbV wiedergeben.",
+    "Die in § 8 FIAusbV festgelegten Inhalte von Teil 1 benennen."
+  ],
+  "dependencies": [],
+  "sourceRefs": [
+    {
+      "sourceId": "FIAUSBV",
+      "quote": "Die Abschlussprüfung besteht aus den Teilen 1 und 2.",
+      "section": "§ 7 Absatz 1",
+      "type": "official"
+    },
+    {
+      "sourceId": "FIAUSBV",
+      "quote": "Teil 1 der Abschlussprüfung erstreckt sich auf die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7",
+      "section": "§ 8 Nummer 1",
+      "type": "official"
+    }
+  ],
+  "sections": [
+    {
+      "id": "ap1-scope",
+      "type": "theory",
+      "title": "Inhalt von Teil 1",
+      "content": "Teil 1 umfasst die für die ersten 18 Monate im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7. Berufsschulstoff wird einbezogen, soweit er diesen Ausbildungsrahmenplan-Inhalten entspricht.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7",
+          "section": "§ 8 Nummer 1",
+          "type": "official"
+        },
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "den im Berufsschulunterricht zu vermittelnden Lehrstoff, soweit er den im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnissen und Fähigkeiten entspricht",
+          "section": "§ 8 Nummer 2",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "exam-timing",
+      "type": "theory",
+      "title": "Zeitliche Einordnung",
+      "content": "Die Abschlussprüfung besteht aus Teil 1 und Teil 2. Teil 1 findet im vierten Ausbildungshalbjahr statt; Teil 2 am Ende der Berufsausbildung. Den jeweiligen Zeitpunkt legt die zuständige Stelle fest.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Die Abschlussprüfung besteht aus den Teilen 1 und 2.",
+          "section": "§ 7 Absatz 1",
+          "type": "official"
+        },
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Teil 1 findet im vierten Ausbildungshalbjahr statt, Teil 2 am Ende der Berufsausbildung. Den jeweiligen Zeitpunkt legt die zuständige Stelle fest.",
+          "section": "§ 7 Absatz 2",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "scope-summary",
+      "type": "summary",
+      "title": "Prüfungsumfang merken",
+      "content": "Für Teil 1 sind die genannten Inhalte der ersten 18 Ausbildungsmonate maßgeblich; Berufsschulstoff zählt nur im entsprechenden Bezug zum Ausbildungsrahmenplan.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten",
+          "section": "§ 8 Nummer 1",
+          "type": "official"
+        },
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "soweit er den im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnissen und Fähigkeiten entspricht",
+          "section": "§ 8 Nummer 2",
+          "type": "official"
+        }
+      ]
+    }
+  ]
+}

@@ -2,13 +2,16 @@ import type { Module, ModuleSummary, QuizSet } from '../../types';
 import ap1IndexData from '../../../content/ap1/index.json';
 import moduleOneData from '../../../content/ap1/01-datenmodellierung/module.json';
 import moduleTwoData from '../../../content/ap1/02-sql/module.json';
+import moduleThreeData from '../../../content/ap1/03-pruefungsrahmen/module.json';
 import quizOneData from '../../../content/ap1/01-datenmodellierung/quiz.json';
 import quizTwoData from '../../../content/ap1/02-sql/quiz.json';
+import quizThreeData from '../../../content/ap1/03-pruefungsrahmen/quiz.json';
 
-const moduleCatalog: Module[] = [moduleOneData as Module, moduleTwoData as Module];
+const moduleCatalog: Module[] = [moduleOneData as Module, moduleTwoData as Module, moduleThreeData as Module];
 const quizCatalog: Record<string, QuizSet> = {
   'ap1-01-datenmodellierung': quizOneData as QuizSet,
   'ap1-02-sql': quizTwoData as QuizSet,
+  'ap1-03-pruefungsrahmen': quizThreeData as QuizSet,
 };
 
 export function getModuleCatalog(): Module[] {

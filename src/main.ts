@@ -1,7 +1,7 @@
 import './styles.css';
 import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, saveAppState } from './app/storage/local-store';
-import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
+import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
 import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
@@ -80,7 +80,7 @@ function getCurrentReviewQueue(): string[] {
   const selectedModule = getSelectedModule();
   const currentQuiz = getCurrentQuiz();
   const persistedQueue = state.reviewQueue[selectedModule.moduleId] ?? [];
-  const derivedQueue = buildReviewQueue(currentQuiz.questions, state.answeredQuestions);
+  const derivedQueue = buildReviewQueue(currentQuiz.questions, state.answeredQuestions, selectedModule.moduleId);
   const validQueue = [...new Set([...derivedQueue, ...persistedQueue])].filter((questionId) => currentQuiz.questions.some((question) => question.id === questionId));
 
   state.reviewQueue[selectedModule.moduleId] = validQueue;
@@ -95,12 +95,12 @@ function getStudyAgenda(): StudyAgendaItem[] {
     const questions = getQuizByModuleId(module.moduleId)?.questions ?? [];
     questionIdsByModule[module.moduleId] = questions.map((question) => question.id);
     reviewQueues[module.moduleId] = [...new Set([
-      ...buildReviewQueue(questions, state.answeredQuestions),
+      ...buildReviewQueue(questions, state.answeredQuestions, module.moduleId),
       ...(state.reviewQueue[module.moduleId] ?? []),
     ])].filter((id) => questions.some((question) => question.id === id));
   }
 
-  return buildStudyAgenda(moduleCatalog, questionIdsByModule, reviewQueues, state.answeredQuestions);
+  return buildStudyAgenda(moduleCatalog, questionIdsByModule, reviewQueues, state.answeredQuestions, 3, state.moduleProgress);
 }
 
 function openAgendaItem(item: StudyAgendaItem): void {
@@ -169,7 +169,7 @@ function renderModuleCard(item: (typeof moduleIndex)[number]): string {
 }
 
 function renderQuestion(question: Question): string {
-  const selectedAnswer = state.answeredQuestions[question.id];
+  const selectedAnswer = state.answeredQuestions[getQuestionAnswerKey(getSelectedModule().moduleId, question.id)];
   const isAnswered = selectedAnswer !== undefined;
   const isRetrying = state.retryQuestionId === question.id;
   const showResult = isAnswered && !isRetrying;
@@ -560,12 +560,13 @@ function render(): void {
       if (!currentQuestion) return;
 
       const nextProgress = getCurrentProgress();
-      const previousAnswer = state.answeredQuestions[questionId];
+      const answerKey = getQuestionAnswerKey(selectedModule.moduleId, questionId);
+      const previousAnswer = state.answeredQuestions[answerKey];
       const isRetry = state.retryQuestionId === questionId;
       if (previousAnswer !== undefined && !isRetry) return;
 
       const isCorrect = answerIndex === currentQuestion.correctIndex;
-      state.answeredQuestions[questionId] = answerIndex;
+      state.answeredQuestions[answerKey] = answerIndex;
       state.retryQuestionId = null;
 
       const moduleReviewQueue = state.reviewQueue[selectedModule.moduleId] ?? [];

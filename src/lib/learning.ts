@@ -45,9 +45,20 @@ export function ensureSourceRefs(sourceRefs: SourceRef[] | undefined): SourceRef
   return sourceRefs ?? [];
 }
 
-export function buildReviewQueue(questions: Question[], answeredQuestions: Record<string, number>): string[] {
+export function getQuestionAnswerKey(moduleId: string, questionId: string): string {
+  return `${moduleId}::${questionId}`;
+}
+
+export function buildReviewQueue(
+  questions: Question[],
+  answeredQuestions: Record<string, number>,
+  moduleId: string,
+): string[] {
   return questions
-    .filter((question) => answeredQuestions[question.id] !== undefined && answeredQuestions[question.id] !== question.correctIndex)
+    .filter((question) => {
+      const answer = answeredQuestions[getQuestionAnswerKey(moduleId, question.id)];
+      return answer !== undefined && answer !== question.correctIndex;
+    })
     .map((question) => question.id);
 }
 
@@ -198,6 +209,7 @@ export function buildStudyAgenda(
   reviewQueues: Record<string, string[]>,
   answeredQuestions: Record<string, number>,
   limit = 3,
+  progressByModule: Record<string, ModuleProgress> = {},
 ): StudyAgendaItem[] {
   const reviews: StudyAgendaItem[] = [];
   const continuations: StudyAgendaItem[] = [];
@@ -218,7 +230,10 @@ export function buildStudyAgenda(
       });
     }
 
-    const unansweredIds = questionIds.filter((id) => answeredQuestions[id] === undefined);
+    const remainingSlots = Math.max(0, questionIds.length - (progressByModule[module.moduleId]?.seen ?? 0));
+    const unansweredIds = questionIds
+      .filter((id) => answeredQuestions[getQuestionAnswerKey(module.moduleId, id)] === undefined)
+      .slice(0, remainingSlots);
     const nextQuestionId = unansweredIds[0];
 
     if (nextQuestionId) {
@@ -259,7 +274,7 @@ export function updateModuleProgressForAnswer(
   correctIndex: number,
   lastPracticedAt: string,
 ): ModuleProgress {
-  const seen = progress.seen + (previousAnswer === undefined ? 1 : 0);
+  const seen = Math.min(progress.total, progress.seen + (previousAnswer === undefined ? 1 : 0));
   const previousWasCorrect = previousAnswer === correctIndex;
   const nextIsCorrect = nextAnswer === correctIndex;
   const correct = Math.max(0, Math.min(seen, progress.correct + Number(nextIsCorrect) - Number(previousWasCorrect)));

@@ -8,6 +8,7 @@ Der Projektstand ist jetzt konkret umgesetzt: Es existiert eine lauffähige Vite
 
 - modulare Content-Loader und zentraler Module-Index
 - zweite AP1-Lernsektion (`SQL-Grundlagen`) inkl. Quiz
+- drittes AP1-Modul zum Prüfungsrahmen, direkt belegt durch §§ 7 und 8 FIAusbV
 - robuste localStorage-Fallback-Logik für Test-/Node-Umgebungen
 - persistierte Lernabschnitt-Auswahl mit Wiederaufnahme im UI
 - erneut beantwortbare Fehlversuche ohne doppelte Fortschrittszählung

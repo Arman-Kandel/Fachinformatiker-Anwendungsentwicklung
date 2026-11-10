@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { getModuleById, getModuleCatalog, getModuleIndex, getQuizByModuleId } from '../src/app/content-loader/content-loader';
 import { loadAppState, saveAppState } from '../src/app/storage/local-store';
-import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, startExamSession, updateModuleProgressForAnswer, validateModule } from '../src/lib/learning';
+import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, startExamSession, updateModuleProgressForAnswer, validateModule } from '../src/lib/learning';
 import type { AppState, Module } from '../src/types';
 
 describe('learning logic', () => {
@@ -44,6 +45,21 @@ describe('learning logic', () => {
     expect(validateModule(module)).toEqual([]);
   });
 
+  it('registers the AP1 exam framework module with source-backed questions', () => {
+    const module = getModuleById('ap1-03-pruefungsrahmen');
+    const quiz = getQuizByModuleId('ap1-03-pruefungsrahmen');
+
+    expect(getModuleCatalog()).toContain(module);
+    expect(getModuleIndex().some((entry) => entry.moduleId === 'ap1-03-pruefungsrahmen')).toBe(true);
+    expect(module).toBeDefined();
+    expect(quiz?.questions).toHaveLength(3);
+    if (!module || !quiz) return;
+
+    expect(validateModule(module)).toEqual([]);
+    expect(module.sourceRefs.every((ref) => ref.sourceId === 'FIAUSBV' && ref.quote.length > 0)).toBe(true);
+    expect(quiz.questions.every((question) => question.sourceRefs.some((ref) => ref.sourceId === 'FIAUSBV' && ref.quote.length > 0))).toBe(true);
+  });
+
   it('computes a normal accuracy percentage', () => {
     expect(computeAccuracy(3, 4)).toBe(75);
   });
@@ -66,13 +82,24 @@ describe('learning logic', () => {
         { id: 'q3', correctIndex: 2, question: 'Q3', options: ['a', 'b', 'c'], explanation: '', sourceRefs: [] },
       ],
       {
-        q1: 0,
-        q2: 0,
-        q3: 2,
+        [getQuestionAnswerKey('module-one', 'q1')]: 0,
+        [getQuestionAnswerKey('module-one', 'q2')]: 0,
+        [getQuestionAnswerKey('module-one', 'q3')]: 2,
       },
+      'module-one',
     );
 
     expect(reviewQueue).toEqual(['q1', 'q2']);
+  });
+
+  it('isolates answers when different modules reuse question ids', () => {
+    const questions = [
+      { id: 'q1', correctIndex: 1, question: 'Q1', options: ['a', 'b'], explanation: '', sourceRefs: [] },
+    ];
+    const answers = { [getQuestionAnswerKey('module-one', 'q1')]: 0 };
+
+    expect(buildReviewQueue(questions, answers, 'module-one')).toEqual(['q1']);
+    expect(buildReviewQueue(questions, answers, 'module-two')).toEqual([]);
   });
 
   it('updates progress when a wrong answer is corrected without double-counting', () => {
@@ -172,17 +199,32 @@ describe('learning logic', () => {
         { moduleId: 'module-one', exam: 'AP1', title: 'Modul Eins', difficulty: 'mittel', status: 'draft', tags: [], learningObjectives: [], dependencies: [], sourceRefs: [], sections: [] },
         { moduleId: 'module-two', exam: 'AP1', title: 'Modul Zwei', difficulty: 'mittel', status: 'draft', tags: [], learningObjectives: [], dependencies: [], sourceRefs: [], sections: [] },
       ],
-      { 'module-one': ['q1', 'q2'], 'module-two': ['q3', 'q4'] },
+      { 'module-one': ['q1', 'q2'], 'module-two': ['q1', 'q2'] },
       { 'module-one': ['q1'], 'module-two': [] },
-      { q1: 0, q3: 1 },
+      { [getQuestionAnswerKey('module-one', 'q1')]: 0 },
       3,
     );
 
     expect(agenda).toEqual([
       { moduleId: 'module-one', title: 'Modul Eins', kind: 'review', questionId: 'q1', pendingCount: 1 },
       { moduleId: 'module-one', title: 'Modul Eins', kind: 'continue', questionId: 'q2', pendingCount: 1 },
-      { moduleId: 'module-two', title: 'Modul Zwei', kind: 'continue', questionId: 'q4', pendingCount: 1 },
+      { moduleId: 'module-two', title: 'Modul Zwei', kind: 'continue', questionId: 'q1', pendingCount: 2 },
     ]);
+  });
+
+  it('does not schedule completed modules when only legacy answer keys remain', () => {
+    const agenda = buildStudyAgenda(
+      [
+        { moduleId: 'module-one', exam: 'AP1', title: 'Modul Eins', difficulty: 'mittel', status: 'draft', tags: [], learningObjectives: [], dependencies: [], sourceRefs: [], sections: [] },
+      ],
+      { 'module-one': ['q1', 'q2'] },
+      { 'module-one': [] },
+      { q1: 1, q2: 1 },
+      3,
+      { 'module-one': buildModuleProgress('module-one', 2, 2, 2, '2026-11-10T12:00:00.000Z') },
+    );
+
+    expect(agenda).toEqual([]);
   });
 
   it('persists and loads app state from local storage', () => {

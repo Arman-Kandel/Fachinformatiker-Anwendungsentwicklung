@@ -28,6 +28,20 @@
           "type": "official"
         }
       ]
+    },
+    {
+      "moduleId": "ap1-03-pruefungsrahmen",
+      "title": "AP1-Prüfungsrahmen",
+      "difficulty": "leicht",
+      "estimatedMinutes": 10,
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Teil 1 der Abschlussprüfung erstreckt sich auf die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten",
+          "section": "§ 8 FIAusbV",
+          "type": "official"
+        }
+      ]
     }
   ]
 }

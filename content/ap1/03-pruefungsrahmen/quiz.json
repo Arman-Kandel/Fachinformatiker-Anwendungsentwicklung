@@ -1,0 +1,72 @@
+{
+  "quizId": "ap1-03-pruefungsrahmen-quiz",
+  "title": "AP1-Prüfungsrahmen – Quiz",
+  "questions": [
+    {
+      "id": "ap1-03-pruefungsrahmen-q1",
+      "question": "Wann findet Teil 1 der Abschlussprüfung statt?",
+      "options": [
+        "Im vierten Ausbildungshalbjahr.",
+        "Am Ende der Berufsausbildung.",
+        "Im ersten Ausbildungshalbjahr.",
+        "Den Zeitpunkt legt ausschließlich der Ausbildungsbetrieb fest."
+      ],
+      "correctIndex": 0,
+      "explanation": "§ 7 Absatz 2 ordnet Teil 1 dem vierten Ausbildungshalbjahr zu. Den konkreten Zeitpunkt legt die zuständige Stelle fest.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Teil 1 findet im vierten Ausbildungshalbjahr statt",
+          "section": "§ 7 Absatz 2",
+          "type": "official"
+        },
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Den jeweiligen Zeitpunkt legt die zuständige Stelle fest.",
+          "section": "§ 7 Absatz 2",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-03-pruefungsrahmen-q2",
+      "question": "Auf welche Ausbildungsrahmenplan-Inhalte erstreckt sich Teil 1?",
+      "options": [
+        "Auf alle Berufsbildpositionen der gesamten Ausbildungszeit.",
+        "Auf die für die ersten 18 Monate genannten Inhalte der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7.",
+        "Ausschließlich auf den Berufsschulunterricht.",
+        "Ausschließlich auf die fachrichtungsspezifischen Inhalte nach § 4 Absatz 3."
+      ],
+      "correctIndex": 1,
+      "explanation": "§ 8 Nummer 1 grenzt den Ausbildungsrahmenplan-Bezug von Teil 1 auf die ersten 18 Monate und die dort genannten Berufsbildpositionen ein.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7",
+          "section": "§ 8 Nummer 1",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-03-pruefungsrahmen-q3",
+      "question": "Wann wird Berufsschulstoff in Teil 1 berücksichtigt?",
+      "options": [
+        "Immer vollständig, unabhängig vom Ausbildungsrahmenplan.",
+        "Nur wenn er den im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnissen und Fähigkeiten entspricht.",
+        "Nur wenn der Ausbildungsbetrieb ihn schriftlich bestätigt.",
+        "Berufsschulstoff wird in Teil 1 nicht berücksichtigt."
+      ],
+      "correctIndex": 1,
+      "explanation": "§ 8 Nummer 2 bezieht Berufsschulstoff nur insoweit ein, wie er den im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnissen und Fähigkeiten entspricht.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "den im Berufsschulunterricht zu vermittelnden Lehrstoff, soweit er den im Ausbildungsrahmenplan genannten Fertigkeiten, Kenntnissen und Fähigkeiten entspricht",
+          "section": "§ 8 Nummer 2",
+          "type": "official"
+        }
+      ]
+    }
+  ]
+}
