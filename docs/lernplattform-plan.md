@@ -172,11 +172,63 @@ Lerninhalte sollten nicht frei im UI liegen, sondern als strukturierte Dateien m
       "front": "Was ist eine Entität?",
       "back": "..."
     }
+  ],
+  "sourceRefs": [
+    { "sourceId": "IHK-AP1-Rahmen-2026", "quote": "..." },
+    { "sourceId": "BMBF-DSD-2026", "quote": "..." }
   ]
 }
 ```
 
 Das ist die zentrale Erkenntnis: Das Thema selbst ist kein UI-Block, sondern ein Datenpaket.
+
+---
+
+## 5.1. Quellenpflicht und Anti-Halluzinations-Policy
+
+Diese Plattform arbeitet nach einem klaren Prinzip: Jede fachliche Aussage muss durch eine verifizierbare Quelle gestützt werden. Ohne Quelle gilt die Information als nicht tragfähig und darf nicht in den Lernpfad aufgenommen werden.
+
+### Verbindliche Regeln
+
+1. Jeder Satz, Paragraph oder fachliche Aussage braucht einen nachvollziehbaren Quellenhinweis.
+2. Jede Quelle muss im Repository dokumentiert und referenziert sein.
+3. Inhaltliche Aussagen dürfen nur dann in Lernmodulen, Erklärungen, Quizfragen oder Tests auftauchen, wenn sie mit einer `sourceRefs`-Liste hinterlegt sind.
+4. LLM-generierte oder manuell formulierte Inhalte ohne Referenz zählen als unzulässig.
+5. Die Quelle muss entweder lokal im Repository hinterlegt sein oder als offizielle Verweisquelle mit URL, Titel und Beschreibung im Quellenregister dokumentiert sein.
+6. Wenn eine Aussage nicht belegt ist, muss sie entfernt, überarbeitet oder ersetzt werden.
+
+### Verpflichtende Metadaten
+
+Jedes Lernmodul und jede Testfrage sollte zusätzlich zu Inhalt und Lösung die folgenden Felder enthalten:
+
+```json
+{
+  "sourceRefs": [
+    {
+      "sourceId": "IHK-AP1-Rahmen-2026",
+      "quote": "...",
+      "page": "...",
+      "section": "...",
+      "type": "official"
+    }
+  ]
+}
+```
+
+### Repository-Anforderung
+
+Das Repository muss ein zentrales Quellenregister enthalten, z. B. unter `sources/reference-index.md`. Dort werden Quellen mit eindeutiger ID, Titel, Typ, URL oder lokaler Referenz und Relevanz geführt. Einzelne Lerninhalte verweisen per `sourceId` auf dieses Register.
+
+### Zweck
+
+Diese Maßnahme verhindert:
+
+- Halluzinationen durch LLMs
+- ungesicherte Inhalte
+- “Wissen” ohne fachlichen Nachweis
+- unklaren Prüfungsbezug
+
+Das Projekt wird dadurch strikt evidenzbasiert und sehr robust für spätere Erweiterungen, Reviews und AI-Unterstützung.
 
 ---
 
