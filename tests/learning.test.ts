@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { loadAppState, saveAppState } from '../src/app/storage/local-store';
 import { buildModuleProgress, computeAccuracy, validateModule } from '../src/lib/learning';
 import type { Module } from '../src/types';
 
@@ -55,5 +56,14 @@ describe('learning logic', () => {
     expect(progress.correct).toBe(1);
     expect(progress.total).toBe(3);
     expect(progress.status).toBe('in-progress');
+  });
+
+  it('persists and loads app state from local storage', () => {
+    const key = 'test-state';
+    const fallback = { value: 'fallback' };
+    const state = { value: 'stored' };
+
+    saveAppState(key, state);
+    expect(loadAppState(key, fallback)).toEqual(state);
   });
 });

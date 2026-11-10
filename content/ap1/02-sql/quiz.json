@@ -1,0 +1,66 @@
+{
+  "quizId": "ap1-02-sql-quiz",
+  "title": "SQL-Grundlagen – Quiz",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Welchen Zweck erfüllt eine WHERE-Klausel in einer SQL-Abfrage?",
+      "options": [
+        "Sie definiert den Spaltennamen der Ausgabe.",
+        "Sie filtert Datensätze nach einer Bedingung.",
+        "Sie erstellt neue Tabellen.",
+        "Sie formatiert das CSS-Layout."
+      ],
+      "correctIndex": 1,
+      "explanation": "Die WHERE-Klausel schränkt die Ergebnismenge anhand einer Bedingung ein und ist daher für gezielte Abfragen entscheidend.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "SQL-Abfragen und deren fachliche Filterlogik sind zentrale Bestandteile der Anwendungsentwicklung.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "question": "Warum werden JOINs in SQL eingesetzt?",
+      "options": [
+        "Um Daten in einem Browser zu speichern.",
+        "Um Datensätze aus mehreren Tabellen fachlich zu verknüpfen.",
+        "Um Style-Regeln zu definieren.",
+        "Um JavaScript zu kompilieren."
+      ],
+      "correctIndex": 1,
+      "explanation": "JOINs verbinden Daten aus unterschiedlichen Tabellen über gemeinsame Schlüssel und ermöglichen so die fachlich sinnvolle Kombination von Informationen.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Die fachliche Verknüpfung von Datensätzen über gemeinsame Schlüssel ist eine zentrale Datenbankkompetenz.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "question": "Was ist die Hauptaufgabe von SELECT in SQL?",
+      "options": [
+        "Eintragungen in der Konsole auszugeben.",
+        "Daten aus Tabellen abzufragen und in einer Ergebnismenge darzustellen.",
+        "Dateien aus dem Browser zu laden.",
+        "Abfragen in CSS umzuwandeln."
+      ],
+      "correctIndex": 1,
+      "explanation": "SELECT definiert, welche Spalten bzw. Daten aus einer oder mehreren Tabellen in der Ergebnismenge zurückgegeben werden.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Datenbankabfragen und deren fachliche Interpretation sind Teil der Ausbildung in der Anwendungsentwicklung.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    }
+  ]
+}

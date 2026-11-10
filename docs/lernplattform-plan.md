@@ -2,7 +2,14 @@
 
 ## Status 2026-11-10
 
-Der Projektstand ist jetzt konkret umgesetzt: Es existiert eine lauffähige Vite/TypeScript-Basis, eine erste modulare Lernansicht mit Browser-Persistenz, ein erstes Quiz-Modul aus `content/` und ein strenger TypeScript-/Build-Check als Qualitätsbasis. Die App arbeitet browser-lokal, hält Lernzustand in `localStorage` und dient als stabiler Startpunkt für weitere AP1/AP2-Module.
+Der Projektstand ist jetzt konkret umgesetzt: Es existiert eine lauffähige Vite/TypeScript-Basis, eine modulare Lernansicht mit Browser-Persistenz, mehrere AP1-Inhalte aus `content/` und ein strenger TypeScript-/Build-Check als Qualitätsbasis. Die App arbeitet browser-lokal, hält Lernzustand in einer Versioned-Storage-Schicht und dient als stabiler Startpunkt für die Erweiterung auf weitere AP1/AP2-Module.
+
+### Fortschritt der zweiten Implementierungsstufe
+
+- modulare Content-Loader und zentraler Module-Index
+- zweite AP1-Lernsektion (`SQL-Grundlagen`) inkl. Quiz
+- robuste localStorage-Fallback-Logik für Test-/Node-Umgebungen
+- Qualitätslauf erfolgreich verifiziert (`npm run check`)
 
 ## 1. Ziel und Grundidee
 

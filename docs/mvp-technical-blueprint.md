@@ -2,7 +2,14 @@
 
 ## Status 2026-11-10
 
-Die Basiskomponenten des MVP sind implementiert: zentrale App-Struktur, Module/Quiz-Daten, lokale State-Persistenz, UI-Shell mit Resume-First-Flow und erste Testabdeckung für die Lernlogik. Der Build- und Type-Check läuft erfolgreich, sodass der Code als produktionsnahe Baseline für weitere Module und Features dient.
+Die Basiskomponenten des MVP sind implementiert: zentrale App-Struktur, modulare Content-Loader, mehrere Lernmodule mit Quellbelegen, lokale State-Persistenz mit Fallback-Mechanik, UI-Shell mit Resume-First-Flow und eine erste Testabdeckung für die Lernlogik. Der Build- und Type-Check läuft erfolgreich, sodass der Code als produktionsnahe Baseline für weitere Module und Features dient.
+
+### Erweiterter MVP-Stand
+
+- Content-Model als modulare Struktur im `content/`-Ordner
+- AP1-Module: Datenmodellierung + SQL-Grundlagen
+- Storage-Schicht mit Versionskontrolle und Browser-/Node-Absicherung
+- Prüfungslauf: TypeScript + Vitest + Vite Production Build
 
 ## 1. Ziel des MVP
 

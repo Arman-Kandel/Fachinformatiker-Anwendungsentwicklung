@@ -2,7 +2,13 @@
 
 ## Status 2026-11-10
 
-Die frühere Philosophie der Sicherheits- und Qualitätsarbeit wurde in die technische Projektbasis übersetzt: strenge TypeScript-Checks, zentrale Agenten-Regeln, definierter Qualitätslauf (`npm run check`) und ein Test- und App-Framework, das lokale Persistenz und modulare Inhalte explizit unterstützt. Der Stack ist damit deutlich robuster für spätere Erweiterungen und für AI-gestützte Entwicklung.
+Die frühere Philosophie der Sicherheits- und Qualitätsarbeit wurde in die technische Projektbasis übersetzt: strenge TypeScript-Checks, zentrale Agenten-Regeln, definierter Qualitätslauf (`npm run check`), modulare Datenquellen und robuste Persistenz-Schicht. Der Stack ist damit deutlich robuster für spätere Erweiterungen und für AI-gestützte Entwicklung.
+
+### Reale Produktionsverbesserungen
+
+- Storage-Fallback verhindert Laufzeitfehler in Test- und CI-Umgebungen
+- modulare Lernmodule erlauben klarere Validierung und Erweiterung
+- das Projekt erfüllt einen echten Checklauf mit Test- und Build-Evidenz
 
 ## 1. Ausgangspunkt
 

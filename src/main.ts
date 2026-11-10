@@ -1,60 +1,65 @@
 import './styles.css';
-import ap1Index from '../content/ap1/index.json';
-import moduleData from '../content/ap1/01-datenmodellierung/module.json';
-import quizData from '../content/ap1/01-datenmodellierung/quiz.json';
+import { getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
+import { loadAppState, saveAppState } from './app/storage/local-store';
 import { buildModuleProgress, computeAccuracy, getQuestionById, validateModule } from './lib/learning';
-import type { AppState, Module, ModuleProgress, Question, QuizSet } from './types';
+import type { AppState, Module, ModuleProgress, Question } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
-const moduleCatalog = ap1Index.modules as Array<{ moduleId: string; title: string; difficulty: string; estimatedMinutes: number; sourceRefs: Array<{ sourceId: string; quote: string; section: string; type?: string }> }>;
-const module = moduleData as Module;
-const quiz = quizData as QuizSet;
-
+const moduleCatalog = getModuleCatalog();
+const moduleIndex = getModuleIndex();
+const firstModule = moduleCatalog[0];
 const defaultState: AppState = {
-  resumeModuleId: module.moduleId,
-  currentQuestionId: quiz.questions[0]?.id ?? null,
-  selectedModuleId: module.moduleId,
+  resumeModuleId: firstModule?.moduleId ?? null,
+  currentQuestionId: getQuizByModuleId(firstModule?.moduleId ?? '')?.questions[0]?.id ?? null,
+  selectedModuleId: firstModule?.moduleId ?? null,
   moduleProgress: {},
   answeredQuestions: {},
   lastUpdatedAt: null,
 };
 
-function readState(): AppState {
-  const raw = localStorage.getItem(STORAGE_KEY);
+const state = loadAppState<AppState>(STORAGE_KEY, defaultState);
+const app = document.querySelector('#app') as HTMLElement;
 
-  if (!raw) {
-    return defaultState;
+function ensureModuleState(moduleId: string): void {
+  const module = getModuleById(moduleId);
+  const quiz = getQuizByModuleId(moduleId);
+
+  if (!module || !quiz) {
+    return;
   }
 
-  try {
-    const parsed = JSON.parse(raw) as Partial<AppState>;
-    return {
-      ...defaultState,
-      ...parsed,
-      moduleProgress: parsed.moduleProgress ?? {},
-      answeredQuestions: parsed.answeredQuestions ?? {},
-    };
-  } catch {
-    return defaultState;
+  if (!state.moduleProgress[moduleId]) {
+    state.moduleProgress[moduleId] = buildModuleProgress(moduleId, quiz.questions.length, 0, 0, new Date().toISOString());
   }
-}
-
-const state: AppState = readState();
-
-function saveState(): void {
-  state.lastUpdatedAt = new Date().toISOString();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
 function getSelectedModule(): Module {
-  return module;
+  const selectedId = state.selectedModuleId ?? firstModule?.moduleId ?? null;
+
+  if (!selectedId) {
+    throw new Error('No module available');
+  }
+
+  const selectedModule = getModuleById(selectedId);
+  if (!selectedModule) {
+    throw new Error(`Module not found: ${selectedId}`);
+  }
+
+  return selectedModule;
+}
+
+function getCurrentQuiz() {
+  const selectedModule = getSelectedModule();
+  const quiz = getQuizByModuleId(selectedModule.moduleId);
+  return quiz ?? { quizId: selectedModule.moduleId, title: selectedModule.title, questions: [] };
 }
 
 function getCurrentProgress(): ModuleProgress {
   const selectedModule = getSelectedModule();
+  const currentQuiz = getCurrentQuiz();
   const progress = state.moduleProgress[selectedModule.moduleId] ?? buildModuleProgress(
     selectedModule.moduleId,
-    quiz.questions.length,
+    currentQuiz.questions.length,
     0,
     0,
     new Date().toISOString(),
@@ -62,10 +67,6 @@ function getCurrentProgress(): ModuleProgress {
 
   state.moduleProgress[selectedModule.moduleId] = progress;
   return progress;
-}
-
-function chooseQuestion(questionId: string | null): Question | null {
-  return getQuestionById(quiz.questions, questionId);
 }
 
 function renderSourceRefs(sourceRefs: Array<{ sourceId: string; quote: string; section: string; type?: string }>): string {
@@ -82,7 +83,7 @@ function renderSourceRefs(sourceRefs: Array<{ sourceId: string; quote: string; s
     .join('');
 }
 
-function renderModuleCard(item: (typeof moduleCatalog)[number]): string {
+function renderModuleCard(item: (typeof moduleIndex)[number]): string {
   const active = item.moduleId === state.selectedModuleId;
   return `
     <button class="module-card ${active ? 'active' : ''}" type="button" data-module-id="${item.moduleId}">
@@ -99,14 +100,9 @@ function renderModuleCard(item: (typeof moduleCatalog)[number]): string {
 function renderQuestion(question: Question): string {
   const selectedAnswer = state.answeredQuestions[question.id];
   const isAnswered = selectedAnswer !== undefined;
-  const statusClass = isAnswered
-    ? selectedAnswer === question.correctIndex
-      ? 'correct'
-      : 'incorrect'
-    : '';
 
   return `
-    <div class="question-box ${statusClass}">
+    <div class="question-box">
       <div class="question-meta">
         <span>Frage</span>
         <strong>${question.id.toUpperCase()}</strong>
@@ -114,11 +110,13 @@ function renderQuestion(question: Question): string {
       <h3>${question.question}</h3>
       <div class="options">
         ${question.options
-          .map(
-            (option, index) => `
+          .map((option, index) => {
+            const isCorrect = isAnswered && index === question.correctIndex;
+            const isWrong = isAnswered && index === selectedAnswer && index !== question.correctIndex;
+            return `
               <button
                 type="button"
-                class="answer-option ${isAnswered && index === question.correctIndex ? 'correct' : ''} ${isAnswered && index === selectedAnswer && index !== question.correctIndex ? 'incorrect' : ''}"
+                class="answer-option ${isCorrect ? 'correct' : ''} ${isWrong ? 'incorrect' : ''}"
                 data-answer-index="${index}"
                 data-question-id="${question.id}"
                 ${isAnswered ? 'disabled' : ''}
@@ -126,8 +124,8 @@ function renderQuestion(question: Question): string {
                 <span>${String.fromCharCode(65 + index)}</span>
                 <span>${option}</span>
               </button>
-            `,
-          )
+            `;
+          })
           .join('')}
       </div>
       ${isAnswered ? `
@@ -141,11 +139,18 @@ function renderQuestion(question: Question): string {
   `;
 }
 
+function saveCurrentState(): void {
+  state.lastUpdatedAt = new Date().toISOString();
+  saveAppState(STORAGE_KEY, state);
+}
+
 function render(): void {
   const selectedModule = getSelectedModule();
+  const currentQuiz = getCurrentQuiz();
   const validationErrors = validateModule(selectedModule);
   const progress = getCurrentProgress();
-  const currentQuestion = chooseQuestion(state.currentQuestionId);
+  const currentQuestion = getQuestionById(currentQuiz.questions, state.currentQuestionId);
+  ensureModuleState(selectedModule.moduleId);
 
   app.innerHTML = `
     <div class="app-shell">
@@ -183,7 +188,7 @@ function render(): void {
             <span class="pill">${moduleCatalog.length} Inhalte</span>
           </div>
           <div class="module-grid">
-            ${moduleCatalog.map(renderModuleCard).join('')}
+            ${moduleIndex.map(renderModuleCard).join('')}
           </div>
         </section>
 
@@ -232,8 +237,10 @@ function render(): void {
       if (!nextId) return;
       state.selectedModuleId = nextId;
       state.resumeModuleId = nextId;
-      state.currentQuestionId = quiz.questions[0]?.id ?? null;
-      saveState();
+      const nextQuiz = getQuizByModuleId(nextId);
+      state.currentQuestionId = nextQuiz?.questions[0]?.id ?? null;
+      ensureModuleState(nextId);
+      saveCurrentState();
       render();
     });
   });
@@ -244,24 +251,25 @@ function render(): void {
       const answerIndex = Number(button.getAttribute('data-answer-index'));
       if (!questionId || Number.isNaN(answerIndex)) return;
 
-      const currentQuestion = chooseQuestion(questionId);
+      const currentQuestion = getQuestionById(currentQuiz.questions, questionId);
       if (!currentQuestion) return;
 
       const nextProgress = getCurrentProgress();
-      const alreadyAnswered = state.answeredQuestions[questionId] !== undefined;
-      if (alreadyAnswered) return;
+      const exists = state.answeredQuestions[questionId] !== undefined;
+      if (exists) return;
 
       const isCorrect = answerIndex === currentQuestion.correctIndex;
       state.answeredQuestions[questionId] = answerIndex;
-      state.moduleProgress[module.moduleId] = {
+      const seen = nextProgress.seen + 1;
+      state.moduleProgress[selectedModule.moduleId] = {
         ...nextProgress,
-        seen: nextProgress.seen + 1,
+        seen,
         correct: isCorrect ? nextProgress.correct + 1 : nextProgress.correct,
         lastPracticedAt: new Date().toISOString(),
-        status: nextProgress.seen + 1 >= quiz.questions.length ? 'completed' : 'in-progress',
+        status: seen >= currentQuiz.questions.length ? 'completed' : 'in-progress',
       };
 
-      saveState();
+      saveCurrentState();
       render();
     });
   });
@@ -269,24 +277,17 @@ function render(): void {
   document.querySelectorAll('[data-action]').forEach((button) => {
     button.addEventListener('click', () => {
       const action = button.getAttribute('data-action');
-      if (action === 'resume') {
-        state.currentQuestionId = quiz.questions[0]?.id ?? null;
-        saveState();
-        render();
-      }
-      if (action === 'study-today') {
-        state.currentQuestionId = quiz.questions[0]?.id ?? null;
-        saveState();
-        render();
-      }
+      if (!action) return;
+
+      state.currentQuestionId = currentQuiz.questions[0]?.id ?? null;
       if (action === 'quick-test') {
-        state.currentQuestionId = quiz.questions[1]?.id ?? null;
-        saveState();
-        render();
+        state.currentQuestionId = currentQuiz.questions[1]?.id ?? null;
       }
+
+      saveCurrentState();
+      render();
     });
   });
 }
 
-const app = document.querySelector('#app') as HTMLElement;
 render();

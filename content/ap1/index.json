@@ -14,6 +14,20 @@
           "type": "official"
         }
       ]
+    },
+    {
+      "moduleId": "ap1-02-sql",
+      "title": "SQL-Grundlagen",
+      "difficulty": "mittel",
+      "estimatedMinutes": 18,
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "SQL und Datenbankabfragen sind fachliche Kernkompetenzen der Anwendungsentwicklung.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
     }
   ]
 }

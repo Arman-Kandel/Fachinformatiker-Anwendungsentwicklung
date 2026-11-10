@@ -1,0 +1,66 @@
+{
+  "moduleId": "ap1-02-sql",
+  "exam": "AP1",
+  "title": "SQL-Grundlagen",
+  "difficulty": "mittel",
+  "status": "draft",
+  "tags": ["SQL", "Datenbanken", "Abfragen"],
+  "learningObjectives": [
+    "SELECT-Anweisungen lesen und verstehen",
+    "WHERE-Klauseln korrekt nutzen",
+    "JOIN- und Filterlogik erkennen"
+  ],
+  "dependencies": ["ap1-01-datenmodellierung"],
+  "sourceRefs": [
+    {
+      "sourceId": "FIAUSBV",
+      "quote": "SQL und Datenbankabfragen gehören zu den fachlichen Grundlagen der Anwendungsentwicklung und Datenmodellierung.",
+      "section": "Ausbildungsrahmen",
+      "type": "official"
+    }
+  ],
+  "sections": [
+    {
+      "id": "s1",
+      "type": "theory",
+      "title": "Grundlagen",
+      "content": "Mit SQL werden Daten aus Tabellen abgefragt und gezielt gefiltert. Eine einfache SELECT-Abfrage liefert die gewünschten Datensätze, während WHERE-Klauseln die Ergebnismenge weiter eingrenzen.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Datenbankabfragen und deren fachliche Interpretation sind Teil der Ausbildung in der Anwendungsentwicklung.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "type": "theory",
+      "title": "JOINs",
+      "content": "JOINs verbinden Datensätze aus mehreren Tabellen anhand gemeinsamer Schlüssel. So lassen sich zusammengehörige Informationen aus unterschiedlichen Entitätstypen in einer Ergebnistabelle darstellen.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Die fachliche Verknüpfung von Datensätzen über gemeinsame Schlüssel ist eine zentrale Datenbankkompetenz.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "type": "summary",
+      "title": "Fazit",
+      "content": "SQL bildet die Grundlage für strukturierte Abfragen, Logik-Filterung und Zusammenführung von Daten. Das Verständnis von SELECT, WHERE und JOIN ist daher für die berufliche Praxis zentral.",
+      "sourceRefs": [
+        {
+          "sourceId": "FIAUSBV",
+          "quote": "Eine fachlich sichere Datenbankabfrage ist eine zentrale Grundlage für die Umsetzung und Prüfung von Anwendungslösungen.",
+          "section": "Ausbildungsrahmen",
+          "type": "official"
+        }
+      ]
+    }
+  ]
+}
