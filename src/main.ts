@@ -145,16 +145,26 @@ function getStudyAgenda(): StudyAgendaItem[] {
   return buildStudyAgenda(moduleCatalog, questionIdsByModule, reviewQueues, state.answeredQuestions, 3, state.moduleProgress);
 }
 
+function selectModule(moduleId: string, nextQuestionId: string | null = null): void {
+  const module = getModuleById(moduleId);
+  if (!module) return;
+
+  state.selectedModuleId = module.moduleId;
+  state.resumeModuleId = module.moduleId;
+  state.studySectionId = module.sections[0]?.id ?? null;
+  state.currentQuestionId = nextQuestionId ?? getQuizByModuleId(moduleId)?.questions[0]?.id ?? null;
+  state.retryQuestionId = null;
+  ensureModuleState(module.moduleId);
+}
+
 function openAgendaItem(item: StudyAgendaItem): void {
   const module = getModuleById(item.moduleId);
-  state.selectedModuleId = item.moduleId;
-  state.resumeModuleId = item.moduleId;
-  state.studySectionId = module?.sections[0]?.id ?? null;
-  state.currentQuestionId = item.questionId;
-  state.retryQuestionId = null;
+  if (!module) return;
+
+  selectModule(item.moduleId, item.questionId);
+  state.studySectionId = module.sections[0]?.id ?? null;
   activeStageTab = 'quiz';
   activeView = 'dashboard';
-  ensureModuleState(item.moduleId);
   saveCurrentState();
   sound.playClick();
   render();
@@ -735,13 +745,12 @@ function render(): void {
       if (!nextId) return;
 
       const nextModule = getModuleById(nextId);
-      state.selectedModuleId = nextId;
-      state.resumeModuleId = nextId;
-      state.studySectionId = nextModule?.sections[0]?.id ?? null;
-      state.retryQuestionId = null;
-      const nextQuiz = getQuizByModuleId(nextId);
-      state.currentQuestionId = nextQuiz?.questions[0]?.id ?? null;
-      ensureModuleState(nextId);
+      if (!nextModule) return;
+
+      const nextQuestionId = getQuizByModuleId(nextId)?.questions[0]?.id ?? null;
+      selectModule(nextId, nextQuestionId);
+      activeStageTab = 'quiz';
+      activeView = 'dashboard';
       saveCurrentState();
       sound.playClick();
       render();
@@ -882,6 +891,8 @@ function render(): void {
       const action = button.getAttribute('data-action');
       if (!action) return;
 
+      const selectedModule = getSelectedModule();
+      const currentQuiz = getCurrentQuiz();
       const reviewQueue = getCurrentReviewQueue();
 
       if (action === 'open-settings') {
@@ -920,10 +931,9 @@ function render(): void {
       }
 
       if (action === 'next-question') {
-        const currentQuiz = getCurrentQuiz();
-        const currentIdx = currentQuiz.questions.findIndex((q) => q.id === state.currentQuestionId);
-        if (currentIdx >= 0 && currentIdx < currentQuiz.questions.length - 1) {
-          state.currentQuestionId = currentQuiz.questions[currentIdx + 1]?.id ?? null;
+        const questionIndex = currentQuiz.questions.findIndex((q) => q.id === state.currentQuestionId);
+        if (questionIndex >= 0 && questionIndex < currentQuiz.questions.length - 1) {
+          state.currentQuestionId = currentQuiz.questions[questionIndex + 1]?.id ?? null;
           state.retryQuestionId = null;
           saveCurrentState();
           sound.playClick();
@@ -977,14 +987,18 @@ function render(): void {
         return;
       }
 
-      state.currentQuestionId = currentQuiz.questions[0]?.id ?? null;
       if (action === 'quick-test') {
         state.currentQuestionId = currentQuiz.questions[1]?.id ?? currentQuiz.questions[0]?.id ?? null;
         activeStageTab = 'quiz';
         activeView = 'dashboard';
         showToast('Schnelltest aktiv 🚀');
+        saveCurrentState();
+        sound.playClick();
+        render();
+        return;
       }
 
+      state.currentQuestionId = currentQuiz.questions[0]?.id ?? null;
       saveCurrentState();
       sound.playClick();
       render();
