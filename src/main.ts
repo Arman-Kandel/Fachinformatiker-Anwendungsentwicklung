@@ -1,8 +1,10 @@
 import './styles.css';
 import { getApprovedSourceUrl, getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, normalizeAppState, parseAppStateExport, saveAppState, serializeAppState } from './app/storage/local-store';
-import { escapeHtml } from './lib/html';
+import { escapeHtml, renderSimpleMarkdown } from './lib/html';
 import { sound, confetti, triggerRewardPill } from './lib/juice';
+import featuresMarkdown from '../FEATURES.md?raw';
+import versionsMarkdown from '../VERSIONS.md?raw';
 import {
   answerExamQuestion,
   buildExamDeck,
@@ -49,6 +51,7 @@ const app = document.querySelector('#app') as HTMLElement;
 let examTimer: number | null = null;
 let toastNotice = '';
 let toastTimer: number | null = null;
+let activeView: 'dashboard' | 'settings' = 'dashboard';
 let activeSidebarTab: 'modules' | 'agenda' = 'modules';
 let activeStageTab: 'quiz' | 'theory' | 'sources' = 'quiz';
 let streak = 0;
@@ -150,6 +153,7 @@ function openAgendaItem(item: StudyAgendaItem): void {
   state.currentQuestionId = item.questionId;
   state.retryQuestionId = null;
   activeStageTab = 'quiz';
+  activeView = 'dashboard';
   ensureModuleState(item.moduleId);
   saveCurrentState();
   sound.playClick();
@@ -233,13 +237,13 @@ function renderQuestion(question: Question): string {
         <span>Frage ${currentIndex + 1} von ${currentQuiz.questions.length}</span>
         <div class="stepper-dots">
           ${currentQuiz.questions
-            .map((q, idx) => {
+            .map((q) => {
               const ansKey = getQuestionAnswerKey(selectedModule.moduleId, q.id);
               const ans = state.answeredQuestions[ansKey];
               let statusClass = '';
               if (q.id === question.id) statusClass = 'active';
               else if (ans !== undefined) statusClass = ans === q.correctIndex ? 'done' : 'wrong';
-              return `<span class="step-dot ${statusClass}" title="Frage ${idx + 1}"></span>`;
+              return `<span class="step-dot ${statusClass}"></span>`;
             })
             .join('')}
         </div>
@@ -498,122 +502,199 @@ function render(): void {
         </div>
 
         <div class="header-actions">
-          <button class="primary" type="button" data-action="quick-test" title="Schnelle Trainingsfrage">🚀 Schnelltest</button>
-          <button type="button" data-action="exam-mode" title="5-Minuten Prüfungssimulation">⏱️ Prüfung</button>
-          <button type="button" data-action="export-state" title="Lernstand als JSON sichern">💾</button>
-          <button type="button" data-action="import-state" title="Lernstand aus JSON wiederherstellen">📂</button>
-          <button class="icon-btn" type="button" data-action="toggle-sound" title="${sound.isMuted() ? 'Sound aktivieren' : 'Sound stummstellen'}">
-            ${sound.isMuted() ? '🔇' : '🔊'}
-          </button>
+          ${activeView === 'settings' ? `
+            <button class="primary" type="button" data-action="close-settings">← Dashboard</button>
+          ` : `
+            <button class="primary" type="button" data-action="quick-test" title="Schnelle Trainingsfrage">🚀 Schnelltest</button>
+            <button type="button" data-action="exam-mode" title="5-Minuten Prüfungssimulation">⏱️ Prüfung</button>
+            <button type="button" data-action="export-state" title="Lernstand als JSON sichern">💾</button>
+            <button type="button" data-action="import-state" title="Lernstand aus JSON wiederherstellen">📂</button>
+            <button class="icon-btn" type="button" data-action="toggle-sound" title="${sound.isMuted() ? 'Sound aktivieren' : 'Sound stummstellen'}">
+              ${sound.isMuted() ? '🔇' : '🔊'}
+            </button>
+            <button type="button" class="icon-btn" data-action="open-settings" title="Einstellungen & Dokumentation">⚙️</button>
+          `}
           <input type="file" accept="application/json,.json" data-state-import-input hidden>
         </div>
       </header>
 
-      <main class="layout">
-        <!-- LEFT SIDEBAR -->
-        <aside class="sidebar-panel">
-          <nav class="sidebar-nav">
-            <button class="nav-tab-btn ${activeSidebarTab === 'modules' ? 'active' : ''}" type="button" data-sidebar-tab="modules">
-              Module (${moduleCatalog.length})
-            </button>
-            <button class="nav-tab-btn ${activeSidebarTab === 'agenda' ? 'active' : ''}" type="button" data-sidebar-tab="agenda">
-              Heute üben (${studyAgenda.length})
-            </button>
-          </nav>
-
-          <div class="sidebar-scrollable">
-            ${activeSidebarTab === 'modules' ? `
-              ${moduleIndex.map(renderModuleCard).join('')}
-            ` : `
-              ${studyAgenda.length > 0 ? studyAgenda.map((item, index) => `
-                <button class="agenda-item" type="button" data-agenda-module="${escapeHtml(item.moduleId)}" data-agenda-question="${escapeHtml(item.questionId)}">
-                  <span class="agenda-order">${String(index + 1).padStart(2, '0')}</span>
-                  <div class="agenda-copy">
-                    <strong>${escapeHtml(item.title)}</strong>
-                    <small>${escapeHtml(item.kind === 'review' ? `Wiederholen (${item.pendingCount})` : `Weiterlernen (${item.pendingCount})`)}</small>
-                  </div>
-                  <span class="agenda-arrow">→</span>
-                </button>
-              `).join('') : '<p style="padding: 12px; font-size: 0.82rem; color: var(--purple-soft);">Alle Tagesaufgaben erledigt! 🎉</p>'}
-            `}
-          </div>
-
-          <div class="sidebar-footer">
-            <div class="footer-stat-row">
-              <span>Genauigkeit:</span>
-              <strong>${computeAccuracy(progress.correct, progress.total)}%</strong>
+      ${activeView === 'settings' ? `
+        <!-- SETTINGS PAGE (ONLY VIEW WITH SCROLLING PERMITTED) -->
+        <main class="settings-page">
+          <div class="settings-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h2>⚙️ Einstellungen & System</h2>
+              <button type="button" class="primary" data-action="close-settings">← Zurück zum Dashboard</button>
             </div>
-            <div class="footer-stat-row">
-              <span>Fragen gelöst:</span>
-              <strong>${progress.seen}/${progress.total}</strong>
-            </div>
-            <button
-              class="review-badge-btn"
-              type="button"
-              data-action="review-next"
-              ${reviewQueue.length === 0 ? 'disabled' : ''}
-            >
-              <span>🔄 Wiederholungs-Queue</span>
-              <strong>${reviewQueue.length}</strong>
-            </button>
-          </div>
-        </aside>
 
-        <!-- RIGHT STAGE -->
-        <section class="stage-panel">
-          ${examSession ? renderExamSession(examSession) : `
-            <div class="stage-header">
-              <div class="stage-title-wrap">
-                <span class="pill" style="border-color: var(--purple-bright);">${escapeHtml(selectedModule.exam)}</span>
-                <h2>${escapeHtml(selectedModule.title)}</h2>
+            <div class="settings-row">
+              <div class="settings-label">
+                <strong>Sound-Effekte & Synthesizer</strong>
+                <small>Echtzeit-Audio-Chimes und Fanfaren bei korrekten Antworten und Abschlüssen</small>
               </div>
-              <div class="stage-tabs">
-                <button class="stage-tab-btn ${activeStageTab === 'quiz' ? 'active' : ''}" type="button" data-stage-tab="quiz">
-                  🎯 Quiz
-                </button>
-                <button class="stage-tab-btn ${activeStageTab === 'theory' ? 'active' : ''}" type="button" data-stage-tab="theory">
-                  📖 Theorie (${selectedModule.sections.length})
-                </button>
-                <button class="stage-tab-btn ${activeStageTab === 'sources' ? 'active' : ''}" type="button" data-stage-tab="sources">
-                  📑 Quellen
-                </button>
+              <button type="button" data-action="toggle-sound">
+                ${sound.isMuted() ? '🔇 Stummgeschaltet' : '🔊 Aktiviert'}
+              </button>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <strong>Lernstand sichern & übertragen</strong>
+                <small>Exportiere oder importiere deinen Fortschritt als validierte JSON-Datei</small>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" data-action="export-state">💾 Exportieren</button>
+                <button type="button" data-action="import-state">📂 Importieren</button>
               </div>
             </div>
 
-            <div class="stage-content-area">
-              ${activeStageTab === 'quiz' ? `
-                ${currentQuestion ? renderQuestion(currentQuestion) : '<p>Keine Fragen für dieses Modul verfügbar.</p>'}
-              ` : activeStageTab === 'theory' ? `
-                <div class="theory-wrapper">
-                  <div class="theory-section-selector">
-                    ${selectedModule.sections.map((sec) => `
-                      <button
-                        type="button"
-                        class="theory-pill-btn ${sec.id === state.studySectionId ? 'active' : ''}"
-                        data-section-id="${escapeHtml(sec.id)}"
-                      >
-                        ${escapeHtml(sec.title)}
-                      </button>
-                    `).join('')}
-                  </div>
-                  ${currentSection ? `
-                    <div class="theory-reader-card">
-                      <h3>${escapeHtml(currentSection.title)}</h3>
-                      <p>${escapeHtml(currentSection.content)}</p>
-                      <ul class="source-list">${renderSourceRefs(currentSection.sourceRefs)}</ul>
-                    </div>
-                  ` : ''}
-                </div>
+            <div class="settings-row">
+              <div class="settings-label">
+                <strong>Lernstand zurücksetzen</strong>
+                <small>Löscht alle gespeicherten Antworten, Queues und XP aus dem lokalen Browser-Speicher</small>
+              </div>
+              <button type="button" data-action="reset-state" style="border-color: var(--red); color: var(--red);">
+                ⚠️ Alles zurücksetzen
+              </button>
+            </div>
+          </div>
+
+          <!-- GANZ UNTEN: BEIDE MARKDOWN DATEIEN -->
+          <div class="settings-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3>✨ Features & Goodies (FEATURES.md)</h3>
+              <span class="pill">Dokumentation</span>
+            </div>
+            <div class="markdown-doc">
+              ${renderSimpleMarkdown(featuresMarkdown)}
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3>📋 Versionsliste & Changelog (VERSIONS.md)</h3>
+              <span class="pill">Changelog</span>
+            </div>
+            <div class="markdown-doc">
+              ${renderSimpleMarkdown(versionsMarkdown)}
+            </div>
+          </div>
+        </main>
+      ` : `
+        <!-- DASHBOARD (STRICT SINGLE PAGE 100vh, NO WINDOW SCROLLING) -->
+        <main class="layout">
+          <!-- LEFT SIDEBAR -->
+          <aside class="sidebar-panel">
+            <nav class="sidebar-nav">
+              <button class="nav-tab-btn ${activeSidebarTab === 'modules' ? 'active' : ''}" type="button" data-sidebar-tab="modules">
+                Module (${moduleCatalog.length})
+              </button>
+              <button class="nav-tab-btn ${activeSidebarTab === 'agenda' ? 'active' : ''}" type="button" data-sidebar-tab="agenda">
+                Heute üben (${studyAgenda.length})
+              </button>
+            </nav>
+
+            <div class="sidebar-scrollable">
+              ${activeSidebarTab === 'modules' ? `
+                ${moduleIndex.map(renderModuleCard).join('')}
               ` : `
-                <div class="theory-reader-card">
-                  <h3>Offizielle Quellenbelege (${selectedModule.title})</h3>
-                  <ul class="source-list">${renderSourceRefs(selectedModule.sourceRefs)}</ul>
-                </div>
+                ${studyAgenda.length > 0 ? studyAgenda.map((item, index) => `
+                  <button class="agenda-item" type="button" data-agenda-module="${escapeHtml(item.moduleId)}" data-agenda-question="${escapeHtml(item.questionId)}">
+                    <span class="agenda-order">${String(index + 1).padStart(2, '0')}</span>
+                    <div class="agenda-copy">
+                      <strong>${escapeHtml(item.title)}</strong>
+                      <small>${escapeHtml(item.kind === 'review' ? `Wiederholen (${item.pendingCount})` : `Weiterlernen (${item.pendingCount})`)}</small>
+                    </div>
+                    <span class="agenda-arrow">→</span>
+                  </button>
+                `).join('') : '<p style="padding: 12px; font-size: 0.82rem; color: var(--purple-soft);">Alle Tagesaufgaben erledigt! 🎉</p>'}
               `}
             </div>
-          `}
-        </section>
-      </main>
+
+            <div class="sidebar-footer">
+              <div class="footer-stat-row">
+                <span>Genauigkeit:</span>
+                <strong>${computeAccuracy(progress.correct, progress.total)}%</strong>
+              </div>
+              <div class="footer-stat-row">
+                <span>Fragen gelöst:</span>
+                <strong>${progress.seen}/${progress.total}</strong>
+              </div>
+              <button
+                class="review-badge-btn"
+                type="button"
+                data-action="review-next"
+                ${reviewQueue.length === 0 ? 'disabled' : ''}
+              >
+                <span>🔄 Wiederholungs-Queue</span>
+                <strong>${reviewQueue.length}</strong>
+              </button>
+              <button
+                type="button"
+                data-action="open-settings"
+                style="background: transparent; border: none; font-size: 0.72rem; color: var(--purple-soft); padding: 4px 0 0 0; cursor: pointer; text-decoration: underline; text-align: center; width: 100%;"
+              >
+                ⚙️ Einstellungen, Features & Changelog
+              </button>
+            </div>
+          </aside>
+
+          <!-- RIGHT STAGE -->
+          <section class="stage-panel">
+            ${examSession ? renderExamSession(examSession) : `
+              <div class="stage-header">
+                <div class="stage-title-wrap">
+                  <span class="pill" style="border-color: var(--purple-bright);">${escapeHtml(selectedModule.exam)}</span>
+                  <h2>${escapeHtml(selectedModule.title)}</h2>
+                </div>
+                <div class="stage-tabs">
+                  <button class="stage-tab-btn ${activeStageTab === 'quiz' ? 'active' : ''}" type="button" data-stage-tab="quiz">
+                    🎯 Quiz
+                  </button>
+                  <button class="stage-tab-btn ${activeStageTab === 'theory' ? 'active' : ''}" type="button" data-stage-tab="theory">
+                    📖 Theorie (${selectedModule.sections.length})
+                  </button>
+                  <button class="stage-tab-btn ${activeStageTab === 'sources' ? 'active' : ''}" type="button" data-stage-tab="sources">
+                    📑 Quellen
+                  </button>
+                </div>
+              </div>
+
+              <div class="stage-content-area">
+                ${activeStageTab === 'quiz' ? `
+                  ${currentQuestion ? renderQuestion(currentQuestion) : '<p>Keine Fragen für dieses Modul verfügbar.</p>'}
+                ` : activeStageTab === 'theory' ? `
+                  <div class="theory-wrapper">
+                    <div class="theory-section-selector">
+                      ${selectedModule.sections.map((sec) => `
+                        <button
+                          type="button"
+                          class="theory-pill-btn ${sec.id === state.studySectionId ? 'active' : ''}"
+                          data-section-id="${escapeHtml(sec.id)}"
+                        >
+                          ${escapeHtml(sec.title)}
+                        </button>
+                      `).join('')}
+                    </div>
+                    ${currentSection ? `
+                      <div class="theory-reader-card">
+                        <h3>${escapeHtml(currentSection.title)}</h3>
+                        <p>${escapeHtml(currentSection.content)}</p>
+                        <ul class="source-list">${renderSourceRefs(currentSection.sourceRefs)}</ul>
+                      </div>
+                    ` : ''}
+                  </div>
+                ` : `
+                  <div class="theory-reader-card">
+                    <h3>Offizielle Quellenbelege (${selectedModule.title})</h3>
+                    <ul class="source-list">${renderSourceRefs(selectedModule.sourceRefs)}</ul>
+                  </div>
+                `}
+              </div>
+            `}
+          </section>
+        </main>
+      `}
 
       ${toastNotice ? `
         <div class="toast-notice" role="status">
@@ -741,6 +822,7 @@ function render(): void {
       state.currentQuestionId = reviewQuestionId;
       state.retryQuestionId = null;
       activeStageTab = 'quiz';
+      activeView = 'dashboard';
       saveCurrentState();
       sound.playClick();
       render();
@@ -754,6 +836,7 @@ function render(): void {
       state.currentQuestionId = retryQuestionId;
       state.retryQuestionId = retryQuestionId;
       activeStageTab = 'quiz';
+      activeView = 'dashboard';
       saveCurrentState();
       sound.playClick();
       render();
@@ -801,6 +884,35 @@ function render(): void {
 
       const reviewQueue = getCurrentReviewQueue();
 
+      if (action === 'open-settings') {
+        activeView = 'settings';
+        sound.playClick();
+        render();
+        return;
+      }
+
+      if (action === 'close-settings') {
+        activeView = 'dashboard';
+        sound.playClick();
+        render();
+        return;
+      }
+
+      if (action === 'reset-state') {
+        if (window.confirm('Möchtest du wirklich deinen gesamten lokalen Lernstand und XP zurücksetzen?')) {
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem('ihk-xp');
+          Object.assign(state, defaultState);
+          saveCurrentState();
+          xp = 0;
+          streak = 0;
+          sound.playWrong();
+          showToast('Lernstand vollständig zurückgesetzt 🔄');
+          render();
+        }
+        return;
+      }
+
       if (action === 'toggle-sound') {
         sound.toggleMute();
         render();
@@ -823,6 +935,7 @@ function render(): void {
       if (action === 'review-next' && reviewQueue.length > 0) {
         state.currentQuestionId = reviewQueue[0] ?? currentQuiz.questions[0]?.id ?? null;
         activeStageTab = 'quiz';
+        activeView = 'dashboard';
         saveCurrentState();
         sound.playClick();
         showToast('Wiederholungsfrage geladen 🔄');
@@ -843,6 +956,7 @@ function render(): void {
       if (action === 'exam-mode') {
         const examDeck = buildExamDeck(currentQuiz.questions, reviewQueue, EXAM_QUESTION_LIMIT);
         state.examSession = startExamSession(selectedModule.moduleId, examDeck, Date.now(), EXAM_DURATION_SECONDS);
+        activeView = 'dashboard';
         saveCurrentState();
         sound.playClick();
         render();
@@ -867,6 +981,7 @@ function render(): void {
       if (action === 'quick-test') {
         state.currentQuestionId = currentQuiz.questions[1]?.id ?? currentQuiz.questions[0]?.id ?? null;
         activeStageTab = 'quiz';
+        activeView = 'dashboard';
         showToast('Schnelltest aktiv 🚀');
       }
 

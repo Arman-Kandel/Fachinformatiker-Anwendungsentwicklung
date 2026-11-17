@@ -938,3 +938,125 @@ button.icon-btn {
   from { transform: scale(1); }
   to { transform: scale(1.06); filter: drop-shadow(0 0 8px #fbbf24); }
 }
+
+/* SETTINGS PAGE - ONLY VIEW WHERE SCROLLING IS PERMITTED */
+.settings-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 12px 36px;
+}
+
+.settings-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-card h2,
+.settings-card h3 {
+  margin: 0;
+  color: #fff;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(197, 169, 255, 0.08);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.settings-label strong {
+  font-size: 0.95rem;
+  color: #f3ebff;
+}
+
+.settings-label small {
+  font-size: 0.78rem;
+  color: var(--purple-soft);
+}
+
+/* MARKDOWN DOCUMENTATION VIEWER */
+.markdown-doc {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #e6dbff;
+}
+
+.markdown-doc h2 {
+  font-size: 1.25rem;
+  color: #fff;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  margin-top: 10px;
+}
+
+.markdown-doc h3 {
+  font-size: 1.05rem;
+  color: var(--purple-soft);
+  margin-top: 8px;
+}
+
+.markdown-doc h4 {
+  font-size: 0.92rem;
+  color: var(--green);
+  margin-top: 4px;
+}
+
+.markdown-doc p {
+  margin: 0;
+}
+
+.markdown-doc ul {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.markdown-doc blockquote {
+  margin: 0;
+  padding: 8px 14px;
+  background: rgba(173, 126, 255, 0.08);
+  border-left: 3px solid var(--purple-bright);
+  border-radius: 4px;
+  font-style: italic;
+  color: var(--purple-soft);
+}
+
+.markdown-doc code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: #ffd166;
+}
+
