@@ -2,6 +2,12 @@
 
 > **Wichtig für Agents:** Bei jeder Anpassung am Codebase muss diese Datei um die vorgenommenen Änderungen ergänzt werden.
 
+## [0.2.1] - 2026-11-17
+### Behoben
+- Fehlerhafte Modul-Auswahl durch unvollständige State-Initialisierung und fehlende gemeinsame Auswahl-Logik behoben.
+- `data-action`-Handler wurden gegen undefinierte Variablen abgesichert; Schnelltest, Prüfung, Wiederholungs-Queue und Module-Buttons funktionieren wieder konsistent.
+- Lokale Toolchain validiert: Abhängigkeiten werden über das lokale Projekt-Setup installiert und via `npm run check` verifiziert.
+
 ## [0.2.0] - 2026-11-17
 ### Hinzugefügt
 - **100vh Single-Page UI:** Vollständig überarbeitetes Layout ohne horizontales oder vertikales Scrollen auf Seitenebene; adaptive Split-Ansicht (Sidebar + Stage).
