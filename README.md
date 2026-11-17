@@ -16,8 +16,7 @@ Eine statische Lernplattform für IHK-relevante Inhalte mit lokalem Browser-Stat
 ## Lokale Entwicklung
 
 ```bash
-npm install
-npm run dev
+.\start.bat
 ```
 
 ## Build und Qualitätscheck

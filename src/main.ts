@@ -2,7 +2,25 @@ import './styles.css';
 import { getApprovedSourceUrl, getModuleCatalog, getModuleIndex, getModuleById, getQuizByModuleId } from './app/content-loader/content-loader';
 import { loadAppState, normalizeAppState, parseAppStateExport, saveAppState, serializeAppState } from './app/storage/local-store';
 import { escapeHtml } from './lib/html';
-import { answerExamQuestion, buildExamDeck, buildModuleOverview, buildModuleProgress, buildReviewQueue, buildStudyAgenda, computeAccuracy, expireExamSession, getExamRemainingSeconds, getExamResult, getMasteryLevel, getQuestionAnswerKey, getQuestionById, startExamSession, updateModuleProgressForAnswer, validateModule } from './lib/learning';
+import { sound, confetti, triggerRewardPill } from './lib/juice';
+import {
+  answerExamQuestion,
+  buildExamDeck,
+  buildModuleOverview,
+  buildModuleProgress,
+  buildReviewQueue,
+  buildStudyAgenda,
+  computeAccuracy,
+  expireExamSession,
+  getExamRemainingSeconds,
+  getExamResult,
+  getMasteryLevel,
+  getQuestionAnswerKey,
+  getQuestionById,
+  startExamSession,
+  updateModuleProgressForAnswer,
+  validateModule,
+} from './lib/learning';
 import type { AppState, ExamSession, Module, ModuleOverview, ModuleProgress, Question, StudyAgendaItem } from './types';
 
 const STORAGE_KEY = 'ihk-lernplattform-state-v1';
@@ -12,6 +30,7 @@ const MAX_STATE_IMPORT_BYTES = 1_000_000;
 const moduleCatalog = getModuleCatalog();
 const moduleIndex = getModuleIndex();
 const firstModule = moduleCatalog[0];
+
 const defaultState: AppState = {
   resumeModuleId: firstModule?.moduleId ?? null,
   currentQuestionId: getQuizByModuleId(firstModule?.moduleId ?? '')?.questions[0]?.id ?? null,
@@ -28,19 +47,35 @@ const defaultState: AppState = {
 const state = loadAppState<AppState>(STORAGE_KEY, defaultState, normalizeAppState);
 const app = document.querySelector('#app') as HTMLElement;
 let examTimer: number | null = null;
-let stateNotice = '';
+let toastNotice = '';
+let toastTimer: number | null = null;
+let activeSidebarTab: 'modules' | 'agenda' = 'modules';
+let activeStageTab: 'quiz' | 'theory' | 'sources' = 'quiz';
+let streak = 0;
+let xp = Number(localStorage.getItem('ihk-xp') || 0);
 
 function safePercentWidth(value: number): number {
   return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+}
+
+function showToast(msg: string): void {
+  toastNotice = msg;
+  if (toastTimer !== null) {
+    window.clearTimeout(toastTimer);
+  }
+  toastTimer = window.setTimeout(() => {
+    toastNotice = '';
+    const el = document.querySelector('.toast-notice');
+    if (el) el.remove();
+  }, 3200);
+  render();
 }
 
 function ensureModuleState(moduleId: string): void {
   const module = getModuleById(moduleId);
   const quiz = getQuizByModuleId(moduleId);
 
-  if (!module || !quiz) {
-    return;
-  }
+  if (!module || !quiz) return;
 
   if (!state.moduleProgress[moduleId]) {
     state.moduleProgress[moduleId] = buildModuleProgress(moduleId, quiz.questions.length, 0, 0, new Date().toISOString());
@@ -49,15 +84,10 @@ function ensureModuleState(moduleId: string): void {
 
 function getSelectedModule(): Module {
   const selectedId = state.selectedModuleId ?? firstModule?.moduleId ?? null;
-
-  if (!selectedId) {
-    throw new Error('No module available');
-  }
+  if (!selectedId) throw new Error('No module available');
 
   const selectedModule = getModuleById(selectedId);
-  if (!selectedModule) {
-    throw new Error(`Module not found: ${selectedId}`);
-  }
+  if (!selectedModule) throw new Error(`Module not found: ${selectedId}`);
 
   return selectedModule;
 }
@@ -88,7 +118,9 @@ function getCurrentReviewQueue(): string[] {
   const currentQuiz = getCurrentQuiz();
   const persistedQueue = state.reviewQueue[selectedModule.moduleId] ?? [];
   const derivedQueue = buildReviewQueue(currentQuiz.questions, state.answeredQuestions, selectedModule.moduleId);
-  const validQueue = [...new Set([...derivedQueue, ...persistedQueue])].filter((questionId) => currentQuiz.questions.some((question) => question.id === questionId));
+  const validQueue = [...new Set([...derivedQueue, ...persistedQueue])].filter((questionId) =>
+    currentQuiz.questions.some((question) => question.id === questionId)
+  );
 
   state.reviewQueue[selectedModule.moduleId] = validQueue;
   return validQueue;
@@ -117,8 +149,10 @@ function openAgendaItem(item: StudyAgendaItem): void {
   state.studySectionId = module?.sections[0]?.id ?? null;
   state.currentQuestionId = item.questionId;
   state.retryQuestionId = null;
+  activeStageTab = 'quiz';
   ensureModuleState(item.moduleId);
   saveCurrentState();
+  sound.playClick();
   render();
 }
 
@@ -138,14 +172,13 @@ function renderSourceRefs(sourceRefs: Array<{ sourceId: string; quote: string; s
     .map((ref) => {
       const sourceUrl = getApprovedSourceUrl(ref.sourceId);
       const sourceLink = sourceUrl
-        ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Originalquelle öffnen</a>`
+        ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Originalquelle öffnen ↗</a>`
         : '<span>Quelle nicht im Register</span>';
 
       return `
         <li>
-          <span>${escapeHtml(ref.sourceId)}</span>
-          <strong>${escapeHtml(ref.section)}</strong>
-          <p>${escapeHtml(ref.quote)}</p>
+          <strong>${escapeHtml(ref.sourceId)} · ${escapeHtml(ref.section)}</strong>
+          <p>"${escapeHtml(ref.quote)}"</p>
           ${sourceLink}
         </li>
       `;
@@ -169,11 +202,11 @@ function renderModuleCard(item: (typeof moduleIndex)[number]): string {
   return `
     <button class="module-card ${active ? 'active' : ''}" type="button" data-module-id="${escapeHtml(item.moduleId)}">
       <div class="module-topline">
-        <span>${escapeHtml(item.difficulty)}</span>
+        <span class="module-tag">${escapeHtml(item.difficulty)}</span>
         <span>${escapeHtml(item.estimatedMinutes)} min</span>
       </div>
       <strong>${escapeHtml(item.title)}</strong>
-      <small>${escapeHtml(item.sourceRefs[0]?.sourceId ?? 'FIAUSBV')} · ${escapeHtml(overview.mastery)}</small>
+      <small>${escapeHtml(overview.mastery.toUpperCase())} · ${escapeHtml(overview.percent)}%</small>
       <div class="mini-progress">
         <span style="width: ${safePercentWidth(overview.percent)}%"></span>
       </div>
@@ -182,47 +215,74 @@ function renderModuleCard(item: (typeof moduleIndex)[number]): string {
 }
 
 function renderQuestion(question: Question): string {
-  const selectedAnswer = state.answeredQuestions[getQuestionAnswerKey(getSelectedModule().moduleId, question.id)];
+  const selectedModule = getSelectedModule();
+  const currentQuiz = getCurrentQuiz();
+  const selectedAnswer = state.answeredQuestions[getQuestionAnswerKey(selectedModule.moduleId, question.id)];
   const isAnswered = selectedAnswer !== undefined;
   const isRetrying = state.retryQuestionId === question.id;
   const showResult = isAnswered && !isRetrying;
-  const canRetry = (state.reviewQueue[getSelectedModule().moduleId] ?? []).includes(question.id);
+  const canRetry = (state.reviewQueue[selectedModule.moduleId] ?? []).includes(question.id);
+  const isCorrect = showResult && selectedAnswer === question.correctIndex;
+
+  const currentIndex = currentQuiz.questions.findIndex((q) => q.id === question.id);
+  const hasNextQuestion = currentIndex >= 0 && currentIndex < currentQuiz.questions.length - 1;
 
   return `
-    <div class="question-box">
-      <div class="question-meta">
-        <span>Frage</span>
-        <strong>${escapeHtml(question.id.toUpperCase())}</strong>
-      </div>
-      <h3>${escapeHtml(question.question)}</h3>
-      <div class="options">
-        ${question.options
-          .map((option, index) => {
-            const isCorrect = showResult && index === question.correctIndex;
-            const isWrong = showResult && index === selectedAnswer && index !== question.correctIndex;
-            return `
-              <button
-                type="button"
-                class="answer-option ${isCorrect ? 'correct' : ''} ${isWrong ? 'incorrect' : ''}"
-                data-answer-index="${index}"
-                data-question-id="${escapeHtml(question.id)}"
-                ${isAnswered && !isRetrying ? 'disabled' : ''}
-              >
-                <span>${String.fromCharCode(65 + index)}</span>
-                <span>${escapeHtml(option)}</span>
-              </button>
-            `;
-          })
-          .join('')}
-      </div>
-      ${showResult ? `
-        <div class="result-panel">
-          <p class="result-label">${selectedAnswer === question.correctIndex ? 'Richtig' : 'Nicht ganz'}</p>
-          <p>${escapeHtml(question.explanation)}</p>
-          <ul class="source-list">${renderSourceRefs(question.sourceRefs)}</ul>
-          ${canRetry ? `<button type="button" data-review-retry="${escapeHtml(question.id)}">Erneut beantworten</button>` : ''}
+    <div class="quiz-wrapper">
+      <div class="quiz-stepper">
+        <span>Frage ${currentIndex + 1} von ${currentQuiz.questions.length}</span>
+        <div class="stepper-dots">
+          ${currentQuiz.questions
+            .map((q, idx) => {
+              const ansKey = getQuestionAnswerKey(selectedModule.moduleId, q.id);
+              const ans = state.answeredQuestions[ansKey];
+              let statusClass = '';
+              if (q.id === question.id) statusClass = 'active';
+              else if (ans !== undefined) statusClass = ans === q.correctIndex ? 'done' : 'wrong';
+              return `<span class="step-dot ${statusClass}" title="Frage ${idx + 1}"></span>`;
+            })
+            .join('')}
         </div>
-      ` : ''}
+        <span class="pill">${escapeHtml(question.id.toUpperCase())}</span>
+      </div>
+
+      <div class="question-box ${showResult ? (isCorrect ? 'celebrate-glow' : 'shake-animation') : ''}">
+        <div class="question-prompt">${escapeHtml(question.question)}</div>
+        <div class="options-grid">
+          ${question.options
+            .map((option, index) => {
+              const optionCorrect = showResult && index === question.correctIndex;
+              const optionWrong = showResult && index === selectedAnswer && index !== question.correctIndex;
+              return `
+                <button
+                  type="button"
+                  class="answer-option ${optionCorrect ? 'correct' : ''} ${optionWrong ? 'incorrect' : ''}"
+                  data-answer-index="${index}"
+                  data-question-id="${escapeHtml(question.id)}"
+                  ${isAnswered && !isRetrying ? 'disabled' : ''}
+                >
+                  <span>${String.fromCharCode(65 + index)}</span>
+                  <span>${escapeHtml(option)}</span>
+                </button>
+              `;
+            })
+            .join('')}
+        </div>
+
+        ${showResult ? `
+          <div class="result-feedback-card ${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">
+            <div class="feedback-headline">
+              <strong>${isCorrect ? '✨ Fantastisch! Richtig beantwortet' : '💡 Nicht ganz richtig'}</strong>
+              ${isCorrect ? `<span class="pill" style="border-color: var(--green); color: var(--green);">+${50 * Math.max(1, streak)} XP</span>` : ''}
+            </div>
+            <p class="feedback-text">${escapeHtml(question.explanation)}</p>
+            <div class="feedback-actions">
+              ${hasNextQuestion ? `<button type="button" class="primary" data-action="next-question">Nächste Frage →</button>` : ''}
+              ${canRetry ? `<button type="button" data-review-retry="${escapeHtml(question.id)}">Erneut beantworten ↺</button>` : ''}
+            </div>
+          </div>
+        ` : ''}
+      </div>
     </div>
   `;
 }
@@ -237,35 +297,48 @@ function renderExamSession(session: ExamSession): string {
   const module = getModuleById(session.moduleId);
   const quiz = getQuizByModuleId(session.moduleId);
   if (!module || !quiz) {
-    return '<section class="panel exam-panel"><p>Diese Prüfung kann nicht mehr geladen werden.</p><button type="button" data-action="close-exam">Schließen</button></section>';
+    return `
+      <div class="exam-view-wrapper">
+        <p>Diese Prüfung kann nicht mehr geladen werden.</p>
+        <button type="button" data-action="close-exam">Schließen</button>
+      </div>
+    `;
   }
 
   if (session.status === 'active') {
     const questionId = session.questionIds[session.currentIndex];
     const question = quiz.questions.find((item) => item.id === questionId);
     if (!question) {
-      return '<section class="panel exam-panel"><p>Die aktuelle Prüfungsfrage fehlt im Inhalt.</p><button type="button" data-action="close-exam">Prüfung beenden</button></section>';
+      return `
+        <div class="exam-view-wrapper">
+          <p>Die aktuelle Prüfungsfrage fehlt im Inhalt.</p>
+          <button type="button" data-action="close-exam">Prüfung beenden</button>
+        </div>
+      `;
     }
 
     const remaining = getExamRemainingSeconds(session, Date.now());
     return `
-      <section class="panel exam-panel">
-        <div class="section-head">
+      <div class="exam-view-wrapper">
+        <div class="exam-timer-bar">
           <div>
-            <p class="eyebrow">Kurzprüfung · 5 Minuten</p>
-            <h2>${escapeHtml(module.title)}</h2>
+            <span class="pill" style="border-color: var(--green); color: var(--green);">Prüfung läuft</span>
+            <strong style="margin-left: 8px;">${escapeHtml(module.title)}</strong>
           </div>
-          <button type="button" data-action="close-exam">Prüfung abbrechen</button>
+          <div class="exam-timer-clock" data-exam-timer>${escapeHtml(formatExamTime(remaining))}</div>
+          <button type="button" data-action="close-exam">Abbrechen</button>
         </div>
-        <div class="exam-progress-line">
-          <span>Frage ${escapeHtml(session.currentIndex + 1)} von ${escapeHtml(session.questionIds.length)}</span>
-          <strong data-exam-timer>${escapeHtml(formatExamTime(remaining))}</strong>
+
+        <div class="quiz-stepper">
+          <span>Frage ${session.currentIndex + 1} von ${session.questionIds.length}</span>
+          <div class="mini-progress" style="width: 140px;">
+            <span style="width: ${safePercentWidth((session.currentIndex / session.questionIds.length) * 100)}%"></span>
+          </div>
         </div>
-        <div class="exam-progress-track"><span style="width: ${safePercentWidth((session.currentIndex / session.questionIds.length) * 100)}%"></span></div>
+
         <div class="question-box">
-          <div class="question-meta"><span>Prüfungsfrage</span><strong>${escapeHtml(question.id.toUpperCase())}</strong></div>
-          <h3>${escapeHtml(question.question)}</h3>
-          <div class="options">
+          <div class="question-prompt">${escapeHtml(question.question)}</div>
+          <div class="options-grid">
             ${question.options
               .map(
                 (option, index) => `
@@ -278,25 +351,21 @@ function renderExamSession(session: ExamSession): string {
               .join('')}
           </div>
         </div>
-      </section>
+      </div>
     `;
   }
 
   const result = getExamResult(session, quiz.questions);
   return `
-    <section class="panel exam-panel exam-result">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">${escapeHtml(session.status === 'expired' ? 'Zeit abgelaufen' : 'Prüfung abgeschlossen')}</p>
-          <h2>${escapeHtml(module.title)}</h2>
-        </div>
-        <button type="button" data-action="close-exam">Zurück zum Lernen</button>
+    <div class="exam-view-wrapper">
+      <div class="exam-result-hero">
+        <span class="pill">${escapeHtml(session.status === 'expired' ? 'Zeit abgelaufen' : 'Prüfung bestanden')}</span>
+        <div class="exam-score-big">${escapeHtml(result.percent)}%</div>
+        <p style="margin: 0; color: #e0d4ff;">${escapeHtml(result.correct)} von ${escapeHtml(result.total)} Fragen richtig</p>
+        <button type="button" class="primary" data-action="close-exam" style="margin-top: 10px;">Zurück zum Lernbereich</button>
       </div>
-      <div class="exam-score">
-        <strong>${escapeHtml(result.correct)}<span>/${escapeHtml(result.total)}</span></strong>
-        <span>${escapeHtml(result.percent)}% richtig</span>
-      </div>
-      <div class="exam-review-list">
+
+      <div class="sidebar-scrollable" style="flex: 1;">
         ${session.questionIds
           .map((questionId, index) => {
             const question = quiz.questions.find((item) => item.id === questionId);
@@ -304,18 +373,20 @@ function renderExamSession(session: ExamSession): string {
             const answerIndex = session.answers[questionId];
             const isCorrect = answerIndex === question.correctIndex;
             return `
-              <article class="exam-review-item ${isCorrect ? 'correct' : 'incorrect'}">
-                <div class="exam-review-heading"><strong>${escapeHtml(index + 1)}. ${escapeHtml(question.question)}</strong><span>${isCorrect ? 'Richtig' : answerIndex === undefined ? 'Keine Antwort' : 'Falsch'}</span></div>
-                <p>Deine Antwort: ${escapeHtml(answerIndex === undefined ? 'Keine Antwort' : question.options[answerIndex] ?? 'Ungültige Auswahl')}</p>
-                <p>Richtige Antwort: ${escapeHtml(question.options[question.correctIndex] ?? 'Keine gültige Antwort')}</p>
-                <p>${escapeHtml(question.explanation)}</p>
-                <ul class="source-list">${renderSourceRefs(question.sourceRefs)}</ul>
-              </article>
+              <div class="result-feedback-card ${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}">
+                <div class="feedback-headline">
+                  <strong>${index + 1}. ${escapeHtml(question.question)}</strong>
+                  <span class="pill">${isCorrect ? 'Richtig' : 'Falsch'}</span>
+                </div>
+                <p class="feedback-text">Deine Antwort: ${escapeHtml(answerIndex === undefined ? 'Keine' : question.options[answerIndex] ?? '')}</p>
+                <p class="feedback-text" style="color: var(--green);">Korrekt: ${escapeHtml(question.options[question.correctIndex] ?? '')}</p>
+                <p class="feedback-text">${escapeHtml(question.explanation)}</p>
+              </div>
             `;
           })
           .join('')}
       </div>
-    </section>
+    </div>
   `;
 }
 
@@ -326,16 +397,14 @@ function saveCurrentState(): void {
 
 async function restoreStateFromFile(file: File): Promise<void> {
   if (file.size > MAX_STATE_IMPORT_BYTES) {
-    stateNotice = 'Die Datei ist größer als 1 MB und wurde nicht importiert.';
-    render();
+    showToast('Datei ist zu groß (> 1MB).');
     return;
   }
 
   try {
     const imported = parseAppStateExport(await file.text(), defaultState);
     if (!imported) {
-      stateNotice = 'Die Datei ist ungültig oder hat ein nicht unterstütztes Format.';
-      render();
+      showToast('Ungültiges Format.');
       return;
     }
 
@@ -345,26 +414,24 @@ async function restoreStateFromFile(file: File): Promise<void> {
     const validQuestion = !imported.currentQuestionId || importedQuiz?.questions.some((question) => question.id === imported.currentQuestionId) === true;
     const importedExamModule = imported.examSession ? getModuleById(imported.examSession.moduleId) : undefined;
     const importedExamQuiz = importedExamModule ? getQuizByModuleId(importedExamModule.moduleId) : undefined;
-    const validExam = !imported.examSession || importedExamQuiz !== undefined
-      && imported.examSession.questionIds.every((questionId) => importedExamQuiz.questions.some((question) => question.id === questionId));
+    const validExam = !imported.examSession || (importedExamQuiz !== undefined
+      && imported.examSession.questionIds.every((questionId) => importedExamQuiz.questions.some((question) => question.id === questionId)));
 
     if (!validSelection || !validQuestion || !validExam) {
-      stateNotice = 'Die Datei verweist auf Inhalte, die in dieser Version nicht verfügbar sind.';
-      render();
+      showToast('Inhalte in dieser Version nicht verfügbar.');
       return;
     }
 
-    if (!window.confirm('Der importierte Lernstand ersetzt die aktuellen lokalen Daten. Fortfahren?')) {
+    if (!window.confirm('Aktuelle Daten mit importiertem Stand überschreiben?')) {
       return;
     }
 
     Object.assign(state, imported);
-    stateNotice = 'Lernstand erfolgreich importiert.';
     saveCurrentState();
-    render();
+    sound.playSuccess(2);
+    showToast('Lernstand erfolgreich importiert! 📂');
   } catch {
-    stateNotice = 'Die Datei konnte nicht gelesen werden.';
-    render();
+    showToast('Datei konnte nicht gelesen werden.');
   }
 }
 
@@ -376,8 +443,8 @@ function downloadCurrentState(): void {
   link.download = `ihk-lernplattform-state-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
-  stateNotice = 'Lernstand wurde als JSON exportiert.';
-  render();
+  sound.playClick();
+  showToast('Lernstand als JSON exportiert! 💾');
 }
 
 function render(): void {
@@ -401,198 +468,185 @@ function render(): void {
   const reviewQueue = getCurrentReviewQueue();
   const studyAgenda = getStudyAgenda();
   const currentQuestion = getQuestionById(currentQuiz.questions, state.currentQuestionId);
+  const mastery = getMasteryLevel(progress);
   ensureModuleState(selectedModule.moduleId);
 
   app.innerHTML = `
     <div class="app-shell">
       <header class="page-header">
-        <div>
-          <p class="eyebrow">Fortsetzen / Wiederholen</p>
-          <h1>IHK Lernplattform</h1>
+        <div class="brand-section">
+          <div class="brand-logo">⚡</div>
+          <div class="brand-title">
+            <h1>IHK Master</h1>
+            <span>FIAU Prüfungstrainer</span>
+          </div>
         </div>
-        <div class="header-badges">
-          <span class="badge">GitHub Pages</span>
-          <span class="badge">Browser-local</span>
+
+        <div class="dopamine-hud">
+          <div class="hud-item hud-streak ${streak > 0 ? 'fire-active' : ''}" title="Aktuelle Serie richtiger Antworten">
+            <span>🔥</span>
+            <span>${streak} Streak</span>
+          </div>
+          <div class="hud-item hud-xp" title="Erspielte Erfahrungspunkte">
+            <span>⭐</span>
+            <span>${xp} XP</span>
+          </div>
+          <div class="hud-item hud-mastery" title="Mastery-Level">
+            <span>🏆</span>
+            <span>${escapeHtml(mastery.label)} (${mastery.percent}%)</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="primary" type="button" data-action="quick-test" title="Schnelle Trainingsfrage">🚀 Schnelltest</button>
+          <button type="button" data-action="exam-mode" title="5-Minuten Prüfungssimulation">⏱️ Prüfung</button>
+          <button type="button" data-action="export-state" title="Lernstand als JSON sichern">💾</button>
+          <button type="button" data-action="import-state" title="Lernstand aus JSON wiederherstellen">📂</button>
+          <button class="icon-btn" type="button" data-action="toggle-sound" title="${sound.isMuted() ? 'Sound aktivieren' : 'Sound stummstellen'}">
+            ${sound.isMuted() ? '🔇' : '🔊'}
+          </button>
+          <input type="file" accept="application/json,.json" data-state-import-input hidden>
         </div>
       </header>
 
       <main class="layout">
-        <section class="panel highlight">
-          <div>
-            <p class="eyebrow">Resume-First</p>
-            <h2>Aktuelles Lernfenster</h2>
-          </div>
-          <div class="cta-row">
-            <button class="primary" type="button" data-action="resume">Fortsetzen</button>
-            <button type="button" data-action="study-today" ${studyAgenda.length === 0 ? 'disabled' : ''}>Heute üben</button>
-            <button type="button" data-action="quick-test">Schnelltest</button>
-            <button type="button" data-action="exam-mode">Prüfungsmodus</button>
-            <button type="button" data-action="review-next" ${reviewQueue.length === 0 ? 'disabled' : ''}>Wiederholen</button>
-            <button type="button" data-action="export-state">Exportieren</button>
-            <button type="button" data-action="import-state">Importieren</button>
-            <input type="file" accept="application/json,.json" data-state-import-input hidden>
-          </div>
-          ${stateNotice ? `<p class="state-notice" role="status">${escapeHtml(stateNotice)}</p>` : ''}
-          <p class="summary">
-            ${escapeHtml(selectedModule.title)} · ${escapeHtml(computeAccuracy(progress.correct, progress.total))}% Trefferquote · ${escapeHtml(getMasteryLevel(progress).label)} · ${escapeHtml(selectedModule.learningObjectives[0] ?? '')}
-          </p>
-          ${validationErrors.length > 0 ? `<p class="validation-warning">Warnung: ${escapeHtml(validationErrors.join(', '))}</p>` : ''}
-        </section>
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar-panel">
+          <nav class="sidebar-nav">
+            <button class="nav-tab-btn ${activeSidebarTab === 'modules' ? 'active' : ''}" type="button" data-sidebar-tab="modules">
+              Module (${moduleCatalog.length})
+            </button>
+            <button class="nav-tab-btn ${activeSidebarTab === 'agenda' ? 'active' : ''}" type="button" data-sidebar-tab="agenda">
+              Heute üben (${studyAgenda.length})
+            </button>
+          </nav>
 
-        <section class="panel agenda-panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Nächste Schritte</p>
-              <h2>Heute üben</h2>
-            </div>
-            <span class="pill">${escapeHtml(studyAgenda.length)} Vorschläge</span>
-          </div>
-          ${studyAgenda.length > 0 ? `
-            <div class="agenda-list">
-              ${studyAgenda
-                .map(
-                  (item, index) => `
-                    <button class="agenda-item" type="button" data-agenda-module="${escapeHtml(item.moduleId)}" data-agenda-question="${escapeHtml(item.questionId)}">
-                      <span class="agenda-order">${escapeHtml(String(index + 1).padStart(2, '0'))}</span>
-                      <span class="agenda-copy">
-                        <strong>${escapeHtml(item.title)}</strong>
-                        <small>${escapeHtml(item.kind === 'review' ? `Wiederholen · ${item.pendingCount} offen` : `Weiterlernen · ${item.pendingCount} unbeantwortet`)}</small>
-                      </span>
-                      <span class="agenda-arrow" aria-hidden="true">→</span>
-                    </button>
-                  `,
-                )
-                .join('')}
-            </div>
-          ` : '<p>Alles erledigt. Neue Module oder Fragen erscheinen hier, sobald Inhalte verfügbar sind.</p>'}
-        </section>
-
-        <section class="panel">
-          <div class="section-head">
-            <h2>Module</h2>
-            <span class="pill">${escapeHtml(moduleCatalog.length)} Inhalte</span>
-          </div>
-          <div class="overview-strip">
-            ${buildModuleOverview(moduleCatalog, state.moduleProgress)
-              .map(
-                (entry) => `
-                  <div class="overview-pill ${entry.status === 'completed' ? 'done' : ''}">
-                    <span>${escapeHtml(entry.title)}</span>
-                    <strong>${escapeHtml(entry.percent)}%</strong>
+          <div class="sidebar-scrollable">
+            ${activeSidebarTab === 'modules' ? `
+              ${moduleIndex.map(renderModuleCard).join('')}
+            ` : `
+              ${studyAgenda.length > 0 ? studyAgenda.map((item, index) => `
+                <button class="agenda-item" type="button" data-agenda-module="${escapeHtml(item.moduleId)}" data-agenda-question="${escapeHtml(item.questionId)}">
+                  <span class="agenda-order">${String(index + 1).padStart(2, '0')}</span>
+                  <div class="agenda-copy">
+                    <strong>${escapeHtml(item.title)}</strong>
+                    <small>${escapeHtml(item.kind === 'review' ? `Wiederholen (${item.pendingCount})` : `Weiterlernen (${item.pendingCount})`)}</small>
                   </div>
-                `,
-              )
-              .join('')}
-          </div>
-          <div class="module-grid">
-            ${moduleIndex.map(renderModuleCard).join('')}
-          </div>
-        </section>
-
-        ${examSession ? renderExamSession(examSession) : ''}
-
-        <section class="panel practice ${examSession ? 'session-paused' : ''}">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Lernmodul</p>
-              <h2>${escapeHtml(selectedModule.title)}</h2>
-            </div>
-            <span class="pill">${escapeHtml(selectedModule.exam)}</span>
+                  <span class="agenda-arrow">→</span>
+                </button>
+              `).join('') : '<p style="padding: 12px; font-size: 0.82rem; color: var(--purple-soft);">Alle Tagesaufgaben erledigt! 🎉</p>'}
+            `}
           </div>
 
-          <div class="stat-row">
-            <div class="stat-box">
-              <span>Fortschritt</span>
-              <strong>${escapeHtml(progress.seen)}/${escapeHtml(progress.total)}</strong>
+          <div class="sidebar-footer">
+            <div class="footer-stat-row">
+              <span>Genauigkeit:</span>
+              <strong>${computeAccuracy(progress.correct, progress.total)}%</strong>
             </div>
-            <div class="stat-box">
-              <span>Genauigkeit</span>
-              <strong>${escapeHtml(computeAccuracy(progress.correct, progress.total))}%</strong>
+            <div class="footer-stat-row">
+              <span>Fragen gelöst:</span>
+              <strong>${progress.seen}/${progress.total}</strong>
             </div>
-            <div class="stat-box">
-              <span>Schwierigkeit</span>
-              <strong>${escapeHtml(selectedModule.difficulty)}</strong>
-            </div>
+            <button
+              class="review-badge-btn"
+              type="button"
+              data-action="review-next"
+              ${reviewQueue.length === 0 ? 'disabled' : ''}
+            >
+              <span>🔄 Wiederholungs-Queue</span>
+              <strong>${reviewQueue.length}</strong>
+            </button>
           </div>
+        </aside>
 
-          <div class="mastery-panel">
-            <div class="section-head compact">
-              <h3>Mastery</h3>
-              <span class="pill">${escapeHtml(getMasteryLevel(progress).label)}</span>
-            </div>
-            <div class="mastery-bar">
-              <span style="width: ${safePercentWidth(getMasteryLevel(progress).percent)}%"></span>
-            </div>
-          </div>
-
-          <div class="study-panel">
-            <div class="section-head compact">
-              <h3>Lernabschnitte</h3>
-              <span class="pill">${escapeHtml(selectedModule.sections.length)} Abschnitte</span>
-            </div>
-            <div class="study-grid">
-              ${selectedModule.sections
-                .map(
-                  (section) => `
-                    <button
-                      type="button"
-                      class="study-card ${section.id === state.studySectionId ? 'active' : ''}"
-                      data-section-id="${escapeHtml(section.id)}"
-                    >
-                      <span>${escapeHtml(section.type)}</span>
-                      <strong>${escapeHtml(section.title)}</strong>
-                    </button>
-                  `,
-                )
-                .join('')}
-            </div>
-            ${currentSection ? `
-              <article class="section-detail">
-                <div class="section-header">
-                  <span>${escapeHtml(currentSection.type)}</span>
-                  <strong>${escapeHtml(currentSection.title)}</strong>
-                </div>
-                <p>${escapeHtml(currentSection.content)}</p>
-                <ul class="source-list">${renderSourceRefs(currentSection.sourceRefs)}</ul>
-              </article>
-            ` : ''}
-          </div>
-
-          <div class="review-box">
-            <div class="section-head compact">
-              <h3>Wiederholungs-Queue</h3>
-              <span class="pill">${escapeHtml(reviewQueue.length)} offen</span>
-            </div>
-            ${reviewQueue.length > 0 ? `
-              <div class="review-list">
-                ${reviewQueue
-                  .map(
-                    (questionId, index) => `
-                      <button type="button" class="review-item" data-review-question="${escapeHtml(questionId)}">
-                        <span>${escapeHtml(index + 1)}</span>
-                        <strong>${escapeHtml(questionId.toUpperCase())}</strong>
-                      </button>
-                    `,
-                  )
-                  .join('')}
+        <!-- RIGHT STAGE -->
+        <section class="stage-panel">
+          ${examSession ? renderExamSession(examSession) : `
+            <div class="stage-header">
+              <div class="stage-title-wrap">
+                <span class="pill" style="border-color: var(--purple-bright);">${escapeHtml(selectedModule.exam)}</span>
+                <h2>${escapeHtml(selectedModule.title)}</h2>
               </div>
-            ` : '<p>Keine offenen Wiederholungen.</p>'}
-          </div>
+              <div class="stage-tabs">
+                <button class="stage-tab-btn ${activeStageTab === 'quiz' ? 'active' : ''}" type="button" data-stage-tab="quiz">
+                  🎯 Quiz
+                </button>
+                <button class="stage-tab-btn ${activeStageTab === 'theory' ? 'active' : ''}" type="button" data-stage-tab="theory">
+                  📖 Theorie (${selectedModule.sections.length})
+                </button>
+                <button class="stage-tab-btn ${activeStageTab === 'sources' ? 'active' : ''}" type="button" data-stage-tab="sources">
+                  📑 Quellen
+                </button>
+              </div>
+            </div>
 
-          <div class="objective-list">
-            ${selectedModule.learningObjectives.map((objective) => `<li>${escapeHtml(objective)}</li>`).join('')}
-          </div>
-
-          ${currentQuestion ? renderQuestion(currentQuestion) : '<p>Keine Fragen verfügbar.</p>'}
-
-          <div class="source-panel">
-            <h3>Quellenbeleg</h3>
-            <ul class="source-list">${renderSourceRefs(selectedModule.sourceRefs)}</ul>
-          </div>
+            <div class="stage-content-area">
+              ${activeStageTab === 'quiz' ? `
+                ${currentQuestion ? renderQuestion(currentQuestion) : '<p>Keine Fragen für dieses Modul verfügbar.</p>'}
+              ` : activeStageTab === 'theory' ? `
+                <div class="theory-wrapper">
+                  <div class="theory-section-selector">
+                    ${selectedModule.sections.map((sec) => `
+                      <button
+                        type="button"
+                        class="theory-pill-btn ${sec.id === state.studySectionId ? 'active' : ''}"
+                        data-section-id="${escapeHtml(sec.id)}"
+                      >
+                        ${escapeHtml(sec.title)}
+                      </button>
+                    `).join('')}
+                  </div>
+                  ${currentSection ? `
+                    <div class="theory-reader-card">
+                      <h3>${escapeHtml(currentSection.title)}</h3>
+                      <p>${escapeHtml(currentSection.content)}</p>
+                      <ul class="source-list">${renderSourceRefs(currentSection.sourceRefs)}</ul>
+                    </div>
+                  ` : ''}
+                </div>
+              ` : `
+                <div class="theory-reader-card">
+                  <h3>Offizielle Quellenbelege (${selectedModule.title})</h3>
+                  <ul class="source-list">${renderSourceRefs(selectedModule.sourceRefs)}</ul>
+                </div>
+              `}
+            </div>
+          `}
         </section>
       </main>
+
+      ${toastNotice ? `
+        <div class="toast-notice" role="status">
+          <span>⚡</span>
+          <span>${escapeHtml(toastNotice)}</span>
+        </div>
+      ` : ''}
+      ${validationErrors.length > 0 ? `<div style="display:none;" class="validation-warning">${escapeHtml(validationErrors.join(', '))}</div>` : ''}
     </div>
   `;
+
+  // Attach Event Listeners
+  document.querySelectorAll('[data-sidebar-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tab = btn.getAttribute('data-sidebar-tab') as 'modules' | 'agenda';
+      if (tab) {
+        activeSidebarTab = tab;
+        sound.playClick();
+        render();
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-stage-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tab = btn.getAttribute('data-stage-tab') as 'quiz' | 'theory' | 'sources';
+      if (tab) {
+        activeStageTab = tab;
+        sound.playClick();
+        render();
+      }
+    });
+  });
 
   document.querySelectorAll('[data-module-id]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -608,6 +662,7 @@ function render(): void {
       state.currentQuestionId = nextQuiz?.questions[0]?.id ?? null;
       ensureModuleState(nextId);
       saveCurrentState();
+      sound.playClick();
       render();
     });
   });
@@ -618,20 +673,22 @@ function render(): void {
       if (!sectionId) return;
       state.studySectionId = sectionId;
       saveCurrentState();
+      sound.playClick();
       render();
     });
   });
 
   document.querySelectorAll('[data-answer-index]').forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (e) => {
       const questionId = button.getAttribute('data-question-id');
       const answerIndex = Number(button.getAttribute('data-answer-index'));
       if (!questionId || Number.isNaN(answerIndex)) return;
 
-      const selectedModule = getSelectedModule();
+      const currentQuiz = getCurrentQuiz();
       const currentQuestion = getQuestionById(currentQuiz.questions, questionId);
       if (!currentQuestion) return;
 
+      const selectedModule = getSelectedModule();
       const nextProgress = getCurrentProgress();
       const answerKey = getQuestionAnswerKey(selectedModule.moduleId, questionId);
       const previousAnswer = state.answeredQuestions[answerKey];
@@ -647,10 +704,23 @@ function render(): void {
 
       if (!isCorrect) {
         nextReviewQueue.push(questionId);
+        streak = 0;
+        sound.playWrong();
+      } else {
+        streak++;
+        const gain = 50 * streak;
+        xp += gain;
+        localStorage.setItem('ihk-xp', String(xp));
+        sound.playSuccess(streak);
+
+        const mouseEvent = e as MouseEvent;
+        const originX = mouseEvent.clientX || window.innerWidth / 2;
+        const originY = mouseEvent.clientY || window.innerHeight / 2;
+        confetti.burst(originX, originY, 35);
+        triggerRewardPill(`+${gain} XP! ${streak > 1 ? `🔥 ${streak}x STREAK` : '🎯'}`, originX, originY);
       }
 
       state.reviewQueue[selectedModule.moduleId] = [...new Set(nextReviewQueue)];
-
       state.moduleProgress[selectedModule.moduleId] = updateModuleProgressForAnswer(
         nextProgress,
         previousAnswer,
@@ -670,7 +740,9 @@ function render(): void {
       if (!reviewQuestionId) return;
       state.currentQuestionId = reviewQuestionId;
       state.retryQuestionId = null;
+      activeStageTab = 'quiz';
       saveCurrentState();
+      sound.playClick();
       render();
     });
   });
@@ -681,7 +753,9 @@ function render(): void {
       if (!retryQuestionId || !getCurrentReviewQueue().includes(retryQuestionId)) return;
       state.currentQuestionId = retryQuestionId;
       state.retryQuestionId = retryQuestionId;
+      activeStageTab = 'quiz';
       saveCurrentState();
+      sound.playClick();
       render();
     });
   });
@@ -702,8 +776,20 @@ function render(): void {
       const answerIndex = Number(button.getAttribute('data-exam-answer'));
       if (!session || !questionId || Number.isNaN(answerIndex)) return;
 
-      state.examSession = answerExamQuestion(session, questionId, answerIndex, Date.now());
+      sound.playClick();
+      const updatedSession = answerExamQuestion(session, questionId, answerIndex, Date.now());
+      state.examSession = updatedSession;
       saveCurrentState();
+
+      if (updatedSession.status === 'completed') {
+        const quiz = getQuizByModuleId(session.moduleId);
+        const result = quiz ? getExamResult(updatedSession, quiz.questions) : null;
+        if (result && result.percent >= 60) {
+          sound.playFanfare();
+          confetti.burst(window.innerWidth / 2, window.innerHeight * 0.4, 70);
+          showToast(`Prüfung mit ${result.percent}% bestanden! 🏆`);
+        }
+      }
       render();
     });
   });
@@ -715,9 +801,31 @@ function render(): void {
 
       const reviewQueue = getCurrentReviewQueue();
 
+      if (action === 'toggle-sound') {
+        sound.toggleMute();
+        render();
+        return;
+      }
+
+      if (action === 'next-question') {
+        const currentQuiz = getCurrentQuiz();
+        const currentIdx = currentQuiz.questions.findIndex((q) => q.id === state.currentQuestionId);
+        if (currentIdx >= 0 && currentIdx < currentQuiz.questions.length - 1) {
+          state.currentQuestionId = currentQuiz.questions[currentIdx + 1]?.id ?? null;
+          state.retryQuestionId = null;
+          saveCurrentState();
+          sound.playClick();
+          render();
+        }
+        return;
+      }
+
       if (action === 'review-next' && reviewQueue.length > 0) {
         state.currentQuestionId = reviewQueue[0] ?? currentQuiz.questions[0]?.id ?? null;
+        activeStageTab = 'quiz';
         saveCurrentState();
+        sound.playClick();
+        showToast('Wiederholungsfrage geladen 🔄');
         render();
         return;
       }
@@ -736,6 +844,7 @@ function render(): void {
         const examDeck = buildExamDeck(currentQuiz.questions, reviewQueue, EXAM_QUESTION_LIMIT);
         state.examSession = startExamSession(selectedModule.moduleId, examDeck, Date.now(), EXAM_DURATION_SECONDS);
         saveCurrentState();
+        sound.playClick();
         render();
         return;
       }
@@ -743,6 +852,7 @@ function render(): void {
       if (action === 'close-exam') {
         state.examSession = null;
         saveCurrentState();
+        sound.playClick();
         render();
         return;
       }
@@ -755,10 +865,13 @@ function render(): void {
 
       state.currentQuestionId = currentQuiz.questions[0]?.id ?? null;
       if (action === 'quick-test') {
-        state.currentQuestionId = currentQuiz.questions[1]?.id ?? null;
+        state.currentQuestionId = currentQuiz.questions[1]?.id ?? currentQuiz.questions[0]?.id ?? null;
+        activeStageTab = 'quiz';
+        showToast('Schnelltest aktiv 🚀');
       }
 
       saveCurrentState();
+      sound.playClick();
       render();
     });
   });
@@ -785,6 +898,8 @@ function render(): void {
       if (remaining === 0) {
         state.examSession = expireExamSession(session, Date.now());
         saveCurrentState();
+        sound.playWrong();
+        showToast('Die Prüfungszeit ist abgelaufen! ⏱️');
         render();
       }
     }, 1_000);
