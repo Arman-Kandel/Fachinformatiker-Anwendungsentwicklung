@@ -1,0 +1,72 @@
+{
+  "moduleId": "ap1-06-it-sicherheit",
+  "exam": "AP1",
+  "title": "IT-Sicherheit & Schutzbedarf",
+  "difficulty": "mittel",
+  "status": "ready",
+  "tags": ["AP1", "IT-Sicherheit", "BSI", "Backup"],
+  "learningObjectives": [
+    "Schutzziele der Informationssicherheit (Vertraulichkeit, Integrität, Authentizität, Verfügbarkeit) definieren.",
+    "Schutzbedarfsanalyse nach BSI IT-Grundschutz durchführen und Kategorien ableiten.",
+    "Datensicherungsstrategien (Voll, differenziell, inkrementell) und das Generationenprinzip anwenden."
+  ],
+  "dependencies": ["ap1-03-pruefungsrahmen"],
+  "sourceRefs": [
+    {
+      "sourceId": "IT-BERUFE-PODCAST-AP1",
+      "quote": "Schutzziele: Vertraulichkeit, Integrität, Authentizität, Verfügbarkeit",
+      "section": "Themencluster > IT-Sicherheit",
+      "type": "educational-guide"
+    }
+  ],
+  "sections": [
+    {
+      "id": "schutzziele",
+      "type": "theory",
+      "title": "Schutzziele der Informationssicherheit",
+      "content": "Die Kernschutzziele der IT-Sicherheit sind Vertraulichkeit (Schutz vor unbefugtem Zugriff), Integrität (Korrektheit und Unverändertheit von Daten), Authentizität (Echtheit von Absendern und Systemen) und Verfügbarkeit (Zugriffsbereitschaft von Systemen und Daten).",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Schutzziele: Vertraulichkeit, Integrität, Authentizität, Verfügbarkeit",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "schutzbedarfsanalyse",
+      "type": "theory",
+      "title": "BSI Schutzbedarfsanalyse",
+      "content": "Gemäß BSI IT-Grundschutz wird der Schutzbedarf für Anwendungen, Systeme und Räume ermittelt. Dabei werden die drei standardisierten Schutzbedarfskategorien 'normal', 'hoch' und 'sehr hoch' abgeleitet und begründet, um angemessene Sicherheitsmaßnahmen zu dimensionieren.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Schutzbedarfskategorien (normal, hoch, sehr hoch) ableiten und begründen",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "backup-strategien",
+      "type": "summary",
+      "title": "Datensicherung & Generationenprinzip",
+      "content": "Bei Backup-Verfahren unterscheidet man Vollbackup, differenzielles Backup (sichert Änderungen seit dem letzten Vollbackup) und inkrementelles Backup (sichert Änderungen seit der letzten Sicherung). Das Generationenprinzip (Großvater-Vater-Sohn) gewährleistet historisierte Wiederherstellungspunkte.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "inkrementelles, differenzielles und Vollbackup",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        },
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Generationenprinzip bzw. Großvater/Vater/Sohn",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}

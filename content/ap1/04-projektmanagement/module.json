@@ -1,0 +1,91 @@
+{
+  "moduleId": "ap1-04-projektmanagement",
+  "exam": "AP1",
+  "title": "Projektmanagement & Methoden",
+  "difficulty": "mittel",
+  "status": "ready",
+  "tags": ["AP1", "Projektmanagement", "Scrum", "Netzplan"],
+  "learningObjectives": [
+    "Merkmale eines Projekts und das Magische Dreieck erläutern.",
+    "Unterschiede zwischen Lastenheft und Pflichtenheft definieren.",
+    "Netzplantechnik mit kritischem Pfad und Pufferzeiten anwenden.",
+    "Agile Methoden wie Kanban und Scrum zielgerichtet einordnen."
+  ],
+  "dependencies": ["ap1-03-pruefungsrahmen"],
+  "sourceRefs": [
+    {
+      "sourceId": "IT-BERUFE-PODCAST-AP1",
+      "quote": "Merkmale eines Projekts: zeitlich befristet, relativ innovativ, risikobehaftet, erhebliche Komplexität, erfordert ein Projektmanagement",
+      "section": "Themencluster > Projektmanagement",
+      "type": "educational-guide"
+    },
+    {
+      "sourceId": "IT-BERUFE-PODCAST-AP1",
+      "quote": "Magisches Dreieck: Qualität, Kosten, Zeit",
+      "section": "Themencluster > Projektmanagement",
+      "type": "educational-guide"
+    }
+  ],
+  "sections": [
+    {
+      "id": "pm-grundlagen",
+      "type": "theory",
+      "title": "Grundlagen & Magisches Dreieck",
+      "content": "Ein Projekt zeichnet sich durch zeitliche Befristung, relative Neuartigkeit, Risikobehaftung und erhebliche Komplexität aus. Das Magische Dreieck beschreibt die Zielgrößen Qualität, Kosten und Zeit, die in wechselseitiger Abhängigkeit stehen. Ziele müssen SMART formuliert sein (spezifisch, messbar, attraktiv, realistisch, terminiert).",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Merkmale eines Projekts: zeitlich befristet, relativ innovativ, risikobehaftet, erhebliche Komplexität, erfordert ein Projektmanagement",
+          "section": "Themencluster > Projektmanagement",
+          "type": "educational-guide"
+        },
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Magisches Dreieck: Qualität, Kosten, Zeit",
+          "section": "Themencluster > Projektmanagement",
+          "type": "educational-guide"
+        },
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "SMARTe Ziele: spezifisch, messbar, attraktiv, realistisch, terminiert",
+          "section": "Themencluster > Projektmanagement",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "lasten-pflichtenheft",
+      "type": "theory",
+      "title": "Lastenheft vs. Pflichtenheft",
+      "content": "Das Lastenheft wird vom Auftraggeber erstellt und beschreibt das 'Was und Wofür' (Gesamtheit aller Kundenanforderungen). Das Pflichtenheft wird vom Auftragnehmer erstellt und definiert das 'Wie und Womit' (Realisierungsvorhaben und konkrete technische Umsetzung).",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Lastenheft: was/wofür? Pflichtenheft: wie/womit?",
+          "section": "Themencluster > Projektmanagement",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "netzplan-agil",
+      "type": "theory",
+      "title": "Netzplantechnik & Agile Steuerung",
+      "content": "In der Netzplantechnik bestimmt der kritische Pfad die minimale Gesamtdauer des Projekts. Auf dem kritischen Pfad ist der Gesamtpuffer 0. Im agilen Kanban werden Work-in-Progress (WIP)-Limits gesetzt, um Überlastung zu verhindern, basierend auf dem Pull-Prinzip.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "kritischer Pfad: Gesamtpuffer ist 0, bestimmt die gesamte Projektdauer",
+          "section": "Themencluster > Methoden und Modelle",
+          "type": "educational-guide"
+        },
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Kanban-Board: WIP-Limit (work in progress), Pull statt Push, Spalten entsprechen Prozessschritten",
+          "section": "Themencluster > Methoden und Modelle",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}

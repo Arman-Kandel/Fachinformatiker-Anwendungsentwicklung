@@ -5,6 +5,7 @@
       "moduleId": "ap1-01-datenmodellierung",
       "title": "Datenmodellierung",
       "difficulty": "mittel",
+      "examRelevance": "mittel",
       "estimatedMinutes": 20,
       "sourceRefs": [
         {
@@ -19,6 +20,7 @@
       "moduleId": "ap1-02-sql",
       "title": "SQL-Grundlagen",
       "difficulty": "mittel",
+      "examRelevance": "hoch",
       "estimatedMinutes": 18,
       "sourceRefs": [
         {
@@ -33,6 +35,7 @@
       "moduleId": "ap1-03-pruefungsrahmen",
       "title": "AP1-Prüfungsrahmen",
       "difficulty": "leicht",
+      "examRelevance": "niedrig",
       "estimatedMinutes": 10,
       "sourceRefs": [
         {
@@ -40,6 +43,66 @@
           "quote": "die im Ausbildungsrahmenplan für die ersten 18 Monate genannten Fertigkeiten, Kenntnisse und Fähigkeiten der Berufsbildpositionen nach § 4 Absatz 2 Nummer 1 bis 7",
           "section": "§ 8 Nummer 1",
           "type": "official"
+        }
+      ]
+    },
+    {
+      "moduleId": "ap1-04-projektmanagement",
+      "title": "Projektmanagement & Methoden",
+      "difficulty": "mittel",
+      "examRelevance": "hoch",
+      "estimatedMinutes": 15,
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Merkmale eines Projekts: zeitlich befristet, relativ innovativ, risikobehaftet, erhebliche Komplexität, erfordert ein Projektmanagement",
+          "section": "Themencluster > Projektmanagement",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "moduleId": "ap1-05-change-und-arbeitsplatz",
+      "title": "Change Management & IT-Arbeitsplatz",
+      "difficulty": "mittel",
+      "examRelevance": "hoch",
+      "estimatedMinutes": 15,
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Im Prüfungsbereich Einrichten eines IT-gestützten Arbeitsplatzes hat der Prüfling nach §9 FIAusbV nachzuweisen, dass er in der Lage ist, Kundenbedarfe zielgruppengerecht zu ermitteln, Hard- und Software auszuwählen und ihre Beschaffung einzuleiten, einen IT-Arbeitsplatz zu konfigurieren und zu testen und dabei die Bestimmungen und die betrieblichen Vorgaben zum Datenschutz, zur IT-Sicherheit und zur Qualitätssicherung einzuhalten, Kunden und Kundinnen in die Nutzung des Arbeitsplatzes einzuweisen und die Leistungserbringung zu kontrollieren und zu protokollieren.",
+          "section": "Themenbereich der Prüfung",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "moduleId": "ap1-06-it-sicherheit",
+      "title": "IT-Sicherheit & Schutzbedarf",
+      "difficulty": "mittel",
+      "examRelevance": "hoch",
+      "estimatedMinutes": 15,
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Schutzziele: Vertraulichkeit, Integrität, Authentizität, Verfügbarkeit",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "moduleId": "ap1-07-wirtschaftlichkeit",
+      "title": "Wirtschaftlichkeit & IT-Kalkulation",
+      "difficulty": "mittel",
+      "examRelevance": "hoch",
+      "estimatedMinutes": 18,
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "TCO (Total Cost of Ownership) erläutern",
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "type": "educational-guide"
         }
       ]
     }

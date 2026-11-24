@@ -19,4 +19,5 @@
 
 - Code-Änderungen müssen mit `npm run check` verifizierbar sein.
 - Wenn Zustand oder Datenmodelle geändert werden, dokumentiere die Auswirkungen in den betroffenen Markdown-Dateien.
+- Alle Schema- und Datenänderungen müssen rückwärtskompatibel sein; der bestehende Lernfortschritt der Nutzer darf niemals gelöscht werden.
 - Vor dem Commit muss geprüft werden, dass der Build und die Tests sauber durchlaufen.

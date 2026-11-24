@@ -1,0 +1,66 @@
+{
+  "quizId": "ap1-06-it-sicherheit-quiz",
+  "title": "IT-Sicherheit – Quiz",
+  "questions": [
+    {
+      "id": "ap1-06-sec-q1",
+      "question": "Welche vier Schutzziele sind grundlegend für das IT-Sicherheitsmanagement?",
+      "options": [
+        "Vertraulichkeit, Integrität, Authentizität und Verfügbarkeit.",
+        "Geschwindigkeit, Bandbreite, Latenz und Kosten.",
+        "Skalierbarkeit, Redundanz, Modularität und Agilität.",
+        "Usability, Barrierefreiheit, Performance und Design."
+      ],
+      "correctIndex": 0,
+      "explanation": "Die Schutzziele Vertraulichkeit, Integrität, Authentizität und Verfügbarkeit bilden das Fundament jeder IT-Sicherheitskonzeption und Schutzbedarfsfeststellung.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Schutzziele: Vertraulichkeit, Integrität, Authentizität, Verfügbarkeit",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-06-sec-q2",
+      "question": "Welche drei Schutzbedarfskategorien werden nach BSI IT-Grundschutz unterschieden?",
+      "options": [
+        "Normal, hoch und sehr hoch.",
+        "Niedrig, mittel und kritisch.",
+        "Öffentlich, intern und geheim.",
+        "Stufe 1, Stufe 2 und Stufe 3."
+      ],
+      "correctIndex": 0,
+      "explanation": "Der BSI IT-Grundschutz definiert die drei standardisierten Schutzbedarfskategorien 'normal', 'hoch' und 'sehr hoch' bezüglich möglicher Schadensauswirkungen.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Schutzbedarfskategorien (normal, hoch, sehr hoch) ableiten und begründen",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-06-sec-q3",
+      "question": "Was kennzeichnet ein differenzielles Backup im Vergleich zu einem inkrementellen Backup?",
+      "options": [
+        "Es sichert alle geänderten Daten seit der letzten Vollsicherung.",
+        "Es sichert ausschließlich geänderte Daten seit der jeweils unmittelbar vorherigen Sicherung.",
+        "Es erfordert bei der Wiederherstellung zwingend alle vorherigen Tages-Backups.",
+        "Es überschreibt immer die ursprüngliche Vollsicherung vollständig."
+      ],
+      "correctIndex": 0,
+      "explanation": "Ein differenzielles Backup sichert stets den Differenzstand seit der letzten Vollsicherung. Für den Restore wird nur die Vollsicherung plus das letzte Differenz-Backup benötigt.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "inkrementelles, differenzielles und Vollbackup",
+          "section": "Themencluster > IT-Sicherheit",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}

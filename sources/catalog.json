@@ -149,6 +149,101 @@
           "quote": "They combine rows from one table with rows from a second table, with an expression specifying which rows are to be paired."
         }
       ]
+    },
+    {
+      "sourceId": "IT-BERUFE-PODCAST-AP1",
+      "title": "Mögliche Themen von Teil 1 der gestreckten Abschlussprüfung (GAP) in den IT-Berufen",
+      "publisher": "Stefan Macke (IT-Berufe-Podcast)",
+      "type": "educational-guide",
+      "status": "approved",
+      "url": "https://it-berufe-podcast.de/vorbereitung-auf-die-ihk-abschlusspruefung-der-it-berufe/moegliche-themen-von-teil-1-der-gestreckten-abschlusspruefung-gap-in-den-it-berufen/",
+      "retrievedAt": "2026-11-17",
+      "reviewedAt": "2026-11-17",
+      "relevance": [
+        "AP1",
+        "Projektmanagement",
+        "Methoden",
+        "Change-Management"
+      ],
+      "notes": "Prüfungskatalog-Themencluster für Teil 1 der gestreckten Abschlussprüfung nach neuer Prüfungsordnung.",
+      "evidence": [
+        {
+          "section": "Themencluster > Projektmanagement",
+          "quote": "Merkmale eines Projekts: zeitlich befristet, relativ innovativ, risikobehaftet, erhebliche Komplexität, erfordert ein Projektmanagement"
+        },
+        {
+          "section": "Themencluster > Projektmanagement",
+          "quote": "Magisches Dreieck: Qualität, Kosten, Zeit"
+        },
+        {
+          "section": "Themencluster > Projektmanagement",
+          "quote": "SMARTe Ziele: spezifisch, messbar, attraktiv, realistisch, terminiert"
+        },
+        {
+          "section": "Themencluster > Projektmanagement",
+          "quote": "Lastenheft: was/wofür? Pflichtenheft: wie/womit?"
+        },
+        {
+          "section": "Themencluster > Methoden und Modelle",
+          "quote": "kritischer Pfad: Gesamtpuffer ist 0, bestimmt die gesamte Projektdauer"
+        },
+        {
+          "section": "Themencluster > Methoden und Modelle",
+          "quote": "Kanban-Board: WIP-Limit (work in progress), Pull statt Push, Spalten entsprechen Prozessschritten"
+        },
+        {
+          "section": "Themencluster > Change Management",
+          "quote": "Change Management (Prozess zur Umsetzung von Veränderungen in Unternehmen) z.B. nach Lewin (Unfreeze, Change, Refreeze)"
+        },
+        {
+          "section": "Themencluster > Change Management",
+          "quote": "Kaizen, Continuous Improvement"
+        },
+        {
+          "section": "Themenbereich der Prüfung",
+          "quote": "Im Prüfungsbereich Einrichten eines IT-gestützten Arbeitsplatzes hat der Prüfling nach §9 FIAusbV nachzuweisen, dass er in der Lage ist, Kundenbedarfe zielgruppengerecht zu ermitteln, Hard- und Software auszuwählen und ihre Beschaffung einzuleiten, einen IT-Arbeitsplatz zu konfigurieren und zu testen und dabei die Bestimmungen und die betrieblichen Vorgaben zum Datenschutz, zur IT-Sicherheit und zur Qualitätssicherung einzuhalten, Kunden und Kundinnen in die Nutzung des Arbeitsplatzes einzuweisen und die Leistungserbringung zu kontrollieren und zu protokollieren."
+        },
+        {
+          "section": "Themencluster > Leistungserbringung",
+          "quote": "Abnahmeprotokoll mit Angaben zu Vollständigkeit, Funktionseignung und Schadensfreiheit des geprüften Werks erstellen"
+        },
+        {
+          "section": "Themencluster > IT-Sicherheit",
+          "quote": "Schutzziele: Vertraulichkeit, Integrität, Authentizität, Verfügbarkeit"
+        },
+        {
+          "section": "Themencluster > IT-Sicherheit",
+          "quote": "Schutzbedarfskategorien (normal, hoch, sehr hoch) ableiten und begründen"
+        },
+        {
+          "section": "Themencluster > IT-Sicherheit",
+          "quote": "inkrementelles, differenzielles und Vollbackup"
+        },
+        {
+          "section": "Themencluster > IT-Sicherheit",
+          "quote": "Generationenprinzip bzw. Großvater/Vater/Sohn"
+        },
+        {
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "quote": "TCO (Total Cost of Ownership) erläutern"
+        },
+        {
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "quote": "Make-or-buy-Entscheidung"
+        },
+        {
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "quote": "Deckungsbeitrag: Stückpreis – variable Stückkosten"
+        },
+        {
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "quote": "Amortisation: Investition / Ertrag pro Jahr"
+        },
+        {
+          "section": "Themencluster > Angebotsvergleich",
+          "quote": "Handelskalkulation: Listen-, Ziel-, Bareinkaufspreis, Bezugspreis, Selbstkosten, Bar-, Ziel-, Listenverkaufspreis"
+        }
+      ]
     }
   ]
 }

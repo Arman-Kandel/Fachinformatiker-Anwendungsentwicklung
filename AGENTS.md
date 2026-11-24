@@ -18,3 +18,4 @@ Leitfaden für KI-Coding-Agents (Copilot, Gemini, Claude, Cursor etc.).
 3. **Quellen-Integrität:** Fachliche Lerninhalte oder Prüfungsfragen müssen mit `sourceRefs` auf validierte Quellen in `sources/catalog.json` verweisen.
 4. **Single-Page Constraint:** Das Layout ist als 100vh Single-Page Cockpit konzipiert. Vermeide globale Seiten-Scrollbalken; nutze stattdessen interne Panels mit `min-height: 0; overflow-y: auto`.
 5. **Dopamine & Feedback:** Behalte Audio- und Visuelles Feedback (Confetti, XP, Streak, Sounds aus `src/lib/juice.ts`) bei Interaktionen bei.
+6. **Rückwärtskompatibilität & Progress-Erhalt:** Alle Daten- und Schema-Änderungen müssen strikt abwärtskompatibel sein. Schema-Updates oder neue Module dürfen unter keinen Umständen vorhandenen Fortschritt (gespeicherte Antworten, Quoten, XP, Queues) der Nutzer löschen oder invalidieren.

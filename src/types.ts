@@ -48,6 +48,7 @@ export type ModuleSummary = {
   difficulty: string;
   estimatedMinutes: number;
   sourceRefs: SourceRef[];
+  examRelevance?: 'hoch' | 'mittel' | 'niedrig';
 };
 
 export type ModuleProgress = {

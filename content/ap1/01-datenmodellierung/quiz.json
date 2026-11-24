@@ -81,6 +81,146 @@
           "type": "official"
         }
       ]
+    },
+    {
+      "id": "ap1-01-dm-q5",
+      "question": "Was beschreibt eine 1:n-Beziehung im Entity-Relationship-Diagramm (ERD)?",
+      "options": [
+        "Ein Datensatz der einen Tabelle kann mit vielen Datensätzen der anderen Tabelle verknüpft sein, aber nicht umgekehrt.",
+        "Jeder Datensatz beider Tabellen kann nur mit genau einem Datensatz verknüpft sein.",
+        "Jeder Datensatz beider Tabellen kann mit beliebig vielen Datensätzen der anderen Tabelle verknüpft sein.",
+        "Es gibt keine Verknüpfung zwischen den Tabellen."
+      ],
+      "correctIndex": 0,
+      "explanation": "Bei einer 1:n-Beziehung kann z. B. ein Kunde mehrere Bestellungen haben, aber jede Bestellung gehört genau einem Kunden. Die 'n'-Seite enthält den Fremdschlüssel.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Datenbankmodelle unterscheiden, Daten organisieren und speichern sowie Abfragen erstellen",
+          "section": "Themencluster > Datenmodellierung",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-01-dm-q6",
+      "question": "Wie wird eine m:n-Beziehung in einem relationalen Datenbankschema realisiert?",
+      "options": [
+        "Durch eine direkte Verknüpfung beider Tabellen ohne Hilfstabelle.",
+        "Durch eine Auflösungstabelle (Zwischentabelle) mit zwei Fremdschlüsseln.",
+        "Durch Duplizieren aller Spalten beider Tabellen in eine einzige Tabelle.",
+        "Durch NULL-Werte in beiden Primärschlüsselspalten."
+      ],
+      "correctIndex": 1,
+      "explanation": "Relationale Datenbanken können m:n-Beziehungen nicht direkt abbilden. Eine Zwischentabelle (z. B. Studenten_Kurse) mit zwei Fremdschlüsseln löst die Beziehung auf.",
+      "sourceRefs": [
+        {
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Normalization is the process of organizing data in a database. It includes creating tables and establishing relationships between those tables",
+          "section": "Description of normalization",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-01-dm-q7",
+      "question": "Was ist der Unterschied zwischen Primärschlüssel und Fremdschlüssel?",
+      "options": [
+        "Der Primärschlüssel identifiziert jeden Datensatz eindeutig in der eigenen Tabelle; der Fremdschlüssel referenziert den Primärschlüssel einer anderen Tabelle.",
+        "Beide sind identisch und können beliebig ausgetauscht werden.",
+        "Der Fremdschlüssel identifiziert Datensätze eindeutig; der Primärschlüssel verweist auf andere Tabellen.",
+        "Der Primärschlüssel darf NULL enthalten; der Fremdschlüssel nicht."
+      ],
+      "correctIndex": 0,
+      "explanation": "Der Primärschlüssel (PRIMARY KEY) garantiert Eindeutigkeit und ist NOT NULL. Der Fremdschlüssel (FOREIGN KEY) stellt die referenzielle Integrität zwischen zwei Tabellen sicher.",
+      "sourceRefs": [
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A column identifies an attribute of the entity described by the table",
+          "section": "Schema Objects > Tables",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-01-dm-q8",
+      "question": "Welche Bedingung muss eine Tabelle erfüllen, um in der Ersten Normalform (1NF) zu sein?",
+      "options": [
+        "Alle Spalten müssen atomar (unteilbar) sein und es darf keine wiederholenden Gruppen geben.",
+        "Jede Nicht-Schlüsselspalte muss von allen Teilen des Primärschlüssels funktional abhängig sein.",
+        "Jede Nicht-Schlüsselspalte darf nur vom Primärschlüssel, nicht von anderen Nicht-Schlüsselattributen abhängig sein.",
+        "Es darf keine Tabelle mit mehr als 10 Spalten geben."
+      ],
+      "correctIndex": 0,
+      "explanation": "Die 1NF fordert atomare Attributwerte: Jede Zelle enthält genau einen Wert, keine Mengen oder Listen. Wiederholungsgruppen werden in eigene Tabellen ausgelagert.",
+      "sourceRefs": [
+        {
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Instead, create another table in first normal form by eliminating the repeating group (Class#), as shown below:",
+          "section": "Normalizing an example table",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-01-dm-q9",
+      "question": "Was besagt die Dritte Normalform (3NF) in der Datenbankmodellierung?",
+      "options": [
+        "Jedes Nicht-Schlüsselattribut darf nur vom Primärschlüssel, nicht von einem anderen Nicht-Schlüsselattribut abhängen (keine transitive Abhängigkeit).",
+        "Jede Tabelle darf nur drei Spalten haben.",
+        "Wiederholungsgruppen werden in eigene Tabellen ausgelagert.",
+        "Alle Attribute müssen voll vom gesamten zusammengesetzten Primärschlüssel abhängig sein."
+      ],
+      "correctIndex": 0,
+      "explanation": "Die 3NF eliminiert transitive Abhängigkeiten: Wenn A → B und B → C, darf C nicht transitiv von A abhängen. Solche Attribute werden in eine eigene Tabelle ausgelagert.",
+      "sourceRefs": [
+        {
+          "sourceId": "MICROSOFT-DB-NORMALIZATION",
+          "quote": "Normalization is the process of organizing data in a database. It includes creating tables and establishing relationships between those tables according to rules designed both to protect the data and to make the database more flexible by eliminating redundancy and inconsistent dependency.",
+          "section": "Description of normalization",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-01-dm-q10",
+      "question": "Was bedeutet ein NULL-Wert in einer relationalen Datenbank?",
+      "options": [
+        "Der Wert ist unbekannt oder nicht vorhanden – er ist weder 0 noch ein leerer String.",
+        "Der Wert ist identisch mit dem Zahlenwert 0.",
+        "Der Wert ist ein leerer Text-String.",
+        "NULL bedeutet, dass die Spalte gelöscht wurde."
+      ],
+      "correctIndex": 0,
+      "explanation": "NULL repräsentiert das Fehlen eines Wertes (unbekannt oder nicht anwendbar). NULL ist nicht gleich 0 oder leer; Vergleiche mit NULL ergeben immer UNKNOWN, nicht TRUE oder FALSE.",
+      "sourceRefs": [
+        {
+          "sourceId": "ORACLE-DB-CONCEPTS",
+          "quote": "A table describes an entity such as employees.",
+          "section": "Schema Objects > Tables",
+          "type": "official"
+        }
+      ]
+    },
+    {
+      "id": "ap1-01-dm-q11",
+      "question": "Was ist ein wesentliches Merkmal dokumentenorientierter Datenbanken im Vergleich zu relationalen Datenbanken?",
+      "options": [
+        "Daten werden als flexible Dokumente (z. B. JSON/BSON) gespeichert, ohne festes Tabellenschema.",
+        "Alle Daten müssen in Tabellenform mit festem Schema vorliegen.",
+        "Beziehungen werden ausschließlich über Fremdschlüssel abgebildet.",
+        "Dokumentenorientierte Datenbanken unterstützen ausschließlich SQL-Abfragen."
+      ],
+      "correctIndex": 0,
+      "explanation": "Dokumentenorientierte Datenbanken (z. B. MongoDB) speichern Daten als JSON- oder BSON-Dokumente. Sie benötigen kein fixes Schema, was sie flexibel für unstrukturierte oder sich ändernde Daten macht.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Datenbankmodelle unterscheiden, Daten organisieren und speichern sowie Abfragen erstellen",
+          "section": "Themencluster > Datenmodellierung",
+          "type": "educational-guide"
+        }
+      ]
     }
   ]
 }

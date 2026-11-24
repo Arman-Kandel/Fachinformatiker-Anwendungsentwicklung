@@ -1,0 +1,72 @@
+{
+  "moduleId": "ap1-05-change-und-arbeitsplatz",
+  "exam": "AP1",
+  "title": "Change Management & IT-Arbeitsplatz",
+  "difficulty": "mittel",
+  "status": "ready",
+  "tags": ["AP1", "Change-Management", "Arbeitsplatz", "FIAusbV"],
+  "learningObjectives": [
+    "Prüfungsbereich 'Einrichten eines IT-gestützten Arbeitsplatzes' nach § 9 FIAusbV erläutern.",
+    "Change-Management-Phasen nach Kurt Lewin und KVP (Kaizen) anwenden.",
+    "Widerstände gegen Veränderungen erkennen und Abnahmeprotokolle erstellen."
+  ],
+  "dependencies": ["ap1-03-pruefungsrahmen"],
+  "sourceRefs": [
+    {
+      "sourceId": "IT-BERUFE-PODCAST-AP1",
+      "quote": "Im Prüfungsbereich Einrichten eines IT-gestützten Arbeitsplatzes hat der Prüfling nach §9 FIAusbV nachzuweisen, dass er in der Lage ist, Kundenbedarfe zielgruppengerecht zu ermitteln, Hard- und Software auszuwählen und ihre Beschaffung einzuleiten, einen IT-Arbeitsplatz zu konfigurieren und zu testen und dabei die Bestimmungen und die betrieblichen Vorgaben zum Datenschutz, zur IT-Sicherheit und zur Qualitätssicherung einzuhalten, Kunden und Kundinnen in die Nutzung des Arbeitsplatzes einzuweisen und die Leistungserbringung zu kontrollieren und zu protokollieren.",
+      "section": "Themenbereich der Prüfung",
+      "type": "educational-guide"
+    }
+  ],
+  "sections": [
+    {
+      "id": "arbeitsplatz-pruefung",
+      "type": "theory",
+      "title": "IT-Arbeitsplatz nach § 9 FIAusbV",
+      "content": "Nach § 9 FIAusbV umfasst der Prüfungsbereich Einrichten eines IT-gestützten Arbeitsplatzes die Bedarfsermittlung, Auswahl von Hard- und Software, Konfiguration unter Einhaltung von Datenschutz und IT-Sicherheit, Kundeneinweisung und Leistungsüberprüfung.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Im Prüfungsbereich Einrichten eines IT-gestützten Arbeitsplatzes hat der Prüfling nach §9 FIAusbV nachzuweisen, dass er in der Lage ist, Kundenbedarfe zielgruppengerecht zu ermitteln, Hard- und Software auszuwählen und ihre Beschaffung einzuleiten, einen IT-Arbeitsplatz zu konfigurieren und zu testen und dabei die Bestimmungen und die betrieblichen Vorgaben zum Datenschutz, zur IT-Sicherheit und zur Qualitätssicherung einzuhalten, Kunden und Kundinnen in die Nutzung des Arbeitsplatzes einzuweisen und die Leistungserbringung zu kontrollieren und zu protokollieren.",
+          "section": "Themenbereich der Prüfung",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "change-management-lewin",
+      "type": "theory",
+      "title": "Change Management & Lewin-Modell",
+      "content": "Veränderungsprozesse in Unternehmen folgen häufig dem 3-Phasen-Modell von Kurt Lewin: Unfreeze (Auftauen der bestehenden Strukturen), Change (Umsetzen der Neuerungen) und Refreeze (Einfrieren und Festigen des neuen Zustands). Begleitend zielt Kaizen auf kontinuierliche Verbesserung ab.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Change Management (Prozess zur Umsetzung von Veränderungen in Unternehmen) z.B. nach Lewin (Unfreeze, Change, Refreeze)",
+          "section": "Themencluster > Change Management",
+          "type": "educational-guide"
+        },
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Kaizen, Continuous Improvement",
+          "section": "Themencluster > Change Management",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "abnahme-protokoll",
+      "type": "summary",
+      "title": "Abnahme & Leistungserbringung",
+      "content": "Bei der Leistungsübergabe wird ein Abnahmeprotokoll angefertigt. Es enthält Angaben zu Vollständigkeit, Funktionseignung und Schadensfreiheit des geprüften Werks und dokumentiert vertragskonforme Leistungserbringung.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Abnahmeprotokoll mit Angaben zu Vollständigkeit, Funktionseignung und Schadensfreiheit des geprüften Werks erstellen",
+          "section": "Themencluster > Leistungserbringung",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}

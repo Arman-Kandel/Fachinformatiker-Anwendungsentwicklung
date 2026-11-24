@@ -54,6 +54,7 @@ let toastTimer: number | null = null;
 let activeView: 'dashboard' | 'settings' = 'dashboard';
 let activeSidebarTab: 'modules' | 'agenda' = 'modules';
 let activeStageTab: 'quiz' | 'theory' | 'sources' = 'quiz';
+let activeSortMode: 'relevanz' | 'schwierigkeit' | 'fortschritt' | 'alphabetisch' = 'relevanz';
 let streak = 0;
 let xp = Number(localStorage.getItem('ihk-xp') || 0);
 

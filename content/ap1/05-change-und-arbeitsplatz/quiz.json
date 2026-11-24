@@ -1,0 +1,66 @@
+{
+  "quizId": "ap1-05-change-und-arbeitsplatz-quiz",
+  "title": "Change Management – Quiz",
+  "questions": [
+    {
+      "id": "ap1-05-change-q1",
+      "question": "Welche drei Phasen beschreibt das Veränderungsmodell nach Kurt Lewin?",
+      "options": [
+        "Unfreeze, Change, Refreeze.",
+        "Plan, Do, Check.",
+        "Forming, Storming, Norming.",
+        "Analyse, Entwurf, Rollout."
+      ],
+      "correctIndex": 0,
+      "explanation": "Kurt Lewin teilt den Veränderungsprozess in Unfreeze (Auftauen), Change (Verändern) und Refreeze (Wiedereinfrieren/Stabilisieren) ein.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Change Management (Prozess zur Umsetzung von Veränderungen in Unternehmen) z.B. nach Lewin (Unfreeze, Change, Refreeze)",
+          "section": "Themencluster > Change Management",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-05-change-q2",
+      "question": "Welche Nachweise sind laut § 9 FIAusbV beim Einrichten eines IT-gestützten Arbeitsplatzes zu erbringen?",
+      "options": [
+        "Bedarfe ermitteln, Hard-/Software auswählen, konfigurieren, Datenschutz/IT-Sicherheit einhalten und Kunden einweisen.",
+        "Ausschließlich die Buchung der Hardwarerechnung im ERP-System.",
+        "Nur das Verlegen von Patchkabeln und Aufstellen von Tischen.",
+        "Die Entwicklung eines vollständigen Betriebssystems."
+      ],
+      "correctIndex": 0,
+      "explanation": "§ 9 FIAusbV fordert Bedarfsermittlung, Beschaffungseinleitung, Konfiguration/Test unter Berücksichtigung von Datenschutz, IT-Sicherheit und Qualitätssicherung sowie Einweisung und Dokumentation.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Im Prüfungsbereich Einrichten eines IT-gestützten Arbeitsplatzes hat der Prüfling nach §9 FIAusbV nachzuweisen, dass er in der Lage ist, Kundenbedarfe zielgruppengerecht zu ermitteln, Hard- und Software auszuwählen und ihre Beschaffung einzuleiten, einen IT-Arbeitsplatz zu konfigurieren und zu testen und dabei die Bestimmungen und die betrieblichen Vorgaben zum Datenschutz, zur IT-Sicherheit und zur Qualitätssicherung einzuhalten, Kunden und Kundinnen in die Nutzung des Arbeitsplatzes einzuweisen und die Leistungserbringung zu kontrollieren und zu protokollieren.",
+          "section": "Themenbereich der Prüfung",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-05-change-q3",
+      "question": "Welche zentralen Angaben gehören laut Leistungsübernahme in ein Abnahmeprotokoll?",
+      "options": [
+        "Angaben zu Vollständigkeit, Funktionseignung und Schadensfreiheit des Werks.",
+        "Nur die Gehaltsabrechnung der ausführenden Techniker.",
+        "Die Quellcode-Zeilenanzahl der Programmiersprachen.",
+        "Ausschließlich die Seriennummern der Peripheriegeräte."
+      ],
+      "correctIndex": 0,
+      "explanation": "Das Abnahmeprotokoll dokumentiert rechtswirksam die Vollständigkeit, Funktionseignung und Schadensfreiheit des erbrachten Werks gegenüber dem Auftraggeber.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Abnahmeprotokoll mit Angaben zu Vollständigkeit, Funktionseignung und Schadensfreiheit des geprüften Werks erstellen",
+          "section": "Themencluster > Leistungserbringung",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}

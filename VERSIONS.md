@@ -17,6 +17,12 @@
   - Dynamisches XP-System ($+50 \times \text{Streak}$) und schwebende Belohnungs-Pills (`+100 XP! 🔥`).
   - Haptische visuelle Effekte: Button-Pops, Fehler-Wobble (`shake`), Glowing Border und Success-Pulsieren.
 - **Portables Startskript (`start.bat`):** Ein-Klick-Starter für Windows, nutzt bevorzugt das gebündelte Node.js aus `.tools/node-v26.13.0` ohne Systeminstallation.
+- **Lernmodul `ap1-04-projektmanagement`:** Grundlagen des Projektmanagements, Magisches Dreieck, Lastenheft vs. Pflichtenheft, Netzplantechnik mit kritischem Pfad und Kanban-Prinzipien.
+- **Lernmodul `ap1-05-change-und-arbeitsplatz`:** IT-Arbeitsplatz nach § 9 FIAusbV, 3-Phasen-Modell nach Kurt Lewin (Unfreeze, Change, Refreeze), Kaizen/KVP und Abnahmeprotokolle.
+- **Lernmodul `ap1-06-it-sicherheit`:** Schutzziele der Informationssicherheit (Vertraulichkeit, Integrität, Authentizität, Verfügbarkeit), BSI Schutzbedarfsanalyse (normal, hoch, sehr hoch) und Backup-Verfahren (Voll, differenziell, inkrementell, Großvater-Vater-Sohn).
+- **Lernmodul `ap1-07-wirtschaftlichkeit`:** TCO (Total Cost of Ownership), Make-or-Buy-Entscheidungen, Stück-Deckungsbeitrag, Amortisationsrechnung und klassische Handelskalkulation (Einkauf bis Verkauf).
+- **Quelleneinbindung `IT-BERUFE-PODCAST-AP1`:** Aufnahme der geprüften Zitate aus dem Prüfungskatalog-Themencluster (Stand Oktober 2024 / Frühjahr 2025) in `sources/catalog.json`.
+- **Rückwärtskompatibilitäts-Garantie:** Feste Verankerung in `AGENTS.md` und `.github/copilot-instructions.md`, dass Daten- und Schemaänderungen strikt abwärtskompatibel sein müssen und niemals Nutzerfortschritt löschen dürfen.
 - **Settings-Page mit Scroll-Freigabe:** Dedizierte Einstellungsseite als einziger Bereich der Anwendung mit Scroll-Funktionalität (`overflow-y: auto`), inklusive Sound-Konfiguration, Lernstand-Reset und Einbindung der Markdown-Dateien `FEATURES.md` und `VERSIONS.md` am Seitenende.
 - **Agenten-Richtlinien (`AGENTS.md`):** Standardisierte Handlungsanweisungen für autonome Coding-Agents.
 

@@ -1,0 +1,66 @@
+{
+  "quizId": "ap1-04-projektmanagement-quiz",
+  "title": "Projektmanagement – Quiz",
+  "questions": [
+    {
+      "id": "ap1-04-pm-q1",
+      "question": "Welche Zieldimensionen bilden das klassische Magische Dreieck des Projektmanagements?",
+      "options": [
+        "Qualität, Kosten und Zeit.",
+        "Umsatz, Gewinn und Risiko.",
+        "Personal, Hardware und Lizenzen.",
+        "Analyse, Entwurf und Testen."
+      ],
+      "correctIndex": 0,
+      "explanation": "Das Magische Dreieck besteht aus Qualität, Kosten und Zeit. Jede Änderung einer Dimension beeinflusst unvermeidlich mindestens eine der beiden anderen.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Magisches Dreieck: Qualität, Kosten, Zeit",
+          "section": "Themencluster > Projektmanagement",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-04-pm-q2",
+      "question": "Was unterscheidet das Lastenheft vom Pflichtenheft?",
+      "options": [
+        "Das Lastenheft beschreibt 'was/wofür' (Auftraggeber), das Pflichtenheft 'wie/womit' (Auftragnehmer).",
+        "Das Lastenheft enthält die Programmierung, das Pflichtenheft nur das Marketing.",
+        "Das Pflichtenheft wird vor dem Lastenheft von der IHK vorgegeben.",
+        "Es gibt keinen inhaltlichen Unterschied, es sind Synonyme."
+      ],
+      "correctIndex": 0,
+      "explanation": "Das Lastenheft formuliert die Kundenanforderungen ('was/wofür'), das Pflichtenheft die technische Umsetzung des Dienstleisters ('wie/womit').",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Lastenheft: was/wofür? Pflichtenheft: wie/womit?",
+          "section": "Themencluster > Projektmanagement",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-04-pm-q3",
+      "question": "Was kennzeichnet den kritischen Pfad in der Netzplantechnik?",
+      "options": [
+        "Der Gesamtpuffer ist 0 und er bestimmt die gesamte Projektdauer.",
+        "Er beinhaltet die riskantesten Programmieraufgaben.",
+        "Er hat den maximalen freien Puffer aller Vorgänge.",
+        "Er darf im Projektplan übersprungen werden."
+      ],
+      "correctIndex": 0,
+      "explanation": "Vorgänge auf dem kritischen Pfad besitzen keinen zeitlichen Puffer (Gesamtpuffer = 0). Jede Verzögerung auf diesem Pfad verschiebt den Endtermin des Gesamtprojekts.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "kritischer Pfad: Gesamtpuffer ist 0, bestimmt die gesamte Projektdauer",
+          "section": "Themencluster > Methoden und Modelle",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}

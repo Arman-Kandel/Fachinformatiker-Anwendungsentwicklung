@@ -1,0 +1,84 @@
+{
+  "moduleId": "ap1-07-wirtschaftlichkeit",
+  "exam": "AP1",
+  "title": "Wirtschaftlichkeit & IT-Kalkulation",
+  "difficulty": "mittel",
+  "status": "ready",
+  "tags": ["AP1", "Wirtschaftlichkeit", "Kalkulation", "TCO"],
+  "learningObjectives": [
+    "Make-or-Buy-Entscheidungen und Total Cost of Ownership (TCO) analysieren.",
+    "Betriebswirtschaftliche Kennzahlen wie Deckungsbeitrag und Amortisationszeit berechnen.",
+    "Handelskalkulation vom Listeneinkaufspreis bis zum Listenverkaufspreis anwenden."
+  ],
+  "dependencies": ["ap1-03-pruefungsrahmen"],
+  "sourceRefs": [
+    {
+      "sourceId": "IT-BERUFE-PODCAST-AP1",
+      "quote": "TCO (Total Cost of Ownership) erläutern",
+      "section": "Themencluster > Wirtschaftlichkeit",
+      "type": "educational-guide"
+    },
+    {
+      "sourceId": "IT-BERUFE-PODCAST-AP1",
+      "quote": "Make-or-buy-Entscheidung",
+      "section": "Themencluster > Wirtschaftlichkeit",
+      "type": "educational-guide"
+    }
+  ],
+  "sections": [
+    {
+      "id": "tco-make-or-buy",
+      "type": "theory",
+      "title": "TCO & Make-or-Buy",
+      "content": "Die Total Cost of Ownership (TCO) erfasst neben den Anschaffungskosten auch alle Betriebs-, Wartungs-, Schulungs- und Entsorgungskosten eines IT-Systems über den gesamten Lebenszyklus. Vor Beschaffungen wird eine Make-or-Buy-Entscheidung getroffen (Eigenfertigung vs. Fremdbezug).",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "TCO (Total Cost of Ownership) erläutern",
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "type": "educational-guide"
+        },
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Make-or-buy-Entscheidung",
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "kennzahlen-rechnung",
+      "type": "theory",
+      "title": "Deckungsbeitrag & Amortisation",
+      "content": "Der Deckungsbeitrag errechnet sich aus Stückpreis abzüglich variabler Stückkosten und dient der Deckung der fixen Gemeinkosten. Die statische Amortisationsdauer ergibt sich aus dem Verhältnis der Investitionskosten zum jährlichen Ertrag bzw. Kosteneinsparung.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Deckungsbeitrag: Stückpreis – variable Stückkosten",
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "type": "educational-guide"
+        },
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Amortisation: Investition / Ertrag pro Jahr",
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "handelskalkulation",
+      "type": "summary",
+      "title": "Handelskalkulation im IT-Einkauf",
+      "content": "Die Vorwärtskalkulation berechnet den Verkaufspreis strukturiert: Listeneinkaufspreis minus Lieferantenrabatt = Zieleinkaufspreis; minus Lieferantenskonto = Bareinkaufspreis; plus Bezugskosten = Bezugspreis; plus Handlungskostenzuschlag = Selbstkostenpreis; plus Gewinn- und Kundenzuschläge = Listenverkaufspreis.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Handelskalkulation: Listen-, Ziel-, Bareinkaufspreis, Bezugspreis, Selbstkosten, Bar-, Ziel-, Listenverkaufspreis",
+          "section": "Themencluster > Angebotsvergleich",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}

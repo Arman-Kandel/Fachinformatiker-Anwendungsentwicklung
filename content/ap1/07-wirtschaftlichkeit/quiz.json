@@ -1,0 +1,66 @@
+{
+  "quizId": "ap1-07-wirtschaftlichkeit-quiz",
+  "title": "Wirtschaftlichkeit – Quiz",
+  "questions": [
+    {
+      "id": "ap1-07-wirt-q1",
+      "question": "Was berücksichtigt der TCO-Ansatz (Total Cost of Ownership) bei IT-Systemen?",
+      "options": [
+        "Die Gesamtheit aller Anschaffungs- und laufenden Betriebs-, Wartungs- und Schulungskosten über die Nutzungsdauer.",
+        "Ausschließlich den einmaligen Netto-Rechnungsbetrag beim Hardwarekauf.",
+        "Nur die jährlichen Stromkosten der Rechenzentrumskühlung.",
+        "Ausschließlich die Abschreibungssätze nach amtlicher AfA-Tabelle."
+      ],
+      "correctIndex": 0,
+      "explanation": "TCO erfasst alle direkten und indirekten Kosten von der Beschaffung über den Betrieb und Support bis zur Entsorgung eines IT-Systems.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "TCO (Total Cost of Ownership) erläutern",
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-07-wirt-q2",
+      "question": "Wie berechnet sich der Deckungsbeitrag (DB) pro Stück?",
+      "options": [
+        "Verkaufspreis pro Stück minus variable Stückkosten.",
+        "Umsatz geteilt durch Gesamtkapital.",
+        "Gewinn plus Fixkosten multipliziert mit der Absatzmenge.",
+        "Listeneinkaufspreis minus Skonto und Rabatt."
+      ],
+      "correctIndex": 0,
+      "explanation": "Der Stück-Deckungsbeitrag ergibt sich aus dem Verkaufspreis abzüglich der variablen Kosten je Einheit und deckt die fixen Gesamtkosten ab.",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Deckungsbeitrag: Stückpreis – variable Stückkosten",
+          "section": "Themencluster > Wirtschaftlichkeit",
+          "type": "educational-guide"
+        }
+      ]
+    },
+    {
+      "id": "ap1-07-wirt-q3",
+      "question": "Welche Reihenfolge gilt in der klassischen Handelskalkulation (Einkauf bis Bezugspreis)?",
+      "options": [
+        "Listeneinkaufspreis minus Rabatt = Zieleinkaufspreis; minus Skonto = Bareinkaufspreis; plus Bezugskosten = Bezugspreis.",
+        "Bareinkaufspreis plus Skonto = Zieleinkaufspreis; plus Rabatt = Bezugspreis.",
+        "Listeneinkaufspreis plus Bezugskosten minus Rabatt = Selbstkostenpreis.",
+        "Zieleinkaufspreis minus Handlungskosten = Bareinkaufspreis."
+      ],
+      "correctIndex": 0,
+      "explanation": "Zuerst wird der Lieferantenrabatt abgezogen (Zieleinkaufspreis), dann das Skonto (Bareinkaufspreis) und zuletzt werden die Bezugskosten addiert (Bezugspreis).",
+      "sourceRefs": [
+        {
+          "sourceId": "IT-BERUFE-PODCAST-AP1",
+          "quote": "Handelskalkulation: Listen-, Ziel-, Bareinkaufspreis, Bezugspreis, Selbstkosten, Bar-, Ziel-, Listenverkaufspreis",
+          "section": "Themencluster > Angebotsvergleich",
+          "type": "educational-guide"
+        }
+      ]
+    }
+  ]
+}
